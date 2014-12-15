@@ -1,7 +1,7 @@
 {
-  "name": "pytrackerv2",
+  "name": "pytracker",
   "version": "1.0.0",
-  "description": "pytrackerv2: An Ionic project",
+  "description": "pytracker: An Ionic project",
   "dependencies": {
     "gulp": "^3.5.6",
     "gulp-sass": "^0.7.1",
