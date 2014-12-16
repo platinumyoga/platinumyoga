@@ -60,6 +60,7 @@
               Sign-In
             </button>
             <p class="text-center">
+			  <a href="http://www.platinumyoga.com/">Register</a><br/>
               <a href="#/forgot-password">Forgot password</a>
             </p>
           </div>
@@ -118,6 +119,24 @@
             <ul class="list">
               <!-- Note each link has the 'menu-close' attribute so the menu auto closes when clicking on one of these links -->
               <a href="#/yoga-app/profile" class="item" menu-close>Profile</a>
+			  
+			  
+			  
+			  <label class="item item-input item-select">
+				<div class="input-label">
+				  Book
+				</div>
+				<select>
+				  <option></option>	
+				  <option><a href ng:click="#/yoga-app/classes">Classes</a></option>
+				  <option>Workshops</option>
+				  <option>Events</option>
+				  <option>Appointments</option>
+				  <option>Challenges</option>
+				</select>
+			  </label>
+			  
+			  <!--
               <a href="#/yoga-app/classes" class="item" menu-close>Classes</a>
 			  <a href="#/yoga-app/workshops" class="item" menu-close>Workshops</a>
 			  <a href="#/yoga-app/events" class="item" menu-close>Events</a>
@@ -125,7 +144,9 @@
 			  <a href="#/yoga-app/challenges" class="item" menu-close>Challenges</a>
 			  <a href="#/yoga-app/posetree" class="item" menu-close>Pose Tree</a>
 			  <a href="#/yoga-app/luckydraw" class="item" menu-close>Lucky Draw</a>
-			  <a href="#/yoga-app/halloffame" class="item" menu-close>Hall of Fame</a>
+			  <a href="#/yoga-app/halloffame" class="item" menu-close>Hall of Fame</a>-->
+			  
+			  <a href="#" class="item" menu-close>FAQ</a>
 			  <a href="#/login" class="item" menu-close>Log Out</a>
             </ul>
           </ion-content>
@@ -139,27 +160,31 @@
 
 			<!--bottom tabs of the profile page(start)-->
 			<ion-tabs class="tabs-energized tabs-icon-only">
-				  <ion-tab title="Home">
-						Home
+				  <ion-tab title="Book">
 						<!-- Tab 1 content -->
 						<ion-content>
 							<p align="center">PROFILE CONTENTS</p>
 						</ion-content>
 				  </ion-tab>
 
-				  <ion-tab title="About">
-						About
+				  <ion-tab title="Barcode">
 						<!-- Tab 2 content -->
 						<ion-content>
 							<p align="center">2ND TAB CONTENTS</p>
 						</ion-content>
 				  </ion-tab>
 
-				  <ion-tab title="Settings">
-						Settings
+				  <ion-tab title="Yoga Tree">
 						<!-- Tab 3 content -->
 						<ion-content>
 							<p align="center">3RD TAB CONTENTS</p>
+						</ion-content>
+				  </ion-tab>
+				  
+				  <ion-tab title="Lucky Draw">
+						<!-- Tab 4 content -->
+						<ion-content>
+							<p align="center">4TH TAB CONTENTS</p>
 						</ion-content>
 				  </ion-tab>
 			</ion-tabs>
