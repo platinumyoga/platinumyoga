@@ -1,4 +1,5 @@
-var app = angular.module('ionicApp', ['ionic'])
+var app = angular.module('ionicApp', ['ionic','ui.router'])
+
 
 app.config(function($stateProvider, $urlRouterProvider) {
 	$urlRouterProvider.otherwise('/login')
@@ -20,16 +21,16 @@ app.config(function($stateProvider, $urlRouterProvider) {
       abstract: true,
       templateUrl: "templates/yoga-app.html"
     })
-    .state('yoga-app.profile', {
-      url: '/profile',
+    .state('yoga-app.home', {
+      url: '/home',
       views: {
         'menuContent' :{
-          templateUrl: "templates/profile.html",
+          templateUrl: "templates/home.html",
         }
       }
     })
     .state('yoga-app.classes', {
-      url: '/classes',
+      url: '/Classes',
       views: {
         'menuContent' :{
           templateUrl: "templates/classes.html",
@@ -37,7 +38,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       }
     })
 	.state('yoga-app.workshops', {
-      url: "/workshops",
+      url: "/Workshops",
       views: {
         'menuContent' :{
           templateUrl: "templates/workshops.html",
@@ -45,7 +46,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       }
     })
 	.state('yoga-app.events', {
-      url: "/events",
+      url: "/Events",
       views: {
         'menuContent' :{
           templateUrl: "templates/events.html",
@@ -53,7 +54,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       }
     })
 	.state('yoga-app.appointments', {
-      url: "/appointments",
+      url: "/Appointments",
       views: {
         'menuContent' :{
           templateUrl: "templates/appointments.html",
@@ -61,7 +62,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       }
     })
 	.state('yoga-app.challenges', {
-      url: "/challenges",
+      url: "/Challenges",
       views: {
         'menuContent' :{
           templateUrl: "templates/challenges.html",
@@ -92,13 +93,61 @@ app.config(function($stateProvider, $urlRouterProvider) {
         }
       }
     })
+	.state('yoga-app.faq', {
+      url: "/faq",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/faq.html",
+        }
+      }
+    })
+	.state('yoga-app.about', {
+      url: "/about",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/about.html",
+        }
+      }
+    })
+	.state('yoga-app.barcode', {
+      url: "/barcode",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/barcode.html",
+        }
+      }
+    })
+	.state('yoga-app.setting', {
+      url: "/setting",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/setting.html",
+        }
+      }
+    })
 })
 
-
-app.controller('loginCtrl', function($scope, $state) {
+app.controller('loginCtrl', function($scope, $state, $http) {
 	$scope.signIn = function(user) {
-		console.log('login', user);
-		$state.go('yoga-app.profile');
+		
+	data1 = [user.username,user.password];
+	
+	// Simple POST request example (passing data) :
+	$http.post('login.php', data1).
+	  success(function(data, status, headers, config) {
+		// this callback will be called asynchronously
+		// when the response is available
+		alert(data);
+		alert(status);
+		if (status==200){
+			$state.go('yoga-app.home');
+		}
+	  }).
+	  error(function(data, status, headers, config) {
+		// called asynchronously if an error occurs
+		// or server returns response with an error status.
+		alert('login fail');
+	  });
 	};
 })
 
@@ -108,6 +157,170 @@ app.controller('MainCtrl', function($scope, $ionicSideMenuDelegate) {
 	$scope.toggleLeft = function() {
     $ionicSideMenuDelegate.toggleLeft();
   };
+  
+	// function to submit the form after all validation has occurred			
+	$scope.submitForm = function() {
+		// check to make sure the form is completely valid
+		if ($scope.userForm.$valid) {
+			alert('our form is amazing');
+		}
+	};
+	
+	$scope.goBack = function() {
+		window.history.back();
+	};
+})
+
+
+app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet){
+	
+	/*ACCORDION START*/
+		$scope.groups = [];
+	  for (var i=0; i<3; i++) {
+		if(i==0){
+			$scope.groups[i] = {
+			name: 'Book',
+			items: []
+			};
+			/*loop through all the classes*/
+			for (var j=0; j<5; j++) {
+				if(j==0){
+					$scope.groups[i].items.push('Classes');
+				}else if(j==1){
+					$scope.groups[i].items.push('Workshops');
+				}else if(j==2){
+					$scope.groups[i].items.push('Events');
+				}else if(j==3){
+					$scope.groups[i].items.push('Appointments');
+				}else if(j==4){
+					$scope.groups[i].items.push('Challenges');
+				}
+				
+			}
+		}
+	  }
+	  
+	  /*
+	   * if given group is the selected group, deselect it
+	   * else, select the given group
+	   */
+	  $scope.toggleGroup = function(group) {
+		if ($scope.isGroupShown(group)) {
+		  $scope.shownGroup = null;
+		} else {
+		  $scope.shownGroup = group;
+		}
+	  };
+	  $scope.isGroupShown = function(group) {
+		return $scope.shownGroup === group;
+	  };
+	/*ACCORDION END*/
+	
+	
+	/*booking pop up start*/
+	$scope.showActionsheet = function() {
+		$ionicActionSheet.show({
+		  titleText: 'BOOKINGS',
+		  buttons: [
+			{ text: 'Classes' },
+			{ text: 'Workshops' },
+			{ text: 'Events' },
+			{ text: 'Appointments' },
+			{ text: 'Challenges' }
+		  ],
+		  cancelText: 'Cancel',
+		  cancel: function() {
+			console.log('CANCELLED');
+		  },
+		buttonClicked: function (index) {
+			switch (index) {
+				case 0:
+					$state.go('yoga-app.classes');
+					break;
+				case 1:
+					$state.go('yoga-app.workshops');
+					break;
+				case 2:
+					$state.go('yoga-app.events');
+					break;
+				case 3:
+					$state.go('yoga-app.appointments');
+					break;
+				case 4:
+					$state.go('yoga-app.challenges');
+					break;
+			}
+			return true;
+		},
+		destructiveButtonClicked: function() {
+			console.log('DESTRUCT');
+			return true;
+		  }
+		});
+	};
+	/*booking pop up end*/
+	
+})
+
+app.controller('homeCtrl',function($scope){
+	$scope.showUpcoming = function(){
+		$scope.showUpcoming = true;
+		$scope.showHistory = false;
+	};
+	
+	$scope.showHistory = function(){
+		$scope.showUpcoming = false;
+		$scope.showHistory = true;
+	};
+	
+	/*ACCORDION START*/
+		$scope.groups = [];
+	  for (var i=0; i<3; i++) {
+		if(i==0){
+			$scope.groups[i] = {
+			name: 'Classes',
+			items: []
+			};
+			/*loop through all the classes*/
+			for (var j=0; j<3; j++) {
+				$scope.groups[i].items.push('item '+j);
+			}
+		}else if(i==1){
+			$scope.groups[i] = {
+			name: 'Appointments',
+			items: []
+			};
+			/*loop through all the classes*/
+			for (var j=0; j<3; j++) {
+				$scope.groups[i].items.push('item '+j);
+			}
+		}else{
+			$scope.groups[i] = {
+			name: 'Others',
+			items: []
+			};
+			/*loop through all the classes*/
+			for (var j=0; j<3; j++) {
+				$scope.groups[i].items.push('item '+j);
+			}
+		}
+	  }
+	  
+	  /*
+	   * if given group is the selected group, deselect it
+	   * else, select the given group
+	   */
+	  $scope.toggleGroup = function(group) {
+		if ($scope.isGroupShown(group)) {
+		  $scope.shownGroup = null;
+		} else {
+		  $scope.shownGroup = group;
+		}
+	  };
+	  $scope.isGroupShown = function(group) {
+		return $scope.shownGroup === group;
+	  };
+	/*ACCORDION END*/
 })
 
 app.controller('classesCtrl', function($scope, $ionicLoading, $timeout) {
@@ -137,4 +350,221 @@ app.controller('classesCtrl', function($scope, $ionicLoading, $timeout) {
       }
     ]
   };
+})
+
+app.controller('faqCtrl',function($scope){
+	
+	/*ACCORDION START*/
+	  $scope.groups = [];
+	  for (var i=0; i<2; i++) {
+		if(i==0){
+			$scope.groups[i] = {
+			name: 'During Class',
+			items: []
+			};
+			
+			for (var j=0; j<10; j++) {
+				if(j==0){
+					$scope.groups[i].items.push('Come well hydrated and eat lightly 2-3 hours prior to your practice.');
+				}else if(j==1){
+					$scope.groups[i].items.push('Please arrive at least 15 minutes early to find parking, sign in and familiarize yourself with our facilities. Classes begin promptly & are subject to room capacity.');
+				}else if(j==2){
+					$scope.groups[i].items.push('Please remove your shoes in the designated area when you enter the center. Classes are practiced barefoot and in lightweight clothing.');
+				}else if(j==3){
+					$scope.groups[i].items.push('Be sure to advise your teacher before class if you are new (first 10 classes), or if you have an injury/medical condition or are pregnant.');
+				}else if(j==4){
+					$scope.groups[i].items.push('Please keep your voices low in the center as classes may be in session.');
+				}else if(j==5){
+					$scope.groups[i].items.push('Please leave valuables and personal belongings at home. Avoid wearing jewelry in classes, especially the ones which make noise or makes your practice uncomfortable.');
+				}else if(j==6){
+					$scope.groups[i].items.push('Ensure cell phones are turned off while in the center.');
+				}else if(j==7){
+					$scope.groups[i].items.push('On your first visit you will be required to fill out a new student registration form. Please be sure to sign a waiver and indicate any physical injuries or special health conditions.');
+				}else if(j==8){
+					$scope.groups[i].items.push('Please be mindful that others may be meditating in the yoga room prior to class and refrain from talking.');
+				}else if(j==9){
+					$scope.groups[i].items.push('Ask questions and clear your doubts regarding the choice of classes. we are always here to help you in best possible ways.');
+				}
+			}
+		}
+		
+		if(i==1){
+			$scope.groups[i] = {
+			name: 'Before Class',
+			items: []
+			};
+			
+			for (var j=0; j<7; j++) {
+				if(j==0){
+					$scope.groups[i].items.push('Once the instructor begins class, refrain from talking to others in the yoga room.');
+				}else if(j==1){
+					$scope.groups[i].items.push('Remember to pick up and neatly put away props used during the class.');
+				}else if(j==2){
+					$scope.groups[i].items.push('To maximize benefits from your practice, stay for a full Savasana, the final relaxation pose.');
+				}else if(j==3){
+					$scope.groups[i].items.push('For hygienic purpose use your yoga mat and a towel if possible, especially in a Hot yoga class where you will sweat. Though we provide mats and all other yoga props needed for the practice.');
+				}else if(j==4){
+					$scope.groups[i].items.push('Go at your own pace. Be gentle and respectful towards your body, never moving to the point of extreme pain.');
+				}else if(j==5){
+					$scope.groups[i].items.push('Drink plenty of water before and after each class, especially if you are practicing hot yoga.');
+				}else if(j==6){
+					$scope.groups[i].items.push('If you must leave early, tell the instructor in advance, place your mat near the door and leave quietly before everyone gets into savasana, the final relaxation pose.');
+				}
+			}
+		}
+	  }
+	  
+	  /*
+	   * if given group is the selected group, deselect it
+	   * else, select the given group
+	   */
+	  $scope.toggleGroup = function(group) {
+		if ($scope.isGroupShown(group)) {
+		  $scope.shownGroup = null;
+		} else {
+		  $scope.shownGroup = group;
+		}
+	  };
+	  $scope.isGroupShown = function(group) {
+		return $scope.shownGroup === group;
+	  };
+	/*ACCORDION END*/
+	
+})
+
+app.controller('aboutCtrl',function($scope){
+	
+	/*ACCORDION START*/
+	  $scope.groups = [];
+	  for (var i=0; i<3; i++) {
+		if(i==0){
+			$scope.groups[i] = {
+			name: 'About Us',
+			items: []
+			};
+			for (var j=0; j<1; j++) {
+				if(j==0){
+					$scope.groups[i].items.push('Platinum Yoga is an authentic yoga centre offering all levels and styles of Yoga in Singapore, with hundreds of classes available 7 days a week.Our yoga instructors and guest instructors are the best in the industry, and represent the full spectrum of yoga disciplines. Be it classical Iyengar yoga, Ashtanga yoga or Flow yoga, or specialized classes in Prenatal, Athletic, Yin Yoga Rehabilitative, Yoga for Kids or Power Yoga, you will find it all at Platinum yoga.');
+				}
+			}
+		}
+		
+		if(i==1){
+			$scope.groups[i] = {
+			name: 'Our Mission',
+			items: []
+			};
+			for (var j=0; j<7; j++) {
+				if(j==0){
+					$scope.groups[i].items.push('It is our mission to honor and embrace each student’s search for personal growth, wellbeing, and fulfillment by offering the highest quality yoga programs to people of all ages and from all walks of life. We do this with love, compassion, a sense of humor, and with respect for what each individual can accomplish through Yoga and throughout their lives. Acknowledging that there are many types of people, and therefore more than one way to practice yoga, we bring it all together just for you!');
+				}
+			}
+		}
+		
+		if(i==2){
+			$scope.groups[i] = {
+			name: 'Our Values',
+			items: []
+			};
+			for (var j=0; j<7; j++) {
+				if(j==0){
+					$scope.groups[i].items.push((j+1)+'. Yoga is a Way of Life');
+				}
+				if(j==1){
+					$scope.groups[i].items.push((j+1)+'. Yoga is for Everyone');
+				}
+				if(j==2){
+					$scope.groups[i].items.push((j+1)+'. In Listening');
+				}
+				if(j==3){
+					$scope.groups[i].items.push((j+1)+'. In Supporting and Respecting Each Other');
+				}
+				if(j==4){
+					$scope.groups[i].items.push((j+1)+'. Yoga Keeps the Body Healthy and the Mind Clear');
+				}
+				
+			}
+		}
+	}
+	  
+	  /*
+	   * if given group is the selected group, deselect it
+	   * else, select the given group
+	   */
+	  $scope.toggleGroup = function(group) {
+		if ($scope.isGroupShown(group)) {
+		  $scope.shownGroup = null;
+		} else {
+		  $scope.shownGroup = group;
+		}
+	  };
+	  $scope.isGroupShown = function(group) {
+		return $scope.shownGroup === group;
+	  };
+	/*ACCORDION END*/
+	
+})
+
+app.controller('halloffameCtrl',function($scope){
+	$scope.winnersData = {
+		"filter" : 'current',
+		"winners": [
+		  {
+			type : "current",
+			title : "Best Attendance",
+			name: "Mr Khan"
+		  },
+		  {
+			type : "current",
+			title : "Youngest at Heart",
+			name: "Mrs Kee"
+		  },
+		  {
+			type : "past",
+			title : "Best Attendance",
+			name: "Mr Singh"
+		  },
+		  {
+			type : "past",
+			title : "Youngest at Heart",
+			name: "Mrs Cheryl"
+		  }
+		]
+	};
+})
+
+app.controller('DateCtrl', function ($scope) {
+  $scope.today = function() {
+    $scope.dt = new Date();
+  };
+  $scope.today();
+
+  $scope.clear = function () {
+    $scope.dt = null;
+  };
+
+  // Disable weekend selection
+  $scope.disabled = function(date, mode) {
+    return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
+  };
+
+  $scope.toggleMin = function() {
+    $scope.minDate = $scope.minDate ? null : new Date();
+  };
+  $scope.toggleMin();
+
+  $scope.open = function($event) {
+    $event.preventDefault();
+    $event.stopPropagation();
+
+    $scope.opened = true;
+  };
+
+  $scope.dateOptions = {
+    formatYear: 'yy',
+    startingDay: 1
+  };
+
+  $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+  $scope.format = $scope.formats[0];
 })

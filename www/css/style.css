@@ -1,1 +1,15 @@
 /* Empty. Add your own CSS if you like */
+.item.wrap, .item-content.wrap {
+	white-space: normal;
+}
+
+.glowing-border {
+    border: 2px solid #9ecaed;
+    border-radius: 7px;
+}
+
+.glowing-border:focus { 
+    outline: none;
+    border-color: #9ecaed;
+    box-shadow: 0 0 10px #9ecaed;
+}

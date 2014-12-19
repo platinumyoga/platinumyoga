@@ -21,7 +21,8 @@
 	1.1 FORGET PASSWORD PAGE
 2. MAIN PARENT PAGE CONTAINER (the top bar fixed, other pages will be injected inside~abstract true)
 --all templates below--
-3. PROFILE PAGE
+-new pages are added
+3. HOME PAGE
 4. CLASSES PAGE
 5. WORKSHOPS PAGE
 6. EVENTS PAGE
@@ -32,9 +33,10 @@
 11. HALL OF FAME PAGE
 -->  
   <body ng-controller="MainCtrl">
-  
+
 	<!--for display-->
 	<ion-nav-view></ion-nav-view>
+  
 	
 	<!--LOGIN PAGE-->
 	<script id="templates/login.html" type="text/ng-template">	
@@ -61,7 +63,7 @@
             </button>
             <p class="text-center">
 			  <a href="http://www.platinumyoga.com/">Register</a><br/>
-              <a href="#/forgot-password">Forgot password</a>
+              <!--<a href="#/forgot-password">Forgot password</a>-->
             </p>
           </div>
         </ion-content>
@@ -69,6 +71,7 @@
     </script>
 	
 	<!--FORGET PASSWORD PAGE-->
+	<!--PAGE NOR NEEDED-->
 	 <script id="templates/forgot-password.html" type="text/ng-template">
       <ion-view title="Forgot Password">
 		<ion-nav-bar class="bar-energized">
@@ -89,7 +92,7 @@
 	 
 	<!--MAIN PARENT PAGE CONTAINER (with only top bar and side menus, contents are injected)-->
     <script id="templates/yoga-app.html" type="text/ng-template">
-      <ion-side-menus>
+      <ion-side-menus ng-controller="sidebarCtrl">
 		
 		<!--main contents area-->
         <ion-side-menu-content>
@@ -97,17 +100,35 @@
 		  <!--Different page titles are injected here-->	
           <ion-nav-bar class="bar-energized">
 				<!--<ion-nav-back-button></ion-nav-back-button>-->
+				
 				<!--left menu navigation button-->
 				<ion-nav-buttons side="left">
 				  <button class="button button-icon button-clear ion-navicon" menu-toggle="left">
 				  </button>
+				</ion-nav-buttons>
+				
+				<!--right menu setting button-->
+				<ion-nav-buttons side="right">
+				  <a class="button button-icon button-clear ion-gear-a" href="#/yoga-app/setting">
+				  </a>
 				</ion-nav-buttons>
           </ion-nav-bar>
 		  
 		  <!--child pages from nesting are INJECTED here (nested under)!!-->		
           <ion-nav-view name="menuContent"></ion-nav-view>
 		  
-        </ion-side-menu-content> 
+		<!--bottom footer (permanent)-->
+			<ion-footer-bar>
+				<ion-tabs class="tabs-energized">
+					<!--<a class="tab-item"><i class="icon ion-home"></i></a>-->
+					<ion-tab title="Home" href="#/yoga-app/home"></ion-tab>
+					<ion-tab title="Book" ng-click="showActionsheet()"></ion-tab>
+					<ion-tab title="Barcode" href="#/yoga-app/barcode"></ion-tab>
+					<ion-tab title="Pose Tree" href="#/yoga-app/posetree"></ion-tab>
+					<ion-tab title="Lucky Draw" href="#/yoga-app/luckydraw"></ion-tab>
+				</ion-tabs>
+			</ion-footer-bar>
+        </ion-side-menu-content>	  
 
 		<!--left side menu bar-->
         <ion-side-menu side="left">
@@ -118,35 +139,27 @@
           <ion-content>
             <ul class="list">
               <!-- Note each link has the 'menu-close' attribute so the menu auto closes when clicking on one of these links -->
-              <a href="#/yoga-app/profile" class="item" menu-close>Profile</a>
+              <a href="#/yoga-app/home" class="item" menu-close>Home</a>
 			  
+			  <!--BOOK LINK in ACCORDION-->
+			  	<ion-list>
+					<div ng-repeat="group in groups">
+					  <ion-item class="item"
+								ng-click="toggleGroup(group)"
+								ng-class="{active: isGroupShown(group)}">
+						  <i class="icon" ng-class="isGroupShown(group) ?"></i>
+						{{group.name}}
+					  </ion-item>
+					  <ion-item class="item-accordion"
+								ng-repeat="item in group.items"
+								ng-show="isGroupShown(group)"  ng-repeat="" href="#/yoga-app/{{item}}" type="item-link" menu-close>
+						&nbsp;&nbsp;&nbsp;&nbsp;{{item}}
+					  </ion-item>
+					</div>
+				</ion-list>
 			  
-			  
-			  <label class="item item-input item-select">
-				<div class="input-label">
-				  Book
-				</div>
-				<select>
-				  <option></option>	
-				  <option><a href ng:click="#/yoga-app/classes">Classes</a></option>
-				  <option>Workshops</option>
-				  <option>Events</option>
-				  <option>Appointments</option>
-				  <option>Challenges</option>
-				</select>
-			  </label>
-			  
-			  <!--
-              <a href="#/yoga-app/classes" class="item" menu-close>Classes</a>
-			  <a href="#/yoga-app/workshops" class="item" menu-close>Workshops</a>
-			  <a href="#/yoga-app/events" class="item" menu-close>Events</a>
-			  <a href="#/yoga-app/appointments" class="item" menu-close>Appointments</a>
-			  <a href="#/yoga-app/challenges" class="item" menu-close>Challenges</a>
-			  <a href="#/yoga-app/posetree" class="item" menu-close>Pose Tree</a>
-			  <a href="#/yoga-app/luckydraw" class="item" menu-close>Lucky Draw</a>
-			  <a href="#/yoga-app/halloffame" class="item" menu-close>Hall of Fame</a>-->
-			  
-			  <a href="#" class="item" menu-close>FAQ</a>
+			  <a href="#/yoga-app/halloffame" class="item" menu-close>Hall of Fame</a>
+			  <a href="#/yoga-app/faq" class="item" menu-close>FAQ</a>
 			  <a href="#/login" class="item" menu-close>Log Out</a>
             </ul>
           </ion-content>
@@ -154,49 +167,60 @@
       </ion-side-menus>
     </script>
 
-	<!--PROFILE PAGE-->
-    <script id="templates/profile.html" type="text/ng-template">
-      <ion-view title="Profile">
+	<!--HOME PAGE-->
+    <script id="templates/home.html" type="text/ng-template">
+      <ion-view title="Home" ng-controller="homeCtrl">
+			<ion-content>
+				<!--user picture & name + points-->
+				<div class="row">
+					<div class="col col-offset-10"><img src="/img/profile_upload.jpg" /></div>
+					<div class="col"><b>Name:</b> Anil Kumar<br/><b>Points:</b> 50</div>
+				</div>
+				
+				<div class="button-bar">
+				  <a class="button button-small" id="showUpcoming" ng-click="showUpcoming($event)">Upcoming</a>
+				  <a class="button button-small" id="showHistory" ng-click="showHistory($event)">History</a>
+				</div>
 
-			<!--bottom tabs of the profile page(start)-->
-			<ion-tabs class="tabs-energized tabs-icon-only">
-				  <ion-tab title="Book">
-						<!-- Tab 1 content -->
-						<ion-content>
-							<p align="center">PROFILE CONTENTS</p>
-						</ion-content>
-				  </ion-tab>
+				<ion-list ng-show="showUpcoming">
+					<div ng-repeat="group in groups">
+					  <ion-item class="item-stable"
+								ng-click="toggleGroup(group)"
+								ng-class="{active: isGroupShown(group)}">
+						  <i class="icon" ng-class="isGroupShown(group) ? 'ion-minus' : 'ion-plus'"></i>
+						&nbsp;
+						{{group.name}}
+					  </ion-item>
+					  <ion-item class="item-accordion"
+								ng-repeat="item in group.items"
+								ng-show="isGroupShown(group)"  ng-repeat="" href="" type="item-link">
+						{{group.name}} {{item}}
+					  </ion-item>
+					</div>
+				</ion-list>
 
-				  <ion-tab title="Barcode">
-						<!-- Tab 2 content -->
-						<ion-content>
-							<p align="center">2ND TAB CONTENTS</p>
-						</ion-content>
-				  </ion-tab>
-
-				  <ion-tab title="Yoga Tree">
-						<!-- Tab 3 content -->
-						<ion-content>
-							<p align="center">3RD TAB CONTENTS</p>
-						</ion-content>
-				  </ion-tab>
-				  
-				  <ion-tab title="Lucky Draw">
-						<!-- Tab 4 content -->
-						<ion-content>
-							<p align="center">4TH TAB CONTENTS</p>
-						</ion-content>
-				  </ion-tab>
-			</ion-tabs>
-			<!--bottom tabs of the profile page(end)-->
+				<ion-list ng-show="showHistory">
+					<ion-item href="#/movie/{{movie.id}}">History 1</ion-item>
+					<ion-item href="#/movie/{{movie.id}}">History 2</ion-item>
+					<ion-item href="#/movie/{{movie.id}}">History 3</ion-item>
+				</ion-list>
+			</ion-content>
       </ion-view>
     </script>
+	
 
 	<!--CLASSES PAGE-->
     <script id="templates/classes.html" type="text/ng-template">
       <ion-view title="Classes">
 	  
 			<ion-content padding="true" ng-controller="classesCtrl">
+				<div ng-controller="DateCtrl">
+					<label class="item item-input">
+					 <span class="input-label">Date</span>
+					 <input type="date">
+					</label>
+				</div>
+
 				  <div class="button-bar">
 					<a class="button button-small button-stable" ng-click="classesData.filter='beginner'">Beginner</a>
 					<a class="button button-small button-stable" ng-click="classesData.filter='intermediate'">Intermediate</a>
@@ -205,7 +229,8 @@
 				  
 				<div class="list">
 					<a class="item" ng-repeat="class in classesData.classes | filter : classesData.filter">
-						<b>{{class.name}}</b><br>{{class.date}}<br>{{class.time}}<br>{{class.instructor}}link
+						<b>{{class.name}}</b><br>{{class.date}}<br>{{class.time}}<br>{{class.instructor}}
+						<button class="button-right button-stable col col-33 col-offset-67">Book</button>
 					</a>
 				</div>
 			</ion-content>
@@ -253,8 +278,11 @@
 	<!--POSE TREE PAGE-->
     <script id="templates/posetree.html" type="text/ng-template">
       <ion-view title="Pose Tree">
+	  
         <ion-content>
-			<p align="center">POSE TREE CONTENTS</p>
+			<p align="center">
+				<img src="img/yoga_v0.jpg" width="90%"/>
+			</p>
         </ion-content>
       </ion-view>
     </script>
@@ -263,23 +291,134 @@
     <script id="templates/luckydraw.html" type="text/ng-template">
       <ion-view title="Lucky Draw">
         <ion-content>
-			<p align="center">LUCKY DRAW CONTENTS</p>
+			<p align="center">
+				<img src="img/spin_wheel.jpg" width="90%"/>
+			</p>
         </ion-content>
       </ion-view>
     </script>
 	
 	<!--HALL OF FAME PAGE-->
     <script id="templates/halloffame.html" type="text/ng-template">
-      <ion-view title="HALL OF FAME">
+      <ion-view title="HALL OF FAME" ng-controller="halloffameCtrl">
+		
+		<ion-content>
+			<div class="button-bar">
+					<a class="button button-small button-stable" ng-click="winnersData.filter='current'">Current</a>
+					<a class="button button-small button-stable" ng-click="winnersData.filter='past'">Past</a>
+			</div>
+			<div class="list">
+				<a class="item" ng-repeat="winner in winnersData.winners | filter : winnersData.filter">
+					<b>{{winner.title}}</b><br>{{winner.name}}
+				</a>
+			</div>
+		</ion-content>
+      </ion-view>
+    </script>
+	
+	<!--FAQ PAGE-->
+    <script id="templates/faq.html" type="text/ng-template">
+	<ion-view title="FAQ">
+		<ion-content ng-controller="faqCtrl">
+			<!--top bar-->
+			<div class="button-bar">
+				<a class="button button-small button-stable" href="#/yoga-app/faq">FAQ</a>
+				<a class="button button-small button-stable" href="#/yoga-app/about">About</a>	
+			</div>
+			<ion-list>
+				<div ng-repeat="group in groups">
+				  <ion-item class="item-stable"
+							ng-click="toggleGroup(group)"
+							ng-class="{active: isGroupShown(group)}">
+					  <i class="icon" ng-class="isGroupShown(group) ? 'ion-minus' : 'ion-plus'"></i>
+					&nbsp;
+					{{group.name}}
+				  </ion-item>
+				  <ion-item class="item-accordion wrap"
+							ng-repeat="item in group.items"
+							ng-show="isGroupShown(group)">
+					{{item}}
+				  </ion-item>
+				</div>
+			</ion-list>
+		</ion-content>
+	</ion-view>
+    </script>
+	
+	<!--FAQ PAGE-->
+    <script id="templates/about.html" type="text/ng-template">
+	<ion-view title="About">
+		<ion-content ng-controller="aboutCtrl">
+			<!--top bar-->
+			<div class="button-bar">
+				<a class="button button-small button-stable" href="#/yoga-app/faq">FAQ</a>
+				<a class="button button-small button-stable" href="#/yoga-app/about">About</a>	
+			</div>
+			<ion-list>
+				<div ng-repeat="group in groups">
+				  <ion-item class="item-stable"
+							ng-click="toggleGroup(group)"
+							ng-class="{active: isGroupShown(group)}">
+					  <i class="icon" ng-class="isGroupShown(group) ? 'ion-minus' : 'ion-plus'"></i>
+					&nbsp;
+					{{group.name}}
+				  </ion-item>
+				  <ion-item class="item-accordion wrap"
+							ng-repeat="item in group.items"
+							ng-show="isGroupShown(group)">
+					{{item}}
+				  </ion-item>
+				</div>
+			</ion-list>
+		</ion-content>
+	</ion-view>
+    </script>
+	
+	<!--BARCODE PAGE-->
+	<script id="templates/barcode.html" type="text/ng-template">
+      <ion-view title="Barcode">
         <ion-content>
-			<p align="center">HALL OF FAME CONTENTS</p>
+			<p align="center"><img src="img/barcode.jpg" width="100%"/></p>
         </ion-content>
       </ion-view>
     </script>
-
 	
-	
-	
+	<!--SETTING PAGE-->
+	<script id="templates/setting.html" type="text/ng-template">
+      <ion-view title="Setting" ng-controller="MainCtrl">
+        <ion-content>
+			
+				
+		<div class="row">
+			<div class="col-sm-6">
+				<!-- =================================================================== -->
+				<!-- FORM ============================================================== -->
+				<!-- =================================================================== -->
+			  
+				<form name="userForm" ng-submit="submitForm()" novalidate>	  
+					  <!-- USERNAME -->
+					<div class="form-group">
+						<label>Address</label>
+						<input type="text" name="address" class="glowing-border" ng-model="user.address" style="color:gray">
+					</div>
+					
+					<!-- EMAIL -->
+					<div class="form-group" ng-class="{'has-error' : userForm.email.$invalid && !userForm.email.$pristine }">
+						<label>Email</label>
+						<input type="email" name="email" class="glowing-border" ng-model="user.email">
+						<p ng-show="userForm.email.$invalid && !userForm.email.$pristine" class="help-block">Enter a valid email.</p>
+					</div>
+					<br/>
+					<button type="submit" class="button" ng-disabled="userForm.$invalid">Submit</button>
+					<button class="button" ng-click="goBack()">Back</button>
+				</form>
+			  </div>
+			</div>
+			
+			
+        </ion-content>
+      </ion-view>
+    </script>
 	
   </body>
 </html>
