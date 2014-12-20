@@ -263,6 +263,8 @@ app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet){
 })
 
 app.controller('homeCtrl',function($scope){
+	$scope.showUpcomingView = true;
+	
 	$scope.showUpcoming = function(){
 		$scope.showUpcomingView = true;
 		$scope.showHistoryView = false;
