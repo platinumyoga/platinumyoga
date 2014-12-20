@@ -264,13 +264,13 @@ app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet){
 
 app.controller('homeCtrl',function($scope){
 	$scope.showUpcoming = function(){
-		$scope.showUpcoming = true;
-		$scope.showHistory = false;
+		$scope.showUpcomingView = true;
+		$scope.showHistoryView = false;
 	};
 	
 	$scope.showHistory = function(){
-		$scope.showUpcoming = false;
-		$scope.showHistory = true;
+		$scope.showUpcomingView = false;
+		$scope.showHistoryView = true;
 	};
 	
 	/*ACCORDION START*/

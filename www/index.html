@@ -182,7 +182,7 @@
 				  <a class="button button-small" id="showHistory" ng-click="showHistory($event)">History</a>
 				</div>
 
-				<ion-list ng-show="showUpcoming">
+				<ion-list ng-show="showUpcomingView">
 					<div ng-repeat="group in groups">
 					  <ion-item class="item-stable"
 								ng-click="toggleGroup(group)"
@@ -199,7 +199,7 @@
 					</div>
 				</ion-list>
 
-				<ion-list ng-show="showHistory">
+				<ion-list ng-if="showHistoryView">
 					<ion-item href="#/movie/{{movie.id}}">History 1</ion-item>
 					<ion-item href="#/movie/{{movie.id}}">History 2</ion-item>
 					<ion-item href="#/movie/{{movie.id}}">History 3</ion-item>
