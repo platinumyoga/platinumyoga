@@ -6,21 +6,18 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 	
 
 	require_once("../includes/clientService.php");
-
-	$loginName = $_POST["loginName"];
-	$loginPassword = $_POST["loginPassword"];
+	
+	$postdata = file_get_contents("php://input");
+	$request = json_decode($postdata);
+	$loginName = $request->username;
+	$loginPassword = $request->password;
+	
+	/*$loginName = $_POST["username"];
+	$loginPassword = $_POST["password"];*/
 
 	$clientService = new MBClientService();
 	$result= $clientService->ValidateLogin($loginName,$loginPassword);
 
-	if(sprintf($result->ValidateLoginResult->ErrorCode)==200){
-		$cdsHtml = 'Welcome,';
-		$cdsHtml .= sprintf($result->ValidateLoginResult->Client->FirstName);
-		$cdsHtml .= sprintf($result->ValidateLoginResult->ErrorCode);
-	}else{
-		$cdsHtml = 'Username and password do not match';
-	}
-
-	echo($cdsHtml);
+	echo json_encode($result);
 
 ?>

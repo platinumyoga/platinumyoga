@@ -34,14 +34,34 @@ app.config(function($stateProvider, $urlRouterProvider) {
       views: {
         'menuContent' :{
           templateUrl: "templates/classes.html",
+		  controller: "classesCtrl"
+        }
+      }
+    })
+	.state('yoga-app.selectedClass', {
+      url: '/selectedClass/:classID',
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/selectedClass.html",
+		  controller: "classesCtrl"
         }
       }
     })
 	.state('yoga-app.workshops', {
-      url: "/Workshops",
+      url: '/Workshops',
       views: {
         'menuContent' :{
           templateUrl: "templates/workshops.html",
+		  controller:"workshopCtrl"
+        }
+      }
+    })
+	.state('yoga-app.selectedWorkshop', {
+      url: '/selectedWorkshop/:workshopID',
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/selectedWorkshop.html",
+		  controller: "workshopCtrl"
         }
       }
     })
@@ -127,36 +147,21 @@ app.config(function($stateProvider, $urlRouterProvider) {
     })
 })
 
-app.controller('loginCtrl', function($scope, $state, $http) {
+app.controller('loginCtrl', function($scope, $state, $http, $stateParams, userService,classesService,workshopsService) {
 	$scope.signIn = function(user) {
-		
-	data1 = [user.username,user.password];
-	
-	// Simple POST request example (passing data) :
-	$http.post('login.php', data1).
-	  success(function(data, status, headers, config) {
-		// this callback will be called asynchronously
-		// when the response is available
-		alert(data);
-		alert(status);
-		if (status==200){
-			$state.go('yoga-app.home');
-		}
-	  }).
-	  error(function(data, status, headers, config) {
-		// called asynchronously if an error occurs
-		// or server returns response with an error status.
-		alert('login fail');
-	  });
+		$scope.authenticationMsg = userService.authentication(user);
+		classesService.getClassesDatabase();
+		workshopsService.getWorkshopsDatabase();
 	};
+	
 })
 
 //$ionicSideMenuDelegate is the dependency for menu
-app.controller('MainCtrl', function($scope, $ionicSideMenuDelegate) {
+app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate) {
 	//left menu
 	$scope.toggleLeft = function() {
     $ionicSideMenuDelegate.toggleLeft();
-  };
+	};
   
 	// function to submit the form after all validation has occurred			
 	$scope.submitForm = function() {
@@ -169,6 +174,31 @@ app.controller('MainCtrl', function($scope, $ionicSideMenuDelegate) {
 	$scope.goBack = function() {
 		window.history.back();
 	};
+	
+	
+	//login
+		$scope.signIn = function(user) {
+		var request = $http({
+			method: "post",
+			url: "login.php",
+			data: {
+				username: user.username,
+				password: user.password
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+		});
+
+		/* Check whether the HTTP Request is successful or not. */
+		request.success(function (data) {
+			if(data.ValidateLoginResult.ErrorCode == 200){
+				$scope.nameing = "HAHA";
+				$state.go("yoga-app.home");
+			}
+		})
+	};
+	
 })
 
 
@@ -259,12 +289,16 @@ app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet){
 		});
 	};
 	/*booking pop up end*/
+	/*booking pop up end*/
 	
 })
 
-app.controller('homeCtrl',function($scope){
+app.controller('homeCtrl',function($scope,userService){
 	$scope.showUpcomingView = true;
 	
+	$scope.id = userService.getUserID();
+	$scope.username = userService.getUsername();
+
 	$scope.showUpcoming = function(){
 		$scope.showUpcomingView = true;
 		$scope.showHistoryView = false;
@@ -325,7 +359,16 @@ app.controller('homeCtrl',function($scope){
 	/*ACCORDION END*/
 })
 
-app.controller('classesCtrl', function($scope, $ionicLoading, $timeout) {
+app.controller('classesCtrl', function($scope,$stateParams,classesService,userService) {
+	$scope.totalClasses = classesService.getClasses();
+	$scope.selectedclass = classesService.getSelectedClass($stateParams.classID);
+	$scope.userID = userService.getUserID();
+	//classesService.bookClass($stateParams.classID,userService.getUserID());
+	
+	$scope.bookClass = function(selectedClassID,userID){
+		classesService.bookClass(selectedClassID,userID);
+	};
+	//dummy classes data - filter enabled
   $scope.classesData = {
     "filter" : 'beginner',
     "classes": [
@@ -352,6 +395,11 @@ app.controller('classesCtrl', function($scope, $ionicLoading, $timeout) {
       }
     ]
   };
+})
+
+app.controller('workshopCtrl',function($scope,$stateParams,workshopsService){
+	$scope.workShopsData = workshopsService.getWorkshops();
+	$scope.selectedWorkshop = workshopsService.getSelectedWorkshop($stateParams.workshopID);
 })
 
 app.controller('faqCtrl',function($scope){
@@ -570,3 +618,182 @@ app.controller('DateCtrl', function ($scope) {
   $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
   $scope.format = $scope.formats[0];
 })
+
+
+//search filter
+.directive('ionSearch', function() {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                getData: '&source',
+                model: '=?',
+                search: '=?filter'
+            },
+            link: function(scope, element, attrs) {
+                attrs.minLength = attrs.minLength || 0;
+                scope.placeholder = attrs.placeholder || '';
+                scope.search = {value: ''};
+
+                if (attrs.class)
+                    element.addClass(attrs.class);
+
+                if (attrs.source) {
+                    scope.$watch('search.value', function (newValue, oldValue) {
+                        if (newValue.length > attrs.minLength) {
+                            scope.getData({str: newValue}).then(function (results) {
+                                scope.model = results;
+                            });
+                        } else {
+                            scope.model = [];
+                        }
+                    });
+                }
+
+                scope.clearSearch = function() {
+                    scope.search.value = '';
+                };
+            },
+            template: '<div class="item-input-wrapper">' +
+                        '<i class="icon ion-android-search"></i>' +
+                        '<input type="search" placeholder="{{placeholder}}" ng-model="search.value">' +
+                        '<i ng-if="search.value.length > 0" ng-click="clearSearch()" class="icon ion-close"></i>' +
+                      '</div>'
+        };
+})
+
+//services
+app.factory('userService', function($http,$state) {
+	var users = [];
+
+	return {
+		authentication: function(user){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/login.php",
+			data: {
+				username: user.username,
+				password: user.password
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				userDatabase = data;
+				userID = userDatabase.ValidateLoginResult.Client.ID;
+				if(data.ValidateLoginResult.ErrorCode == 200){
+					alert(data.ValidateLoginResult.Status);
+					$state.go("yoga-app.home");
+				}else{
+					//not working
+					alert("Login Failed");
+					loginFail();
+				}
+			})
+			
+			//not working
+			request.error(function (data) {
+				alert(data);
+                loginFail();
+            })
+		},
+		loginFail:function(){
+			var msg = "Login failed. Please try again later."
+			return msg;
+		},
+		getUserID: function(){
+			return userDatabase.ValidateLoginResult.Client.ID;
+		},
+		getUsername: function(){
+			return userDatabase.ValidateLoginResult.Client.FirstName+" "+userDatabase.ValidateLoginResult.Client.LastName;
+		}
+	}
+})
+
+
+app.factory('classesService', function($http) {
+	return {
+		getClassesDatabase: function(){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getClasses.php",
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				classesDatabase = data;
+			})
+		},
+		getClasses:function(){
+			return classesDatabase;
+		},
+		getSelectedClass:function(classID){	
+			for(var i=0;i<classesDatabase.length;i++){
+				if(classesDatabase[i].ID==classID){
+					return classesDatabase[i];
+				}
+			}
+		},
+		bookClass:function(classID,userID){
+			var request1 = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/bookClientIntoClass.php",
+			data: {
+				classID: classID,
+				userID: userID
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request1.success(function (data) {
+				var bookClassResult = data;
+				alert(bookClassResult.ErrorCode);
+				//bookClassResult.
+				//alert(data);
+			})
+			
+			//not working
+			request1.error(function (data) {
+            })
+		}
+	}
+})
+
+app.factory('workshopsService',function($http){
+	return {
+		getWorkshopsDatabase: function(){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getWorkshops.php",
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				workshopsDatabase = data;
+			})
+		},
+		getWorkshops:function(){
+			return workshopsDatabase;
+		},
+		getSelectedWorkshop:function(workshopID){
+			for(var i=0;i<workshopsDatabase.length;i++){
+				if(workshopsDatabase[i].ID==workshopID){
+					return workshopsDatabase[i];
+				}
+			}
+		}
+	}
+})
+

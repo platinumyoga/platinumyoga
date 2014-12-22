@@ -10,6 +10,13 @@
     <link href="css/ionic.app.css" rel="stylesheet">-->
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
+	
+	<!--star review[start]-->
+	<!--http://runnable.com/UfH637_djX9LAAAt/how-to-add-5-star-rating-using-jquery--> 
+	<script src="js/jquery.min.js"></script>
+	<script src="js/jquery.raty.js"></script>
+	<!--star review[end]-->
+	
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
     <!-- your app's js -->
@@ -36,7 +43,7 @@
 
 	<!--for display-->
 	<ion-nav-view></ion-nav-view>
-  
+	
 	
 	<!--LOGIN PAGE-->
 	<script id="templates/login.html" type="text/ng-template">	
@@ -61,6 +68,7 @@
             <button class="button button-block button-energized" ng-click="signIn(user)">
               Sign-In
             </button>
+			<p>{{authenticationMsg}}</p>
             <p class="text-center">
 			  <a href="http://www.platinumyoga.com/">Register</a><br/>
               <!--<a href="#/forgot-password">Forgot password</a>-->
@@ -174,7 +182,10 @@
 				<!--user picture & name + points-->
 				<div class="row">
 					<div class="col col-offset-10"><img src="/img/profile_upload.jpg" /></div>
-					<div class="col"><b>Name:</b> Anil Kumar<br/><b>Points:</b> 50</div>
+					
+					<div class="col"><b>Name:</b><div ng-model="username">{{username}}</div><br/><b>User ID: </b><div ng-model="id">{{id}}</div>
+					<br/><b>Points:</b> 50
+					</div>
 				</div>
 				
 				<div class="button-bar">
@@ -212,8 +223,7 @@
 	<!--CLASSES PAGE-->
     <script id="templates/classes.html" type="text/ng-template">
       <ion-view title="Classes">
-	  
-			<ion-content padding="true" ng-controller="classesCtrl">
+			<ion-content padding="true">
 				<div ng-controller="DateCtrl">
 					<label class="item item-input">
 					 <span class="input-label">Date</span>
@@ -221,34 +231,187 @@
 					</label>
 				</div>
 
-				  <div class="button-bar">
+				<div class="button-bar">
+					<a class="button button-small button-stable" ng-click="">Beginner</a>
+					<a class="button button-small button-stable" ng-click="">Intermediate</a>
+					<a class="button button-small button-stable" ng-click="">Advance</a>
+				</div>
+				
+				<div class="list">
+					<div class="item" ng-repeat="class in totalClasses">
+						<a href="#/yoga-app/selectedClass/{{class.ID}}">
+						<b>{{class.ClassDescription.Name}}</b><br/>			
+						{{(class.StartDateTime).slice(0,10)}}<br/>
+						{{(class.StartDateTime).slice(11,16)}} - {{(class.EndDateTime).slice(11,16)}}<br/>
+						{{class.Staff.Name}}</a>
+						<button class="button-right button-stable col col-33 col-offset-67" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
+					</div>
+				</div>
+				
+				<!--OLD FILTER PORTION-->
+				<!--
+				<div class="button-bar">
 					<a class="button button-small button-stable" ng-click="classesData.filter='beginner'">Beginner</a>
 					<a class="button button-small button-stable" ng-click="classesData.filter='intermediate'">Intermediate</a>
 					<a class="button button-small button-stable" ng-click="classesData.filter='advance'">Advance</a>
-				  </div>
-				  
-				<div class="list">
+				</div>-->
+				
+				<!--<div class="list">
 					<a class="item" ng-repeat="class in classesData.classes | filter : classesData.filter">
 						<b>{{class.name}}</b><br>{{class.date}}<br>{{class.time}}<br>{{class.instructor}}
 						<button class="button-right button-stable col col-33 col-offset-67">Book</button>
 					</a>
-				</div>
-			</ion-content>
-				
+				</div>-->
+			</ion-content>	
       </ion-view>
     </script>
 	
+	<!--SELECTED CLASS PAGE-->
+    <script id="templates/selectedClass.html" type="text/ng-template">
+      <ion-view title="Class">
+        <ion-content>
+			
+			<div align="center">
+				<div class="row">
+				  <div class="col"><b>{{selectedclass.ClassDescription.Name}}</b></div>
+				</div>
+
+				<div class="row">
+				  <div class="col">25/30 Enrolled (dummy)</div>
+				</div>
+
+				<div class="row">
+				  <div class="col">
+						<div class="button-bar">
+						  <a class="button button-small button-energized" href="tel:+6563480809">Call</a>
+						  <div class="button button-small button-energized" ng-click="bookClass({{selectedclass.ID}},{{userID}})">Enroll</div>
+						  <a class="button button-small button-energized" href="#/yoga-app/Classes">All Classes</a>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+				  <div class="col">{{selectedclass.Staff.Name}}</div>
+				</div>
+				
+				<!--rating stars-->
+				<div class="row">
+					<div class="col">
+						<div style="align:right;size:70%;" id="review1" data-score="3.5"></div>
+						<div id="result1" style="font-size: 15px !important;"></div>
+					</div>
+				</div>
+
+				<div class="row">
+				  <div class="col">{{(selectedclass.StartDateTime).slice(0,10)}}</div>
+				</div>
+				
+				<div class="row">
+				  <div class="col">{{(selectedclass.StartDateTime).slice(11,16)}} - {{(selectedclass.EndDateTime).slice(11,16)}}</div>
+				</div>
+				
+				<div class="row">
+				  <div class="col"><b>Description:</b><br/>{{selectedclass.ClassDescription.Description}}</div>
+				</div>
+				
+			</div>
+        </ion-content>
+      </ion-view>
+    </script>
+	
+	<!--CLASS RATING STARS SCRIPT (for selected class)-->
+	<script type="text/javascript">
+		$(function(){
+		$('#review1').raty(
+			{
+				half: true,
+				target: '#result1',
+				targetKeep: true,
+				score: function()
+				{
+					return $(this).attr('data-score');
+				}
+			});
+		});
+	</script>
+
 	
 	<!--WORKSHOPS PAGE-->
     <script id="templates/workshops.html" type="text/ng-template">
       <ion-view title="Workshops">
         <ion-content>
-			<p align="center">WORKSHOPS CONTENTS</p>
+			<div class="list">
+				<div class="bar bar-header item-input-inset">
+					<ion-search placeholder="Search a user" filter="search"></ion-search>
+				</div>
+			
+				<a class="item" ng-repeat="workshop in workShopsData | filter:search.value" href="#/yoga-app/selectedWorkshop/{{workshop.ID}}">
+					{{workshop.ClassDescription.Name}}<br/>
+					{{(workshop.StartDate).slice(0,10)}}<br/>
+					{{(workshop.StartTime).slice(12,20)}} - {{(workshop.EndTime).slice(12,20)}}<br/>
+					{{workshop.Staff.Name}} 
+					<button class="button-right button-stable col col-33 col-offset-67">Book</button>
+				</a>
+			</div>
         </ion-content>
       </ion-view>
     </script>
 	
-	<!--EVENTS PAGE-->
+	
+	<!--SELECTED WORKSHOP PAGE-->
+    <script id="templates/selectedWorkshop.html" type="text/ng-template">
+      <ion-view title="Workshop">
+        <ion-content>
+			<div align="center">
+				<div class="row">
+				  <div class="col"><b>{{selectedWorkshop.ClassDescription.Name}}</b></div>
+				</div>
+
+				<div class="row">
+				  <div class="col">25/30 Enrolled (dummy)</div>
+				</div>
+
+				<div class="row">
+				  <div class="col">
+						<div class="button-bar">
+						  <a class="button button-small button-energized" href="tel:+6563480809">Call</a>
+						  <div class="button button-small button-energized" ng-click="">Enroll</div>
+						  <a class="button button-small button-energized" href="#/yoga-app/Workshops">All Workshops</a>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+				  <div class="col">{{selectedWorkshop.Staff.Name}}</div>
+				</div>
+				
+				<!--rating stars-->
+				<div class="row">
+					<div class="col">
+						<div style="align:right;size:70%;" id="review1" data-score="3.5"></div>
+						<div id="result1" style="font-size: 15px !important;"></div>
+					</div>
+				</div>
+
+				<div class="row">
+				  <div class="col">{{(selectedWorkshop.StartDate).slice(0,10)}}</div>
+				</div>
+				
+				<div class="row">
+				  <div class="col">{{(selectedWorkshop.StartTime).slice(12,20)}} - {{(selectedWorkshop.StartDate.EndTime).slice(12,20)}}</div>
+				</div>
+				
+				<div class="row">
+				  <div class="col"><b>Description:</b><br/>{{selectedWorkshop.ClassDescription.Description}}</div>
+				</div>
+			</div>
+        </ion-content>
+      </ion-view>
+    </script>
+	
+	
+	
+	<!--EVENTS PAGE(check with anil, whether it is static info)-->
     <script id="templates/events.html" type="text/ng-template">
       <ion-view title="Events">
         <ion-content>
@@ -266,7 +429,7 @@
       </ion-view>
     </script>
 	
-	<!--CHALLENGES PAGE-->
+	<!--CHALLENGES PAGE(static info, uploaded via online portal)-->
     <script id="templates/challenges.html" type="text/ng-template">
       <ion-view title="Challenges">
         <ion-content>
