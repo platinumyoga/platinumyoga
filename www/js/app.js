@@ -685,6 +685,7 @@ app.factory('userService', function($http,$state) {
 				userDatabase = data;
 				userID = userDatabase.ValidateLoginResult.Client.ID;
 				if(data.ValidateLoginResult.ErrorCode == 200){
+					//alert(data.ValidateLoginResult);
 					alert(data.ValidateLoginResult.Status);
 					$state.go("yoga-app.home");
 				}else{
@@ -727,7 +728,7 @@ app.factory('classesService', function($http) {
 
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
-				classesDatabase = data;
+				classesDatabase = data.Classes.Class;
 			})
 		},
 		getClasses:function(){
@@ -756,7 +757,7 @@ app.factory('classesService', function($http) {
 			/* Check whether the HTTP Request is successful or not. */
 			request1.success(function (data) {
 				var bookClassResult = data;
-				alert(bookClassResult.ErrorCode);
+				alert(bookClassResult.Status);
 				//bookClassResult.
 				//alert(data);
 			})
