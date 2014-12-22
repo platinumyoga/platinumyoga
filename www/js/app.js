@@ -757,7 +757,7 @@ app.factory('classesService', function($http) {
 			/* Check whether the HTTP Request is successful or not. */
 			request1.success(function (data) {
 				var bookClassResult = data;
-				alert(bookClassResult.Status);
+				alert(bookClassResult.AddClientsToClassesResult.Status);
 				//bookClassResult.
 				//alert(data);
 			})
