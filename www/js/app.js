@@ -26,6 +26,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       views: {
         'menuContent' :{
           templateUrl: "templates/home.html",
+		  controller: "homeCtrl"
         }
       }
     })
@@ -47,6 +48,15 @@ app.config(function($stateProvider, $urlRouterProvider) {
         }
       }
     })
+	.state('yoga-app.classStaff', {
+      url: '/classStaff/:classStaffID',
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/classStaff.html",
+		  controller: "classesCtrl"
+        }
+      }
+    })
 	.state('yoga-app.workshops', {
       url: '/Workshops',
       views: {
@@ -61,6 +71,15 @@ app.config(function($stateProvider, $urlRouterProvider) {
       views: {
         'menuContent' :{
           templateUrl: "templates/selectedWorkshop.html",
+		  controller: "workshopCtrl"
+        }
+      }
+    })
+	.state('yoga-app.workshopStaff', {
+      url: '/workshopStaff/:workshopStaffID',
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/workshopStaff.html",
 		  controller: "workshopCtrl"
         }
       }
@@ -152,8 +171,8 @@ app.controller('loginCtrl', function($scope, $state, $http, $stateParams, userSe
 		$scope.authenticationMsg = userService.authentication(user);
 		classesService.getClassesDatabase();
 		workshopsService.getWorkshopsDatabase();
+		$scope.userId = userService.getUserID();
 	};
-	
 })
 
 //$ionicSideMenuDelegate is the dependency for menu
@@ -174,31 +193,6 @@ app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate)
 	$scope.goBack = function() {
 		window.history.back();
 	};
-	
-	
-	//login
-		$scope.signIn = function(user) {
-		var request = $http({
-			method: "post",
-			url: "login.php",
-			data: {
-				username: user.username,
-				password: user.password
-			},
-			headers: { 
-				'Content-Type': 'application/x-www-form-urlencoded' 
-			}
-		});
-
-		/* Check whether the HTTP Request is successful or not. */
-		request.success(function (data) {
-			if(data.ValidateLoginResult.ErrorCode == 200){
-				$scope.nameing = "HAHA";
-				$state.go("yoga-app.home");
-			}
-		})
-	};
-	
 })
 
 
@@ -289,28 +283,68 @@ app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet){
 		});
 	};
 	/*booking pop up end*/
-	/*booking pop up end*/
 	
 })
 
-app.controller('homeCtrl',function($scope,userService){
+app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,userService,userScheduleService){
+
+	$scope.userId = userService.getUserID();
+	$scope.username = userService.getUsername();
+	
 	$scope.showUpcomingView = true;
 	
-	$scope.id = userService.getUserID();
-	$scope.username = userService.getUsername();
-
 	$scope.showUpcoming = function(){
 		$scope.showUpcomingView = true;
 		$scope.showHistoryView = false;
 	};
+	
+	$scope.init1 = function(){
+		userScheduleService.getUserSchedule($scope.userId);
+		$scope.scheduledClasses = userScheduleService.getUserScheduleOutput();
+		//$state.go($state.current, {}, {reload: true});
+		//$state.forceReload();
+	}
 	
 	$scope.showHistory = function(){
 		$scope.showUpcomingView = false;
 		$scope.showHistoryView = true;
 	};
 	
+	$scope.removeClass = function(classId,userId){
+		 // A confirm dialog
+		   var confirmPopup = $ionicPopup.confirm({
+			 title: 'Remove Class',
+			 template: 'Are you sure you want to remove this class?',
+			 okText: 'Confirm'
+		   });
+		   confirmPopup.then(function(res) {
+			 if(res) {
+				userScheduleService.removeScheduledClass(classId,userId);
+				/*$state.transitionTo($state.current, $stateParams, {
+					reload: true,
+					inherit: false,
+					notify: true
+				});*/
+				//$window.location.reload(true);
+				//$state.forceReload();
+				//$state.go($state.current, {}, {reload: true});
+				//alert("done");
+			 } else {
+				//press cancel
+				//alert("nope");
+			 }
+		   });
+		//$state.go($state.current, {}, {reload: true});
+		
+	}
+	
+	
+	
+	
+	
+	
 	/*ACCORDION START*/
-		$scope.groups = [];
+	$scope.groups = [];
 	  for (var i=0; i<3; i++) {
 		if(i==0){
 			$scope.groups[i] = {
@@ -319,25 +353,26 @@ app.controller('homeCtrl',function($scope,userService){
 			};
 			/*loop through all the classes*/
 			for (var j=0; j<3; j++) {
+				//var id = $scope.scheduledClasses[j].ID;
 				$scope.groups[i].items.push('item '+j);
 			}
 		}else if(i==1){
 			$scope.groups[i] = {
 			name: 'Appointments',
-			items: []
+			items1: []
 			};
-			/*loop through all the classes*/
+			/*loop through all the appts*/
 			for (var j=0; j<3; j++) {
-				$scope.groups[i].items.push('item '+j);
+				$scope.groups[i].items1.push('item '+j);
 			}
 		}else{
 			$scope.groups[i] = {
 			name: 'Others',
-			items: []
+			items2: []
 			};
 			/*loop through all the classes*/
 			for (var j=0; j<3; j++) {
-				$scope.groups[i].items.push('item '+j);
+				$scope.groups[i].items2.push('item '+j);
 			}
 		}
 	  }
@@ -363,11 +398,13 @@ app.controller('classesCtrl', function($scope,$stateParams,classesService,userSe
 	$scope.totalClasses = classesService.getClasses();
 	$scope.selectedclass = classesService.getSelectedClass($stateParams.classID);
 	$scope.userID = userService.getUserID();
-	//classesService.bookClass($stateParams.classID,userService.getUserID());
 	
 	$scope.bookClass = function(selectedClassID,userID){
 		classesService.bookClass(selectedClassID,userID);
 	};
+	
+	$scope.selectedStaff = classesService.getClassStaff($stateParams.classStaffID);
+	
 	//dummy classes data - filter enabled
   $scope.classesData = {
     "filter" : 'beginner',
@@ -400,6 +437,7 @@ app.controller('classesCtrl', function($scope,$stateParams,classesService,userSe
 app.controller('workshopCtrl',function($scope,$stateParams,workshopsService){
 	$scope.workShopsData = workshopsService.getWorkshops();
 	$scope.selectedWorkshop = workshopsService.getSelectedWorkshop($stateParams.workshopID);
+	$scope.selectedWorkshopStaff = workshopsService.getWorkshopStaff($stateParams.workshopStaffID);
 })
 
 app.controller('faqCtrl',function($scope){
@@ -684,15 +722,13 @@ app.factory('userService', function($http,$state) {
 			request.success(function (data) {
 				userDatabase = data;
 				userID = userDatabase.ValidateLoginResult.Client.ID;
-				if(data.ValidateLoginResult.ErrorCode == 200){
+				if(data.ValidateLoginResult.ErrorCode === 200){
 					//alert(data.ValidateLoginResult);
 					alert(data.ValidateLoginResult.Status);
 					$state.go("yoga-app.home");
 				}else{
-					//not working
 					alert("Login Failed");
-					loginFail();
-				}
+				}	
 			})
 			
 			//not working
@@ -700,10 +736,6 @@ app.factory('userService', function($http,$state) {
 				alert(data);
                 loginFail();
             })
-		},
-		loginFail:function(){
-			var msg = "Login failed. Please try again later."
-			return msg;
 		},
 		getUserID: function(){
 			return userDatabase.ValidateLoginResult.Client.ID;
@@ -715,7 +747,7 @@ app.factory('userService', function($http,$state) {
 })
 
 
-app.factory('classesService', function($http) {
+app.factory('classesService', function($http,$ionicPopup) {
 	return {
 		getClassesDatabase: function(){
 			var request = $http({
@@ -741,13 +773,20 @@ app.factory('classesService', function($http) {
 				}
 			}
 		},
-		bookClass:function(classID,userID){
+		getClassStaff:function(classStaffID){
+			for(var i=0;i<classesDatabase.length;i++){
+				if(classesDatabase[i].Staff.ID==classStaffID){
+					return classesDatabase[i].Staff;
+				}
+			}
+		},
+		bookClass:function(classId,userId){
 			var request1 = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/bookClientIntoClass.php",
 			data: {
-				classID: classID,
-				userID: userID
+				classID: classId,
+				userID: userId
 			},
 			headers: { 
 				'Content-Type': 'application/x-www-form-urlencoded' 
@@ -756,12 +795,31 @@ app.factory('classesService', function($http) {
 
 			/* Check whether the HTTP Request is successful or not. */
 			request1.success(function (data) {
-				var bookClassResult = data;
-				alert(bookClassResult.AddClientsToClassesResult.Status);
-				//bookClassResult.
-				//alert(data);
+				var confirmBookingPopup = $ionicPopup.confirm({
+					 title: 'Book Class',
+					 template: 'Are you sure you want to book this class?',
+					 okText: 'Confirm'
+				   });
+				   confirmBookingPopup.then(function(res) {
+					 if(res){
+						//click on confirm
+						var returnMsg = "";
+						if (data.AddClientsToClassesResult.ErrorCode===200){
+							returnMsg = "Success!";
+						}else{
+							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToClassesResult.Classes.Class.Clients.Client.Messages.string);
+						}
+						 var alertPopup = $ionicPopup.alert({
+							 title: 'Book Class',
+							 template: returnMsg
+						   });
+						   alertPopup.then(function(res) {});
+					 }else{
+						//press cancel
+						//alert("nope");
+					 }
+				   });
 			})
-			
 			//not working
 			request1.error(function (data) {
             })
@@ -794,7 +852,83 @@ app.factory('workshopsService',function($http){
 					return workshopsDatabase[i];
 				}
 			}
+		},
+		getWorkshopStaff:function(workshopStaffID){
+			for(var i=0;i<workshopsDatabase.length;i++){
+				if(workshopsDatabase[i].Staff.ID==workshopStaffID){
+					return workshopsDatabase[i].Staff;
+				}
+			}
 		}
 	}
 })
 
+
+app.factory('userScheduleService', function($http,$state,$ionicPopup) {
+	return {
+		getUserSchedule: function(userId){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getClientSchedule.php",
+			data: {
+				userID: userId,
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				userScheduleDatabase = data;
+			})
+			
+			//not working
+			request.error(function (data) {
+            })
+		},
+		getUserScheduleOutput:function(){
+			if(JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit).charAt(0)!="["){
+				return JSON.parse("["+JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit)+"]"); 
+			}else{
+				return userScheduleDatabase.GetClientScheduleResult.Visits.Visit; 
+			}
+			//alert(JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit)[0]);
+			
+		},
+		removeScheduledClass:function(classId,userId){
+			var request2 = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/removeClientFromClass.php",
+			data: {
+				classID: classId,
+				userID: userId
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request2.success(function (data) {
+				if(data.RemoveClientsFromClassesResult.ErrorCode===200){
+					var successRemovePopUp = $ionicPopup.alert({
+						 title: 'Remove Class',
+						 template: 'You have successfully removed this class!'
+					   });
+					   alertPopup.then(function(res){});
+				}else{
+					var unSuccessRemovePopUp = $ionicPopup.alert({
+						 title: 'Remove Class',
+						 template: 'You cannot remove this class!'
+					   });
+					   alertPopup.then(function(res){
+					   });
+				}
+			})
+			//not working
+			request2.error(function (data) {
+            })
+		}
+	}
+})

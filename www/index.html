@@ -177,13 +177,13 @@
 
 	<!--HOME PAGE-->
     <script id="templates/home.html" type="text/ng-template">
-      <ion-view title="Home" ng-controller="homeCtrl">
+      <ion-view title="Home" ng-init="init1()">
 			<ion-content>
 				<!--user picture & name + points-->
 				<div class="row">
 					<div class="col col-offset-10"><img src="/img/profile_upload.jpg" /></div>
 					
-					<div class="col"><b>Name:</b><div ng-model="username">{{username}}</div><br/><b>User ID: </b><div ng-model="id">{{id}}</div>
+					<div class="col"><b>Name:</b><div ng-model="username">{{username}}</div><br/><b>User ID: </b><div ng-model="id">{{userId}}</div>
 					<br/><b>Points:</b> 50
 					</div>
 				</div>
@@ -191,9 +191,20 @@
 				<div class="button-bar">
 				  <a class="button button-small" id="showUpcoming" ng-click="showUpcoming($event)">Upcoming</a>
 				  <a class="button button-small" id="showHistory" ng-click="showHistory($event)">History</a>
+				  <!--<div class="button button-small" ng-click="open()">TEST</div>-->
 				</div>
-
+				
+			
+				
 				<ion-list ng-show="showUpcomingView">
+				
+					<div class="list">
+					<div class="item" ng-repeat="class in scheduledClasses">
+						{{class.Name}}
+						<div class="button button-small assertive" ng-click="removeClass({{class.ClassID}},{{userId}})">Delete</div>
+					</div>
+				</div>
+				
 					<div ng-repeat="group in groups">
 					  <ion-item class="item-stable"
 								ng-click="toggleGroup(group)"
@@ -243,7 +254,9 @@
 						<b>{{class.ClassDescription.Name}}</b><br/>			
 						{{(class.StartDateTime).slice(0,10)}}<br/>
 						{{(class.StartDateTime).slice(11,16)}} - {{(class.EndDateTime).slice(11,16)}}<br/>
-						{{class.Staff.Name}}</a>
+						{{class.Staff.Name}}<br/>
+						{{class.ID}}
+						</a>
 						<button class="button-right button-stable col col-33 col-offset-67" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
 					</div>
 				</div>
@@ -291,7 +304,10 @@
 				</div>
 
 				<div class="row">
-				  <div class="col">{{selectedclass.Staff.Name}}</div>
+				  <div class="col">
+					<a href="#yoga-app/classStaff/{{selectedclass.Staff.ID}}" class="button button-small">{{selectedclass.Staff.Name}}
+					</a>
+				  </div>
 				</div>
 				
 				<!--rating stars-->
@@ -334,6 +350,26 @@
 			});
 		});
 	</script>
+	
+	
+	<!--CLASS STAFF INFO-->
+    <script id="templates/classStaff.html" type="text/ng-template">
+      <ion-view title="Staff">
+        <ion-content>
+			
+			<div align="center">
+				<div class="row">
+				  <div class="col"><img src="{{selectedStaff.ImageURL}}" /></div>
+				</div>
+				
+				<div class="row">
+				  <div class="col"><b>{{selectedStaff.Name}}</b></div>
+				</div>
+				
+			</div>
+        </ion-content>
+      </ion-view>
+    </script>
 
 	
 	<!--WORKSHOPS PAGE-->
@@ -345,13 +381,14 @@
 					<ion-search placeholder="Search a user" filter="search"></ion-search>
 				</div>
 			
-				<a class="item" ng-repeat="workshop in workShopsData | filter:search.value" href="#/yoga-app/selectedWorkshop/{{workshop.ID}}">
+				<div class="item" ng-repeat="workshop in workShopsData | filter:search.value"><a href="#/yoga-app/selectedWorkshop/{{workshop.ID}}">
 					{{workshop.ClassDescription.Name}}<br/>
 					{{(workshop.StartDate).slice(0,10)}}<br/>
 					{{(workshop.StartTime).slice(12,20)}} - {{(workshop.EndTime).slice(12,20)}}<br/>
-					{{workshop.Staff.Name}} 
+					{{workshop.Staff.Name}} <br/>
+					{{workshop.ID}}</a>
 					<button class="button-right button-stable col col-33 col-offset-67">Book</button>
-				</a>
+				</div>
 			</div>
         </ion-content>
       </ion-view>
@@ -382,7 +419,9 @@
 				</div>
 
 				<div class="row">
-				  <div class="col">{{selectedWorkshop.Staff.Name}}</div>
+				  <div class="col">
+					  <a href="#yoga-app/workshopStaff/{{selectedWorkshop.Staff.ID}}" class="button button-small">{{selectedWorkshop.Staff.Name}}</a>
+				  </div>
 				</div>
 				
 				<!--rating stars-->
@@ -410,7 +449,24 @@
     </script>
 	
 	
-	
+	<!--WORKSHOP STAFF INFO-->
+    <script id="templates/workshopStaff.html" type="text/ng-template">
+      <ion-view title="Staff">
+        <ion-content>
+			<div align="center">
+				<div class="row">
+				  <div class="col"><img src="{{selectedWorkshopStaff.ImageURL}}" /></div>
+				</div>
+				
+				<div class="row">
+				  <div class="col"><b>{{selectedWorkshopStaff.Name}}</b></div>
+				</div>
+				
+			</div>
+        </ion-content>
+      </ion-view>
+    </script>
+
 	<!--EVENTS PAGE(check with anil, whether it is static info)-->
     <script id="templates/events.html" type="text/ng-template">
       <ion-view title="Events">
