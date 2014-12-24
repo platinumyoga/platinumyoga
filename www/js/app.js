@@ -293,9 +293,16 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,u
 	
 	$scope.showUpcomingView = true;
 	
+	var upcoming = document.getElementById('showUpcoming');
+	var history = document.getElementById('showHistory');
+	upcoming.style.cssText ="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;";
+	history.style.cssText ="background-color:#f8f8f8";
+	
 	$scope.showUpcoming = function(){
 		$scope.showUpcomingView = true;
 		$scope.showHistoryView = false;
+		upcoming.style.cssText="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;";
+		history.style.cssText ="background-color:#f8f8f8";
 	};
 	
 	$scope.init1 = function(){
@@ -308,6 +315,8 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,u
 	$scope.showHistory = function(){
 		$scope.showUpcomingView = false;
 		$scope.showHistoryView = true;
+		history.style.cssText ="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;";
+		upcoming.style.cssText ="background-color:#f8f8f8";
 	};
 	
 	$scope.removeClass = function(classId,userId){

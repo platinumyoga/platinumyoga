@@ -42,7 +42,7 @@
   <body ng-controller="MainCtrl">
 
 	<!--for display-->
-	<ion-nav-view></ion-nav-view>
+	<ion-nav-view animation="no-animation"></ion-nav-view>
 	
 	
 	<!--LOGIN PAGE-->
@@ -55,13 +55,13 @@
 		
         <ion-content>			
           <div class="list">
-            <label class="item item-input">
+            <label class="item item-input item-stacked-label" style="padding-right:15px">
               <span class="input-label">Username</span>
-              <input type="text" ng-model="user.username">
-            </label>
-            <label class="item item-input">
+              <input type="text" style="background-color:#ecf0f1;padding-left: 10px;" ng-model="user.username">
+			</label>
+            <label class="item item-input item-stacked-label" style="padding-right:15px">
               <span class="input-label">Password</span>
-              <input type="password" ng-model="user.password">
+              <input type="password" style="background-color:#ecf0f1;padding-left:10px;" ng-model="user.password">
             </label>
           </div>
           <div class="padding">
@@ -161,7 +161,7 @@
 					  <ion-item class="item-accordion"
 								ng-repeat="item in group.items"
 								ng-show="isGroupShown(group)"  ng-repeat="" href="#/yoga-app/{{item}}" type="item-link" menu-close>
-						&nbsp;&nbsp;&nbsp;&nbsp;{{item}}
+						<i class="icon ion-chevron-right">&nbsp;&nbsp;&nbsp;&nbsp;{{item}}</i>
 					  </ion-item>
 					</div>
 				</ion-list>
@@ -249,7 +249,8 @@
 				</div>
 				
 				<div class="list">
-					<div class="item" ng-repeat="class in totalClasses">
+				<div class="row" ng-repeat="class in totalClasses">
+					<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
 						<a href="#/yoga-app/selectedClass/{{class.ID}}">
 						<b>{{class.ClassDescription.Name}}</b><br/>			
 						{{(class.StartDateTime).slice(0,10)}}<br/>
@@ -257,8 +258,11 @@
 						{{class.Staff.Name}}<br/>
 						{{class.ID}}
 						</a>
-						<button class="button-right button-stable col col-33 col-offset-67" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
 					</div>
+					<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
+						<button class="button-right button-stable col col-33 col-offset-33" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
+					</div>
+				</div>
 				</div>
 				
 				<!--OLD FILTER PORTION-->
@@ -541,7 +545,7 @@
 		<ion-content ng-controller="faqCtrl">
 			<!--top bar-->
 			<div class="button-bar">
-				<a class="button button-small button-stable" href="#/yoga-app/faq">FAQ</a>
+				<a style="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;" class="button button-small button-stable" href="#/yoga-app/faq">FAQ</a>
 				<a class="button button-small button-stable" href="#/yoga-app/about">About</a>	
 			</div>
 			<ion-list>
@@ -564,14 +568,14 @@
 	</ion-view>
     </script>
 	
-	<!--FAQ PAGE-->
+	<!--ABOUT PAGE-->
     <script id="templates/about.html" type="text/ng-template">
 	<ion-view title="About">
 		<ion-content ng-controller="aboutCtrl">
 			<!--top bar-->
 			<div class="button-bar">
 				<a class="button button-small button-stable" href="#/yoga-app/faq">FAQ</a>
-				<a class="button button-small button-stable" href="#/yoga-app/about">About</a>	
+				<a class="button button-small button-stable" href="#/yoga-app/about" style="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;">About</a>	
 			</div>
 			<ion-list>
 				<div ng-repeat="group in groups">
