@@ -97,6 +97,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       views: {
         'menuContent' :{
           templateUrl: "templates/appointments.html",
+		  controller:"appointmentCtrl"
         }
       }
     })
@@ -161,6 +162,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       views: {
         'menuContent' :{
           templateUrl: "templates/setting.html",
+		  controller:"MainCtrl"
         }
       }
     })
@@ -183,11 +185,13 @@ app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate)
 	};
   
 	// function to submit the form after all validation has occurred			
-	$scope.submitForm = function() {
+	$scope.submitForm = function(user) {
+		alert(user.email);
+		
 		// check to make sure the form is completely valid
-		if ($scope.userForm.$valid) {
-			alert('our form is amazing');
-		}
+		//if ($scope.userForm.$valid) {
+		//	alert('our form is amazing');
+		//}
 	};
 	
 	$scope.goBack = function() {
@@ -286,18 +290,19 @@ app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet){
 	
 })
 
-app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,userService,userScheduleService){
+app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,userService,userScheduleService,historyService){
 
 	$scope.userId = userService.getUserID();
 	$scope.username = userService.getUsername();
-	
-	$scope.showUpcomingView = true;
+
 	
 	var upcoming = document.getElementById('showUpcoming');
 	var history = document.getElementById('showHistory');
 	upcoming.style.cssText ="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;";
 	history.style.cssText ="background-color:#f8f8f8";
 	
+	
+	$scope.showUpcomingView = true;
 	$scope.showUpcoming = function(){
 		$scope.showUpcomingView = true;
 		$scope.showHistoryView = false;
@@ -306,11 +311,19 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,u
 	};
 	
 	$scope.init1 = function(){
+		//retrieve user's scheduled classes
 		userScheduleService.getUserSchedule($scope.userId);
+		//retrieve user's history 
+		historyService.getUserHistory($scope.userId);
+		
+		//response for user's scheduled classes
 		$scope.scheduledClasses = userScheduleService.getUserScheduleOutput();
+		
+		//response for user's history
+		$scope.userHistory = historyService.getUserHistoryResponse();
 		//$state.go($state.current, {}, {reload: true});
 		//$state.forceReload();
-	}
+	};
 	
 	$scope.showHistory = function(){
 		$scope.showUpcomingView = false;
@@ -346,8 +359,10 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,u
 		//$state.go($state.current, {}, {reload: true});
 		
 	}
+
 	
-	
+
+
 	
 	
 	
@@ -443,10 +458,15 @@ app.controller('classesCtrl', function($scope,$stateParams,classesService,userSe
   };
 })
 
-app.controller('workshopCtrl',function($scope,$stateParams,workshopsService){
+app.controller('workshopCtrl',function($scope,$stateParams,userService,workshopsService){
 	$scope.workShopsData = workshopsService.getWorkshops();
 	$scope.selectedWorkshop = workshopsService.getSelectedWorkshop($stateParams.workshopID);
 	$scope.selectedWorkshopStaff = workshopsService.getWorkshopStaff($stateParams.workshopStaffID);
+	$scope.userID = userService.getUserID();
+	
+	$scope.bookSelectedWorkshop = function(workshopId,userId){
+		workshopsService.bookWorkshop(workshopId,userId);
+	};
 })
 
 app.controller('faqCtrl',function($scope){
@@ -600,6 +620,12 @@ app.controller('aboutCtrl',function($scope){
 	  };
 	/*ACCORDION END*/
 	
+})
+
+app.controller('appointmentCtrl',function($scope,appointmentService){
+	$scope.showAppt = function(){
+		appointmentService.getAppointments();
+	};
 })
 
 app.controller('halloffameCtrl',function($scope){
@@ -836,7 +862,7 @@ app.factory('classesService', function($http,$ionicPopup) {
 	}
 })
 
-app.factory('workshopsService',function($http){
+app.factory('workshopsService',function($http,$ionicPopup){
 	return {
 		getWorkshopsDatabase: function(){
 			var request = $http({
@@ -868,6 +894,50 @@ app.factory('workshopsService',function($http){
 					return workshopsDatabase[i].Staff;
 				}
 			}
+		},
+		bookWorkshop:function(workshopId,userId){
+			var request1 = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/bookClientIntoWorkshop.php",
+			data: {
+				workshopID: workshopId,
+				userID: userId
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request1.success(function (data) {
+				var confirmBookingPopup = $ionicPopup.confirm({
+					 title: 'Book Workshop',
+					 template: 'Are you sure you want to book this workshop?',
+					 okText: 'Confirm'
+				   });
+				   confirmBookingPopup.then(function(res) {
+					 if(res){
+						//click on confirm
+						var returnMsg = "";
+						if (data.AddClientsToEnrollmentsResult.ErrorCode===200){
+							returnMsg = "Success!";
+						}else{
+							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
+						}
+						 var alertPopup = $ionicPopup.alert({
+							 title: 'Book Workshop',
+							 template: returnMsg
+						   });
+						   alertPopup.then(function(res) {});
+					 }else{
+						//press cancel
+						//alert("nope");
+					 }
+				   });
+			})
+			//not working
+			request1.error(function (data) {
+            })
 		}
 	}
 })
@@ -937,6 +1007,59 @@ app.factory('userScheduleService', function($http,$state,$ionicPopup) {
 			})
 			//not working
 			request2.error(function (data) {
+            })
+		}
+	}
+})
+
+
+app.factory('historyService', function($http) {
+	return {
+		getUserHistory: function(userId){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getClientHistory.php",
+			data: {
+				userID: userId,
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				historyDatabase = data;
+			})
+			
+			//not working
+			request.error(function (data) {
+            })
+		},
+		getUserHistoryResponse:function(){
+			return historyDatabase.GetClientVisitsResult.Visits.Visit;
+		}
+	}
+})
+
+app.factory('appointmentService',function($http){
+	return {
+		getAppointments: function(){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getAppointments.php",
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				apptDatabase = data;
+			})
+			
+			//not working
+			request.error(function (data) {
             })
 		}
 	}

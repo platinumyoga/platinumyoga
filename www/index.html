@@ -181,30 +181,42 @@
 			<ion-content>
 				<!--user picture & name + points-->
 				<div class="row">
-					<div class="col col-offset-10"><img src="/img/profile_upload.jpg" /></div>
-					
-					<div class="col"><b>Name:</b><div ng-model="username">{{username}}</div><br/><b>User ID: </b><div ng-model="id">{{userId}}</div>
-					<br/><b>Points:</b> 50
+					<div class="col">
+						<b>Username:</b>{{username}}<br/>
+						<b>User ID: </b>{{userId}}<br/>
+						<b>Points:</b> 50(dummy)
 					</div>
 				</div>
 				
 				<div class="button-bar">
-				  <a class="button button-small" id="showUpcoming" ng-click="showUpcoming($event)">Upcoming</a>
-				  <a class="button button-small" id="showHistory" ng-click="showHistory($event)">History</a>
-				  <!--<div class="button button-small" ng-click="open()">TEST</div>-->
+				  <a class="button button-small" id="showUpcoming" ng-click="showUpcoming()">Upcoming</a>
+				  <a class="button button-small" id="showHistory" ng-click="showHistory()">History</a>
 				</div>
 				
-			
-				
-				<ion-list ng-show="showUpcomingView">
-				
-					<div class="list">
+				<!--list displaying booked classes and workshops[this is a single list from the mindbodyonline service]-->
+				<div class="list" ng-show="showUpcomingView">
 					<div class="item" ng-repeat="class in scheduledClasses">
-						{{class.Name}}
-						<div class="button button-small assertive" ng-click="removeClass({{class.ClassID}},{{userId}})">Delete</div>
+						{{(class.StartDateTime).slice(0,10)}}&nbsp;<br/>
+						<b>Lesson:</b>&nbsp;{{class.Name}}<br/>
+						<b>Staff:</b>&nbsp;{{class.Staff.Name}}
+							<div class="button button-small assertive" ng-click="removeClass({{class.ClassID}},{{userId}})">Delete</div>
 					</div>
 				</div>
 				
+				<!--list showing the history-->
+				<div class="list" ng-show="showHistoryView">
+					<div class="item" ng-repeat="history in userHistory">
+						{{(history.StartDateTime).slice(0,10)}}<br/>
+						<b>Lesson:</b>&nbsp;{{history.Name}}<br/>
+						<b>Staff:</b>&nbsp;{{history.Staff.Name}}<br/>
+						<b>Attendance:&nbsp;</b>
+						<span ng-show={{history.SignedIn}}>Present</span>
+						<span ng-show=!{{history.SignedIn}}>Absent</span>
+					</div>
+				</div>
+				
+				
+			<!--<ion-list ng-show="showUpcomingView">
 					<div ng-repeat="group in groups">
 					  <ion-item class="item-stable"
 								ng-click="toggleGroup(group)"
@@ -220,12 +232,12 @@
 					  </ion-item>
 					</div>
 				</ion-list>
-
+				//history list
 				<ion-list ng-if="showHistoryView">
 					<ion-item href="#/movie/{{movie.id}}">History 1</ion-item>
 					<ion-item href="#/movie/{{movie.id}}">History 2</ion-item>
 					<ion-item href="#/movie/{{movie.id}}">History 3</ion-item>
-				</ion-list>
+				</ion-list>-->
 			</ion-content>
       </ion-view>
     </script>
@@ -256,11 +268,11 @@
 						{{(class.StartDateTime).slice(0,10)}}<br/>
 						{{(class.StartDateTime).slice(11,16)}} - {{(class.EndDateTime).slice(11,16)}}<br/>
 						{{class.Staff.Name}}<br/>
-						{{class.ID}}
+						Class ID:&nbsp;{{class.ID}}
 						</a>
 					</div>
 					<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
-						<button class="button-right button-stable col col-33 col-offset-33" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
+						<button class="button-right button-stable col" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
 					</div>
 				</div>
 				</div>
@@ -382,17 +394,29 @@
         <ion-content>
 			<div class="list">
 				<div class="bar bar-header item-input-inset">
-					<ion-search placeholder="Search a user" filter="search"></ion-search>
+					<ion-search placeholder="Search for workshop" filter="search"></ion-search>
 				</div>
-			
-				<div class="item" ng-repeat="workshop in workShopsData | filter:search.value"><a href="#/yoga-app/selectedWorkshop/{{workshop.ID}}">
-					{{workshop.ClassDescription.Name}}<br/>
-					{{(workshop.StartDate).slice(0,10)}}<br/>
-					{{(workshop.StartTime).slice(12,20)}} - {{(workshop.EndTime).slice(12,20)}}<br/>
-					{{workshop.Staff.Name}} <br/>
-					{{workshop.ID}}</a>
-					<button class="button-right button-stable col col-33 col-offset-67">Book</button>
+				
+				<div class="row" ng-repeat="workshop in workShopsData | filter:search.value">
+						<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
+							<a href="#/yoga-app/selectedWorkshop/{{workshop.ID}}">
+							<b>{{workshop.ClassDescription.Name}}</b><br/>
+							{{(workshop.StartDate).slice(0,10)}}<br/>
+							{{(workshop.StartTime).slice(12,20)}} - {{(workshop.EndTime).slice(12,20)}}<br/>
+							{{workshop.Staff.Name}} <br/>
+							Workshop ID:&nbsp;{{workshop.ID}}
+							</a>
+						</div>
+						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
+							<button class="button-right button-stable col" ng-click="bookSelectedWorkshop({{workshop.ID}},{{userID}})">Book</button>
+						</div>
+					</div>
 				</div>
+			</div>
+				
+				
+				
+				
 			</div>
         </ion-content>
       </ion-view>
@@ -484,7 +508,11 @@
     <script id="templates/appointments.html" type="text/ng-template">
       <ion-view title="Appointments">
         <ion-content>
-			<p align="center">APPOINTMENTS CONTENTS</p>
+			<p align="center">APPOINTMENTS CONTENTS
+			
+			<button ng-click="showAppt()">Show Appointments</button>
+			
+			</p>
         </ion-content>
       </ion-view>
     </script>
@@ -608,17 +636,17 @@
 	
 	<!--SETTING PAGE-->
 	<script id="templates/setting.html" type="text/ng-template">
-      <ion-view title="Setting" ng-controller="MainCtrl">
+      <ion-view title="Setting">
         <ion-content>
 			
 				
 		<div class="row">
 			<div class="col-sm-6">
-				<!-- =================================================================== -->
-				<!-- FORM ============================================================== -->
-				<!-- =================================================================== -->
+				<!-- ================================== -->
+				<!-- FORM ========================== -->
+				<!-- ================================= -->
 			  
-				<form name="userForm" ng-submit="submitForm()" novalidate>	  
+				<form name="userForm" ng-submit="submitForm(user)" novalidate>	  
 					  <!-- USERNAME -->
 					<div class="form-group">
 						<label>Address</label>
