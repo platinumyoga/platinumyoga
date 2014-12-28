@@ -133,6 +133,22 @@ app.config(function($stateProvider, $urlRouterProvider) {
         }
       }
     })
+	.state('yoga-app.promotions', {
+      url: "/promotions",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/promotions.html",
+        }
+      }
+    })
+	.state('yoga-app.contactus', {
+      url: "/contactus",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/contactus.html",
+        }
+      }
+    })
 	.state('yoga-app.faq', {
       url: "/faq",
       views: {
@@ -154,6 +170,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       views: {
         'menuContent' :{
           templateUrl: "templates/barcode.html",
+		  controller:"barcodeCtrl"
         }
       }
     })
@@ -168,12 +185,349 @@ app.config(function($stateProvider, $urlRouterProvider) {
     })
 })
 
-app.controller('loginCtrl', function($scope, $state, $http, $stateParams, userService,classesService,workshopsService) {
+
+
+//services
+app.factory('userService', function($http,$state) {
+	var users = [];
+	var userDatabase = "";
+	
+	return {
+		authentication: function(user){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/login.php",
+			data: {
+				username: user.username,
+				password: user.password
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				userDatabase = data;
+				userID = userDatabase.ValidateLoginResult.Client.ID;
+				if(data.ValidateLoginResult.ErrorCode === 200){
+					//alert(data.ValidateLoginResult);
+					alert(data.ValidateLoginResult.Status);
+					$state.go("yoga-app.home");
+				}else{
+					alert("Login Failed");
+				}	
+			})
+			
+			//not working
+			request.error(function (data) {
+				alert(data);
+                loginFail();
+            })
+		},
+		getUserID: function(){
+			return userDatabase.ValidateLoginResult.Client.ID;
+		},
+		getUsername: function(){
+			return userDatabase.ValidateLoginResult.Client.FirstName+" "+userDatabase.ValidateLoginResult.Client.LastName;
+		}
+	}
+})
+
+
+app.factory('classesService', function($http,$ionicPopup) {
+	return {
+		getClassesDatabase: function(){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getClasses.php",
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				classesDatabase = data.Classes.Class;
+			})
+		},
+		getClasses:function(){
+			return classesDatabase;
+		},
+		getSelectedClass:function(classID){	
+			for(var i=0;i<classesDatabase.length;i++){
+				if(classesDatabase[i].ID==classID){
+					return classesDatabase[i];
+				}
+			}
+		},
+		getClassStaff:function(classStaffID){
+			for(var i=0;i<classesDatabase.length;i++){
+				if(classesDatabase[i].Staff.ID==classStaffID){
+					return classesDatabase[i].Staff;
+				}
+			}
+		},
+		bookClass:function(classId,userId){
+			var request1 = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/bookClientIntoClass.php",
+			data: {
+				classID: classId,
+				userID: userId
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request1.success(function (data) {
+				var confirmBookingPopup = $ionicPopup.confirm({
+					 title: 'Book Class',
+					 template: 'Are you sure you want to book this class?',
+					 okText: 'Confirm'
+				   });
+				   confirmBookingPopup.then(function(res) {
+					 if(res){
+						//click on confirm
+						var returnMsg = "";
+						if (data.AddClientsToClassesResult.ErrorCode===200){
+							returnMsg = "Success!";
+						}else{
+							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToClassesResult.Classes.Class.Clients.Client.Messages.string);
+						}
+						 var alertPopup = $ionicPopup.alert({
+							 title: 'Book Class',
+							 template: returnMsg
+						   });
+						   alertPopup.then(function(res) {});
+					 }else{
+						//press cancel
+						//alert("nope");
+					 }
+				   });
+			})
+			//not working
+			request1.error(function (data) {
+            })
+		}
+	}
+})
+
+app.factory('workshopsService',function($http,$ionicPopup){
+	return {
+		getWorkshopsDatabase: function(){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getWorkshops.php",
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				workshopsDatabase = data;
+			})
+		},
+		getWorkshops:function(){
+			return workshopsDatabase;
+		},
+		getSelectedWorkshop:function(workshopID){
+			for(var i=0;i<workshopsDatabase.length;i++){
+				if(workshopsDatabase[i].ID==workshopID){
+					return workshopsDatabase[i];
+				}
+			}
+		},
+		getWorkshopStaff:function(workshopStaffID){
+			for(var i=0;i<workshopsDatabase.length;i++){
+				if(workshopsDatabase[i].Staff.ID==workshopStaffID){
+					return workshopsDatabase[i].Staff;
+				}
+			}
+		},
+		bookWorkshop:function(workshopId,userId){
+			var request1 = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/bookClientIntoWorkshop.php",
+			data: {
+				workshopID: workshopId,
+				userID: userId
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request1.success(function (data) {
+				var confirmBookingPopup = $ionicPopup.confirm({
+					 title: 'Book Workshop',
+					 template: 'Are you sure you want to book this workshop?',
+					 okText: 'Confirm'
+				   });
+				   confirmBookingPopup.then(function(res) {
+					 if(res){
+						//click on confirm
+						var returnMsg = "";
+						if (data.AddClientsToEnrollmentsResult.ErrorCode===200){
+							returnMsg = "Success!";
+						}else{
+							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
+						}
+						 var alertPopup = $ionicPopup.alert({
+							 title: 'Book Workshop',
+							 template: returnMsg
+						   });
+						   alertPopup.then(function(res) {});
+					 }else{
+						//press cancel
+						//alert("nope");
+					 }
+				   });
+			})
+			//not working
+			request1.error(function (data) {
+            })
+		}
+	}
+})
+
+
+app.factory('userScheduleService', function($http,$state,$ionicPopup) {
+	return {
+		getUserSchedule: function(userId){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getClientSchedule.php",
+			data: {
+				userID: userId,
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				 userScheduleDatabase = data;
+			})
+			
+			//not working
+			request.error(function (data) {
+            })
+		},
+		getUserScheduleOutput:function(){
+			if(JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit).charAt(0)!="["){
+				JSON.parse("["+JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit)+"]"); 
+			}else{
+				return  userScheduleDatabase.GetClientScheduleResult.Visits.Visit; 
+			}
+		},
+		removeScheduledClass:function(classId,userId){
+			var request2 = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/removeClientFromClass.php",
+			data: {
+				classID: classId,
+				userID: userId
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request2.success(function (data) {
+				if(data.RemoveClientsFromClassesResult.ErrorCode===200){
+					var successRemovePopUp = $ionicPopup.alert({
+						 title: 'Cancel Class',
+						 template: 'You have successfully cancelled this class!'
+					   });
+					   alertPopup.then(function(res){});
+				}else{
+					var unSuccessRemovePopUp = $ionicPopup.alert({
+						 title: 'Cancel Class',
+						 template: 'You cannot cancel this class!'
+					   });
+					   alertPopup.then(function(res){
+					   });
+				}
+			})
+			//not working
+			request2.error(function (data) {
+            })
+		}
+	}
+})
+
+
+app.factory('historyService', function($http) {
+	return {
+		getUserHistory: function(userId){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getClientHistory.php",
+			data: {
+				userID: userId,
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				historyDatabase = data;
+			})
+			
+			//not working
+			request.error(function (data) {
+            })
+		},
+		getUserHistoryResponse:function(){
+			return historyDatabase.GetClientVisitsResult.Visits.Visit;
+		}
+	}
+})
+
+app.factory('appointmentService',function($http){
+	return {
+		getAppointments: function(){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getAppointments.php",
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				apptDatabase = data;
+			})
+			
+			//not working
+			request.error(function (data) {
+            })
+		}
+	}
+})
+
+
+
+app.controller('loginCtrl', function($scope, $state,userService,classesService,workshopsService) {
 	$scope.signIn = function(user) {
-		$scope.authenticationMsg = userService.authentication(user);
+		userService.authentication(user);
 		classesService.getClassesDatabase();
 		workshopsService.getWorkshopsDatabase();
 		$scope.userId = userService.getUserID();
+	};
+	
+	$scope.next = function(){
+		$state.go('yoga-app.home');
 	};
 })
 
@@ -197,6 +551,7 @@ app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate)
 	$scope.goBack = function() {
 		window.history.back();
 	};
+	
 })
 
 
@@ -290,10 +645,40 @@ app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet){
 	
 })
 
-app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,userService,userScheduleService,historyService){
+app.controller('barcodeCtrl',function($scope,userService){
+	$scope.userId = userService.getUserID();
+})
+
+app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$timeout,$ionicLoading,$interval,userService,userScheduleService,historyService){
 
 	$scope.userId = userService.getUserID();
 	$scope.username = userService.getUsername();
+	
+	var retrieveUserInfo = function(){
+		//retrieve user's scheduled classes
+		userScheduleService.getUserSchedule($scope.userId);
+		$scope.scheduledClasses = userScheduleService.getUserScheduleOutput();
+		
+		//retrieve user's history 
+		historyService.getUserHistory($scope.userId);
+		$scope.userHistory = historyService.getUserHistoryResponse();
+	};
+	//retrieveUserInfo();
+	
+	// Setup the loader
+	  $ionicLoading.show({
+		content: 'Loading',
+		animation: 'fade-in',
+		showBackdrop: true,
+		maxWidth: 200,
+		showDelay: 0
+	  });
+	  
+	  // Set a timeout to clear loader, however you would actually call the $ionicLoading.hide(); method whenever everything is ready or loaded.
+	  $timeout(function () {
+		$ionicLoading.hide();
+		retrieveUserInfo();
+	  }, 1000);
 
 	
 	var upcoming = document.getElementById('showUpcoming');
@@ -308,22 +693,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,u
 		$scope.showHistoryView = false;
 		upcoming.style.cssText="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;";
 		history.style.cssText ="background-color:#f8f8f8";
-	};
-	
-	$scope.init1 = function(){
-		//retrieve user's scheduled classes
-		userScheduleService.getUserSchedule($scope.userId);
-		//retrieve user's history 
-		historyService.getUserHistory($scope.userId);
-		
-		//response for user's scheduled classes
-		$scope.scheduledClasses = userScheduleService.getUserScheduleOutput();
-		
-		//response for user's history
-		$scope.userHistory = historyService.getUserHistoryResponse();
-		//$state.go($state.current, {}, {reload: true});
-		//$state.forceReload();
-	};
+	};	
 	
 	$scope.showHistory = function(){
 		$scope.showUpcomingView = false;
@@ -335,34 +705,21 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,u
 	$scope.removeClass = function(classId,userId){
 		 // A confirm dialog
 		   var confirmPopup = $ionicPopup.confirm({
-			 title: 'Remove Class',
-			 template: 'Are you sure you want to remove this class?',
+			 title: 'Cancel Class',
+			 template: 'Are you sure you want to cancel this class?',
 			 okText: 'Confirm'
 		   });
 		   confirmPopup.then(function(res) {
 			 if(res) {
 				userScheduleService.removeScheduledClass(classId,userId);
-				/*$state.transitionTo($state.current, $stateParams, {
-					reload: true,
-					inherit: false,
-					notify: true
-				});*/
-				//$window.location.reload(true);
-				//$state.forceReload();
-				//$state.go($state.current, {}, {reload: true});
-				//alert("done");
 			 } else {
 				//press cancel
 				//alert("nope");
 			 }
 		   });
 		//$state.go($state.current, {}, {reload: true});
-		
 	}
-
 	
-
-
 	
 	
 	
@@ -733,334 +1090,4 @@ app.controller('DateCtrl', function ($scope) {
                         '<i ng-if="search.value.length > 0" ng-click="clearSearch()" class="icon ion-close"></i>' +
                       '</div>'
         };
-})
-
-//services
-app.factory('userService', function($http,$state) {
-	var users = [];
-
-	return {
-		authentication: function(user){
-			var request = $http({
-			method: "post",
-			url: "http://platinumyoga-rerawan.rhcloud.com/login.php",
-			data: {
-				username: user.username,
-				password: user.password
-			},
-			headers: { 
-				'Content-Type': 'application/x-www-form-urlencoded' 
-			}
-			});
-
-			/* Check whether the HTTP Request is successful or not. */
-			request.success(function (data) {
-				userDatabase = data;
-				userID = userDatabase.ValidateLoginResult.Client.ID;
-				if(data.ValidateLoginResult.ErrorCode === 200){
-					//alert(data.ValidateLoginResult);
-					alert(data.ValidateLoginResult.Status);
-					$state.go("yoga-app.home");
-				}else{
-					alert("Login Failed");
-				}	
-			})
-			
-			//not working
-			request.error(function (data) {
-				alert(data);
-                loginFail();
-            })
-		},
-		getUserID: function(){
-			return userDatabase.ValidateLoginResult.Client.ID;
-		},
-		getUsername: function(){
-			return userDatabase.ValidateLoginResult.Client.FirstName+" "+userDatabase.ValidateLoginResult.Client.LastName;
-		}
-	}
-})
-
-
-app.factory('classesService', function($http,$ionicPopup) {
-	return {
-		getClassesDatabase: function(){
-			var request = $http({
-			method: "post",
-			url: "http://platinumyoga-rerawan.rhcloud.com/getClasses.php",
-			headers: { 
-				'Content-Type': 'application/x-www-form-urlencoded' 
-			}
-			});
-
-			/* Check whether the HTTP Request is successful or not. */
-			request.success(function (data) {
-				classesDatabase = data.Classes.Class;
-			})
-		},
-		getClasses:function(){
-			return classesDatabase;
-		},
-		getSelectedClass:function(classID){	
-			for(var i=0;i<classesDatabase.length;i++){
-				if(classesDatabase[i].ID==classID){
-					return classesDatabase[i];
-				}
-			}
-		},
-		getClassStaff:function(classStaffID){
-			for(var i=0;i<classesDatabase.length;i++){
-				if(classesDatabase[i].Staff.ID==classStaffID){
-					return classesDatabase[i].Staff;
-				}
-			}
-		},
-		bookClass:function(classId,userId){
-			var request1 = $http({
-			method: "post",
-			url: "http://platinumyoga-rerawan.rhcloud.com/bookClientIntoClass.php",
-			data: {
-				classID: classId,
-				userID: userId
-			},
-			headers: { 
-				'Content-Type': 'application/x-www-form-urlencoded' 
-			}
-			});
-
-			/* Check whether the HTTP Request is successful or not. */
-			request1.success(function (data) {
-				var confirmBookingPopup = $ionicPopup.confirm({
-					 title: 'Book Class',
-					 template: 'Are you sure you want to book this class?',
-					 okText: 'Confirm'
-				   });
-				   confirmBookingPopup.then(function(res) {
-					 if(res){
-						//click on confirm
-						var returnMsg = "";
-						if (data.AddClientsToClassesResult.ErrorCode===200){
-							returnMsg = "Success!";
-						}else{
-							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToClassesResult.Classes.Class.Clients.Client.Messages.string);
-						}
-						 var alertPopup = $ionicPopup.alert({
-							 title: 'Book Class',
-							 template: returnMsg
-						   });
-						   alertPopup.then(function(res) {});
-					 }else{
-						//press cancel
-						//alert("nope");
-					 }
-				   });
-			})
-			//not working
-			request1.error(function (data) {
-            })
-		}
-	}
-})
-
-app.factory('workshopsService',function($http,$ionicPopup){
-	return {
-		getWorkshopsDatabase: function(){
-			var request = $http({
-			method: "post",
-			url: "http://platinumyoga-rerawan.rhcloud.com/getWorkshops.php",
-			headers: { 
-				'Content-Type': 'application/x-www-form-urlencoded' 
-			}
-			});
-
-			/* Check whether the HTTP Request is successful or not. */
-			request.success(function (data) {
-				workshopsDatabase = data;
-			})
-		},
-		getWorkshops:function(){
-			return workshopsDatabase;
-		},
-		getSelectedWorkshop:function(workshopID){
-			for(var i=0;i<workshopsDatabase.length;i++){
-				if(workshopsDatabase[i].ID==workshopID){
-					return workshopsDatabase[i];
-				}
-			}
-		},
-		getWorkshopStaff:function(workshopStaffID){
-			for(var i=0;i<workshopsDatabase.length;i++){
-				if(workshopsDatabase[i].Staff.ID==workshopStaffID){
-					return workshopsDatabase[i].Staff;
-				}
-			}
-		},
-		bookWorkshop:function(workshopId,userId){
-			var request1 = $http({
-			method: "post",
-			url: "http://platinumyoga-rerawan.rhcloud.com/bookClientIntoWorkshop.php",
-			data: {
-				workshopID: workshopId,
-				userID: userId
-			},
-			headers: { 
-				'Content-Type': 'application/x-www-form-urlencoded' 
-			}
-			});
-
-			/* Check whether the HTTP Request is successful or not. */
-			request1.success(function (data) {
-				var confirmBookingPopup = $ionicPopup.confirm({
-					 title: 'Book Workshop',
-					 template: 'Are you sure you want to book this workshop?',
-					 okText: 'Confirm'
-				   });
-				   confirmBookingPopup.then(function(res) {
-					 if(res){
-						//click on confirm
-						var returnMsg = "";
-						if (data.AddClientsToEnrollmentsResult.ErrorCode===200){
-							returnMsg = "Success!";
-						}else{
-							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
-						}
-						 var alertPopup = $ionicPopup.alert({
-							 title: 'Book Workshop',
-							 template: returnMsg
-						   });
-						   alertPopup.then(function(res) {});
-					 }else{
-						//press cancel
-						//alert("nope");
-					 }
-				   });
-			})
-			//not working
-			request1.error(function (data) {
-            })
-		}
-	}
-})
-
-
-app.factory('userScheduleService', function($http,$state,$ionicPopup) {
-	return {
-		getUserSchedule: function(userId){
-			var request = $http({
-			method: "post",
-			url: "http://platinumyoga-rerawan.rhcloud.com/getClientSchedule.php",
-			data: {
-				userID: userId,
-			},
-			headers: { 
-				'Content-Type': 'application/x-www-form-urlencoded' 
-			}
-			});
-
-			/* Check whether the HTTP Request is successful or not. */
-			request.success(function (data) {
-				userScheduleDatabase = data;
-			})
-			
-			//not working
-			request.error(function (data) {
-            })
-		},
-		getUserScheduleOutput:function(){
-			if(JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit).charAt(0)!="["){
-				return JSON.parse("["+JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit)+"]"); 
-			}else{
-				return userScheduleDatabase.GetClientScheduleResult.Visits.Visit; 
-			}
-			//alert(JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit)[0]);
-			
-		},
-		removeScheduledClass:function(classId,userId){
-			var request2 = $http({
-			method: "post",
-			url: "http://platinumyoga-rerawan.rhcloud.com/removeClientFromClass.php",
-			data: {
-				classID: classId,
-				userID: userId
-			},
-			headers: { 
-				'Content-Type': 'application/x-www-form-urlencoded' 
-			}
-			});
-
-			/* Check whether the HTTP Request is successful or not. */
-			request2.success(function (data) {
-				if(data.RemoveClientsFromClassesResult.ErrorCode===200){
-					var successRemovePopUp = $ionicPopup.alert({
-						 title: 'Remove Class',
-						 template: 'You have successfully removed this class!'
-					   });
-					   alertPopup.then(function(res){});
-				}else{
-					var unSuccessRemovePopUp = $ionicPopup.alert({
-						 title: 'Remove Class',
-						 template: 'You cannot remove this class!'
-					   });
-					   alertPopup.then(function(res){
-					   });
-				}
-			})
-			//not working
-			request2.error(function (data) {
-            })
-		}
-	}
-})
-
-
-app.factory('historyService', function($http) {
-	return {
-		getUserHistory: function(userId){
-			var request = $http({
-			method: "post",
-			url: "http://platinumyoga-rerawan.rhcloud.com/getClientHistory.php",
-			data: {
-				userID: userId,
-			},
-			headers: { 
-				'Content-Type': 'application/x-www-form-urlencoded' 
-			}
-			});
-
-			/* Check whether the HTTP Request is successful or not. */
-			request.success(function (data) {
-				historyDatabase = data;
-			})
-			
-			//not working
-			request.error(function (data) {
-            })
-		},
-		getUserHistoryResponse:function(){
-			return historyDatabase.GetClientVisitsResult.Visits.Visit;
-		}
-	}
-})
-
-app.factory('appointmentService',function($http){
-	return {
-		getAppointments: function(){
-			var request = $http({
-			method: "post",
-			url: "http://platinumyoga-rerawan.rhcloud.com/getAppointments.php",
-			headers: { 
-				'Content-Type': 'application/x-www-form-urlencoded' 
-			}
-			});
-
-			/* Check whether the HTTP Request is successful or not. */
-			request.success(function (data) {
-				apptDatabase = data;
-			})
-			
-			//not working
-			request.error(function (data) {
-            })
-		}
-	}
 })
