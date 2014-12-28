@@ -114,12 +114,12 @@ About page
 		  
 		<!--bottom footer (permanent)-->
 				<ion-footer-bar>	
-					<ion-tabs class="tabs-energized">
+					<ion-tabs class="tabs-striped tabs-background-energized tabs-color-light">
 							  <a class="tab-item" href="#/yoga-app/home">
 								<i class="icon ion-home" style="padding-top:2px;"></i>
 							  </a>
 							  <div class="tab-item" ng-click="showActionsheet()">
-								<i class="icon ion-clipboard" style="padding-top:2px;"></></i>
+								<i class="icon ion-compose" style="padding-top:2px;"></></i>
 							  </div>
 							  <!--barcode-->
 							  <a class="tab-item" href="#/yoga-app/barcode">
@@ -171,7 +171,7 @@ About page
 					  <ion-item class="item-accordion"
 								ng-repeat="item in group.items"
 								ng-show="isGroupShown(group)"  ng-repeat="" href="#/yoga-app/{{item}}" type="item-link" menu-close>
-						<i class="icon ion-chevron-right">&nbsp;&nbsp;&nbsp;&nbsp;{{item}}</i>
+						<i class="icon ion-chevron-right" style="padding:10px">&nbsp;&nbsp;&nbsp;&nbsp;{{item}}</i>
 					  </ion-item>
 					</div>
 				</ion-list>
