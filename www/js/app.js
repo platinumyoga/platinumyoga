@@ -986,6 +986,7 @@ app.controller('appointmentCtrl',function($scope,appointmentService){
 })
 
 app.controller('halloffameCtrl',function($scope){
+	
 	$scope.winnersData = {
 		"filter" : 'current',
 		"winners": [
