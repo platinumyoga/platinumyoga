@@ -503,14 +503,107 @@ About page
       </ion-view>
     </script>
 
-	<!--EVENTS PAGE(under workshops but has its own tab)-->
+		<!--EVENTS PAGE(under workshops but has its own tab)-->
     <script id="templates/events.html" type="text/ng-template">
       <ion-view title="Events">
-        <ion-content has-header="true">
-			<p align="center">EVENTS CONTENTS</p>
+			<ion-content has-header="true">
+			<div class="list">
+				<div class="bar bar-header item-input-inset">
+					<ion-search placeholder="Search for events" filter="search"></ion-search>
+				</div>
+				
+				<div class="row" ng-repeat="event in eventsData| filter:search.value">
+						<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
+							<a href="#/yoga-app/selectedEvent/{{event.ID}}">
+							<b>{{event.ClassDescription.Name}}</b><br/>
+							{{(event.StartDate).slice(0,10)}}<br/>
+							{{(event.StartTime).slice(12,20)}} - {{(event.EndTime).slice(12,20)}}<br/>
+							{{event.Staff.Name}} <br/>
+							Event ID:&nbsp;{{event.ID}}
+							</a>
+						</div>
+						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
+							<button class="button-right button-stable col" ng-click="bookEvent({{event.ID}},{{userID}})">Book</button>
+						</div>
+				</div>
+			</div>	
         </ion-content>
       </ion-view>
     </script>
+	
+	
+	<!--SELECTED EVENT PAGE-->
+    <script id="templates/selectedEvent.html" type="text/ng-template">
+      <ion-view title="Event">
+        <ion-content has-header="true">
+			<div align="center">
+				<div class="row">
+				  <div class="col"><b>{{selectedEvent.ClassDescription.Name}}</b></div>
+				</div>
+
+				<div class="row">
+				  <div class="col">22/30 Enrolled (dummy)</div>
+				</div>
+
+				<div class="row">
+				  <div class="col">
+						<div class="button-bar">
+						  <a class="button button-small button-energized" href="tel:+6563480809">Call</a>
+						  <div class="button button-small button-energized" ng-click="bookEvent({{selectedEvent.ID}},{{userID}})">Enroll</div>
+						  <a class="button button-small button-energized" href="#/yoga-app/Events">All Events</a>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+				  <div class="col">
+					  <a href="#yoga-app/eventStaff/{{selectedEvent.Staff.ID}}" class="button button-small">{{selectedEvent.Staff.Name}}</a>
+				  </div>
+				</div>
+				
+				<!--rating stars-->
+				<div class="row">
+					<div class="col">
+						<div style="align:right;size:70%;" id="review1" data-score="3.5"></div>
+						<div id="result1" style="font-size: 15px !important;"></div>
+					</div>
+				</div>
+
+				<div class="row">
+				  <div class="col">{{(selectedEvent.StartDate).slice(0,10)}}</div>
+				</div>
+				
+				<div class="row">
+				  <div class="col">{{(selectedEvent.StartTime).slice(12,20)}} - {{(selectedEvent.StartDate.EndTime).slice(12,20)}}</div>
+				</div>
+				
+				<div class="row">
+				  <div class="col"><b>Description:</b><br/>{{selectedEvent.ClassDescription.Description}}</div>
+				</div>
+			</div>
+        </ion-content>
+      </ion-view>
+    </script>
+	
+	
+	<!--EVENT STAFF INFO-->
+    <script id="templates/eventStaff.html" type="text/ng-template">
+      <ion-view title="Staff">
+        <ion-content has-header="true">
+			<div align="center">
+				<div class="row">
+				  <div class="col"><img src="{{selectedEventStaff.ImageURL}}" /></div>
+				</div>
+				
+				<div class="row">
+				  <div class="col"><b>{{selectedEventStaff.Name}}</b></div>
+				</div>
+			</div>
+        </ion-content>
+      </ion-view>
+    </script>
+	
+	
 	
 	<!--APPOINTMENTS PAGE-->
     <script id="templates/appointments.html" type="text/ng-template">
@@ -529,10 +622,78 @@ About page
     <script id="templates/challenges.html" type="text/ng-template">
       <ion-view title="Challenges">
         <ion-content has-header="true">
-			<p align="center">CHALLENGES CONTENTS</p>
+			<div class="list">
+				<div class="bar bar-header item-input-inset">
+					<ion-search placeholder="Search for challenge" filter="search"></ion-search>
+				</div>
+				<div class="row" ng-repeat="challenge in challengesData | filter:search.value">
+						<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
+							<a href="#/yoga-app/selectedChallenge/{{challenge.ID}}">
+							<b>{{challenge.ClassDescription.Name}}</b><br/>
+							{{(challenge.StartDate).slice(0,10)}}<br/>
+							{{(challenge.StartTime).slice(12,20)}} - {{(challenge.EndTime).slice(12,20)}}<br/>
+							{{challenge.Staff.Name}} <br/>
+							Challenge ID:&nbsp;{{challenge.ID}}
+							</a>
+						</div>
+						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
+							<button class="button-right button-stable col" ng-click="bookChallenge({{challenge.ID}},{{userID}})">Book</button>
+						</div>
+				</div>
+			</div>
         </ion-content>
       </ion-view>
     </script>
+	
+	
+	<!--SELECTED CHALLENGE PAGE-->
+    <script id="templates/selectedChallenge.html" type="text/ng-template">
+      <ion-view title="Challenge">
+        <ion-content has-header="true">
+			<div align="center">
+				<div class="row">
+				  <div class="col"><b>{{selectedChallenge.ClassDescription.Name}}</b></div>
+				</div>
+
+				<div class="row">
+				  <div class="col">23/30 Enrolled (dummy)</div>
+				</div>
+
+				<div class="row">
+				  <div class="col">
+						<div class="button-bar">
+						  <a class="button button-small button-energized" href="tel:+6563480809">Call</a>
+						  <div class="button button-small button-energized" ng-click="bookChallenge({{selectedChallenge.ID}},{{userID}})">Enroll</div>
+						  <a class="button button-small button-energized" href="#/yoga-app/Challenges">All Challenges</a>
+						</div>
+					</div>
+				</div>
+
+				<!--rating stars-->
+				<div class="row">
+					<div class="col">
+						<div style="align:right;size:70%;" id="review1" data-score="3.5"></div>
+						<div id="result1" style="font-size: 15px !important;"></div>
+					</div>
+				</div>
+
+				<div class="row">
+				  <div class="col">{{(selectedChallenge.StartDate).slice(0,10)}}</div>
+				</div>
+				
+				<div class="row">
+				  <div class="col">{{(selectedChallenge.StartTime).slice(12,20)}} - {{(selectedChallenge.StartDate.EndTime).slice(12,20)}}</div>
+				</div>
+				
+				<div class="row">
+				  <div class="col"><b>Description:</b><br/>{{selectedChallenge.ClassDescription.Description}}</div>
+				</div>
+			</div>
+        </ion-content>
+      </ion-view>
+    </script>
+	
+	
 	
 	<!--POSE TREE PAGE-->
     <script id="templates/posetree.html" type="text/ng-template">

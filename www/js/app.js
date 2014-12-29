@@ -1,6 +1,7 @@
 var app = angular.module('ionicApp', ['ionic','ui.router'])
 
-
+//CONFIGURATION+ROUTE
+//CONFIGURATION+ROUTE
 app.config(function($stateProvider, $urlRouterProvider) {
 	$urlRouterProvider.otherwise('/login')
 	
@@ -89,6 +90,25 @@ app.config(function($stateProvider, $urlRouterProvider) {
       views: {
         'menuContent' :{
           templateUrl: "templates/events.html",
+		  controller: "eventsCtrl"
+        }
+      }
+    })
+	.state('yoga-app.selectedEvent', {
+      url: "/selectedEvent/:eventID",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/selectedEvent.html",
+		  controller: "eventsCtrl"
+        }
+      }
+    })
+	.state('yoga-app.eventStaff', {
+      url: '/eventStaff/:eventStaffID',
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/eventStaff.html",
+		  controller: "eventsCtrl"
         }
       }
     })
@@ -106,6 +126,16 @@ app.config(function($stateProvider, $urlRouterProvider) {
       views: {
         'menuContent' :{
           templateUrl: "templates/challenges.html",
+		  controller: "challengesCtrl"
+        }
+      }
+    })
+	.state('yoga-app.selectedChallenge', {
+      url: "/selectedChallenge/:challengeID",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/selectedChallenge.html",
+		  controller: "challengesCtrl"
         }
       }
     })
@@ -396,6 +426,169 @@ app.factory('workshopsService',function($http,$ionicPopup){
 })
 
 
+app.factory('eventsService',function($http,$ionicPopup){
+	return {
+		getEventsDatabase: function(){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getWorkshops.php",
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				eventsDatabase = data;
+			})
+		},
+		getEvents:function(){
+			return eventsDatabase;
+		},
+		getSelectedEvent:function(eventID){
+			for(var i=0;i<eventsDatabase.length;i++){
+				if(eventsDatabase[i].ID==eventID){
+					return eventsDatabase[i];
+				}
+			}
+		},
+		getEventStaff:function(eventStaffID){
+			for(var i=0;i<eventsDatabase.length;i++){
+				if(eventsDatabase[i].Staff.ID==eventStaffID){
+					return eventsDatabase[i].Staff;
+				}
+			}
+		},
+		bookEvent:function(eventId,userId){
+			var request1 = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/bookClientIntoWorkshop.php",
+			data: {
+				workshopID: eventId,
+				userID: userId
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request1.success(function (data) {
+				var confirmBookingPopup = $ionicPopup.confirm({
+					 title: 'Book Event',
+					 template: 'Are you sure you want to book this event?',
+					 okText: 'Confirm'
+				   });
+				   confirmBookingPopup.then(function(res) {
+					 if(res){
+						//click on confirm
+						var returnMsg = "";
+						if (data.AddClientsToEnrollmentsResult.ErrorCode===200){
+							returnMsg = "Success!";
+						}else{
+							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
+						}
+						 var alertPopup = $ionicPopup.alert({
+							 title: 'Book Event',
+							 template: returnMsg
+						   });
+						   alertPopup.then(function(res) {});
+					 }else{
+						//press cancel
+						//alert("nope");
+					 }
+				   });
+			})
+			//not working
+			request1.error(function (data) {
+            })
+		}
+	}
+})
+
+
+app.factory('challengesService',function($http,$ionicPopup){
+	return {
+		getChallengesDatabase: function(){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getWorkshops.php",
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				challengesDatabase = data;
+			})
+		},
+		getChallenges:function(){
+			return challengesDatabase;
+		},
+		getSelectedChallenge:function(challengeID){
+			for(var i=0;i<challengesDatabase.length;i++){
+				if(challengesDatabase[i].ID==challengeID){
+					return challengesDatabase[i];
+				}
+			}
+		},
+		getChallengeStaff:function(challengeID){
+			for(var i=0;i<challengesDatabase.length;i++){
+				if(challengesDatabase[i].Staff.ID==challengeID){
+					return challengesDatabase[i].Staff;
+				}
+			}
+		},
+		bookChallenge:function(challengeID,userId){
+			var request1 = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/bookClientIntoWorkshop.php",
+			data: {
+				workshopID: challengeID,
+				userID: userId
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request1.success(function (data) {
+				var confirmBookingPopup = $ionicPopup.confirm({
+					 title: 'Book Challenge',
+					 template: 'Are you sure you want to book this challenge?',
+					 okText: 'Confirm'
+				   });
+				   confirmBookingPopup.then(function(res) {
+					 if(res){
+						//click on confirm
+						var returnMsg = "";
+						if (data.AddClientsToEnrollmentsResult.ErrorCode===200){
+							returnMsg = "Success!";
+						}else{
+							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
+						}
+						 var alertPopup = $ionicPopup.alert({
+							 title: 'Book Challenge',
+							 template: returnMsg
+						   });
+						   alertPopup.then(function(res) {});
+					 }else{
+						//press cancel
+						//alert("nope");
+					 }
+				   });
+			})
+			//not working
+			request1.error(function (data) {
+            })
+		}
+	}
+})
+
+
+
 app.factory('userScheduleService', function($http,$state,$ionicPopup) {
 	return {
 		getUserSchedule: function(userId){
@@ -518,11 +711,13 @@ app.factory('appointmentService',function($http){
 
 
 
-app.controller('loginCtrl', function($scope, $state,userService,classesService,workshopsService) {
+app.controller('loginCtrl', function($scope, $state,userService,classesService,workshopsService,eventsService,challengesService) {
 	$scope.signIn = function(user) {
 		userService.authentication(user);
 		classesService.getClassesDatabase();
 		workshopsService.getWorkshopsDatabase();
+		eventsService.getEventsDatabase();
+		challengesService.getChallengesDatabase();
 		$scope.userId = userService.getUserID();
 	};
 	
@@ -823,6 +1018,27 @@ app.controller('workshopCtrl',function($scope,$stateParams,userService,workshops
 	
 	$scope.bookSelectedWorkshop = function(workshopId,userId){
 		workshopsService.bookWorkshop(workshopId,userId);
+	};
+})
+
+app.controller('eventsCtrl',function($scope,$stateParams,userService,eventsService){
+	$scope.eventsData = eventsService.getEvents();
+	$scope.selectedEvent = eventsService.getSelectedEvent($stateParams.eventID);
+	$scope.selectedEventStaff = eventsService.getEventStaff($stateParams.eventStaffID);
+	$scope.userID = userService.getUserID();
+	
+	$scope.bookEvent = function(eventId,userID){
+		eventsService.bookEvent(eventId,userID);
+	};
+})
+
+app.controller('challengesCtrl',function($scope,$stateParams,userService,challengesService){
+	$scope.challengesData = challengesService.getChallenges();
+	$scope.selectedChallenge = challengesService.getSelectedChallenge($stateParams.challengeID);
+	$scope.userID = userService.getUserID();
+	
+	$scope.bookChallenge = function(challengeId,userID){
+		challengesService.bookChallenge(challengeId,userID);
 	};
 })
 
