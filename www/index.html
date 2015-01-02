@@ -208,15 +208,26 @@ About page
 				<!--list displaying booked classes and workshops[this is a single list from the mindbodyonline service]-->
 				<div class="list" ng-show="showUpcomingView">
 					<div class="item" ng-repeat="class in scheduledClasses">
-						{{(class.StartDateTime).slice(0,10)}}&nbsp;<br/>
-						<b>Lesson:</b>&nbsp;{{class.Name}}<br/>
-						<b>Staff:</b>&nbsp;{{class.Staff.Name}}
-							<div class="button button-small assertive" ng-click="removeClass({{class.ClassID}},{{userId}})">Cancel</div>
+						<div class="row">
+							<div class="col col-67">
+							{{(class.StartDateTime).slice(0,10)}}&nbsp;<br/>
+							<b>Lesson:</b>&nbsp;{{class.Name}}<br/>
+							<b>Staff:</b>&nbsp;{{class.Staff.Name}}</div>
+							<div class="col col-33" style="padding-top:20px;padding-left:40px;">
+								<div class="button button-small assertive" ng-click="removeClass({{class.ClassID}},{{userId}})">Cancel</div>
+							</div>
+						</div>
 					</div>
 				</div>
 				
 				<!--list showing the history-->
 				<div class="list" ng-show="showHistoryView">
+					
+					<div class="button-bar">
+					  <a class="button button-small" ng-click="showBookingHistory()">Bookings</a>
+					  <a class="button button-small" ng-click="showPurchaseHistory()">Purchase</a>
+					</div>
+					
 					<div class="item" ng-repeat="history in userHistory">
 						{{(history.StartDateTime).slice(0,10)}}<br/>
 						<b>Lesson:</b>&nbsp;{{history.Name}}<br/>
@@ -224,6 +235,18 @@ About page
 						<b>Attendance:&nbsp;</b>
 						<span ng-show={{history.SignedIn}}>Present</span>
 						<span ng-show=!{{history.SignedIn}}>Absent</span>
+					</div>
+				</div>
+				
+				<!--list displaying purchase histories-->
+				<div class="list" ng-show="showPurchase">
+					<div class="button-bar">
+					  <a class="button button-small" ng-click="showBookingHistory()">Bookings</a>
+					  <a class="button button-small" ng-click="showPurchaseHistory()">Purchase</a>
+					</div>
+					
+					<div class="item" ng-repeat="purchase in purchases">
+						{{purchase}}
 					</div>
 				</div>
 				

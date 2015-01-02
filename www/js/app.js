@@ -5,7 +5,7 @@ var app = angular.module('ionicApp', ['ionic','ui.router'])
 app.config(function($stateProvider, $urlRouterProvider) {
 	$urlRouterProvider.otherwise('/login')
 	
-  $stateProvider	
+  $stateProvider
 	.state('login', {
 			url:"/login",
 			templateUrl:"templates/login.html",
@@ -252,7 +252,7 @@ app.factory('userService', function($http,$state,userScheduleService,historyServ
 			
 			//not working
 			request.error(function (data) {
-				alert(data);
+				//alert(data);
                 loginFail();
             })
 		},
@@ -266,7 +266,7 @@ app.factory('userService', function($http,$state,userScheduleService,historyServ
 })
 
 
-app.factory('classesService', function($http,$ionicPopup) {
+app.factory('classesService', function($http,$ionicPopup,userScheduleService) {
 	return {
 		getClassesDatabase: function(){
 			var request = $http({
@@ -325,6 +325,7 @@ app.factory('classesService', function($http,$ionicPopup) {
 						var returnMsg = "";
 						if (data.AddClientsToClassesResult.ErrorCode===200){
 							returnMsg = "Success!";
+							userScheduleService.getUserSchedule(userId);
 						}else{
 							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToClassesResult.Classes.Class.Clients.Client.Messages.string);
 						}
@@ -346,7 +347,7 @@ app.factory('classesService', function($http,$ionicPopup) {
 	}
 })
 
-app.factory('workshopsService',function($http,$ionicPopup){
+app.factory('workshopsService',function($http,$ionicPopup,userScheduleService){
 	return {
 		getWorkshopsDatabase: function(){
 			var request = $http({
@@ -405,6 +406,7 @@ app.factory('workshopsService',function($http,$ionicPopup){
 						var returnMsg = "";
 						if (data.AddClientsToEnrollmentsResult.ErrorCode===200){
 							returnMsg = "Success!";
+							userScheduleService.getUserSchedule(userId);
 						}else{
 							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
 						}
@@ -427,7 +429,7 @@ app.factory('workshopsService',function($http,$ionicPopup){
 })
 
 
-app.factory('eventsService',function($http,$ionicPopup){
+app.factory('eventsService',function($http,$ionicPopup,userScheduleService){
 	return {
 		getEventsDatabase: function(){
 			var request = $http({
@@ -486,6 +488,7 @@ app.factory('eventsService',function($http,$ionicPopup){
 						var returnMsg = "";
 						if (data.AddClientsToEnrollmentsResult.ErrorCode===200){
 							returnMsg = "Success!";
+							userScheduleService.getUserSchedule(userId);
 						}else{
 							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
 						}
@@ -508,7 +511,7 @@ app.factory('eventsService',function($http,$ionicPopup){
 })
 
 
-app.factory('challengesService',function($http,$ionicPopup){
+app.factory('challengesService',function($http,$ionicPopup,userScheduleService){
 	return {
 		getChallengesDatabase: function(){
 			var request = $http({
@@ -567,6 +570,7 @@ app.factory('challengesService',function($http,$ionicPopup){
 						var returnMsg = "";
 						if (data.AddClientsToEnrollmentsResult.ErrorCode===200){
 							returnMsg = "Success!";
+							userScheduleService.getUserSchedule(userId);
 						}else{
 							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
 						}
@@ -590,7 +594,7 @@ app.factory('challengesService',function($http,$ionicPopup){
 
 
 
-app.factory('userScheduleService', function($http,$state,$ionicPopup) {
+app.factory('userScheduleService', function($http,$state) {
 	return {
 		getUserSchedule: function(userId){
 			var request = $http({
@@ -607,6 +611,7 @@ app.factory('userScheduleService', function($http,$state,$ionicPopup) {
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
 				 userScheduleDatabase = data;
+				 //alert("delete trigger database!=)");
 			})
 			
 			//not working
@@ -615,12 +620,17 @@ app.factory('userScheduleService', function($http,$state,$ionicPopup) {
 		},
 		getUserScheduleOutput:function(){
 			if(JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit).charAt(0)!="["){
-				JSON.parse("["+JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit)+"]"); 
+				return JSON.parse("["+JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit)+"]"); 
 			}else{
+				return userScheduleDatabase.GetClientScheduleResult.Visits.Visit; 
 				
-				return  userScheduleDatabase.GetClientScheduleResult.Visits.Visit; 
 			}
-		},
+		}
+	}
+})
+
+app.factory('removeBookingService',function($http,userScheduleService,$ionicPopup){
+	return{
 		removeScheduledClass:function(classId,userId){
 			var request2 = $http({
 			method: "post",
@@ -636,12 +646,15 @@ app.factory('userScheduleService', function($http,$state,$ionicPopup) {
 
 			/* Check whether the HTTP Request is successful or not. */
 			request2.success(function (data) {
+					   userScheduleService.getUserSchedule(userId);
 				if(data.RemoveClientsFromClassesResult.ErrorCode===200){
+					//alert(data.RemoveClientsFromClassesResult.Classes.Class.Clients.Client.ID);
 					var successRemovePopUp = $ionicPopup.alert({
 						 title: 'Cancel Class',
 						 template: 'You have successfully cancelled this class!'
 					   });
 					   alertPopup.then(function(res){});
+					   
 				}else{
 					var unSuccessRemovePopUp = $ionicPopup.alert({
 						 title: 'Cancel Class',
@@ -845,7 +858,7 @@ app.controller('barcodeCtrl',function($scope,userService){
 	$scope.userId = userService.getUserID();
 })
 
-app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$timeout,$ionicLoading,$interval,userService,userScheduleService,historyService){
+app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$timeout,$ionicLoading,$interval,userService,userScheduleService,removeBookingService,historyService){
 
 	$scope.userId = userService.getUserID();;
 	$scope.username = userService.getUsername();
@@ -856,8 +869,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		//retrieve user's history
 		$scope.userHistory = historyService.getUserHistoryResponse();
 	};
-	//retrieveUserInfo();
-	
+
 	// Setup the loader
 	  $ionicLoading.show({
 		content: 'Loading',
@@ -871,7 +883,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	  $timeout(function () {
 		$ionicLoading.hide();
 		retrieveUserInfo();
-	  }, 1000);
+	  }, 2800);
 
 	
 	var upcoming = document.getElementById('showUpcoming');
@@ -884,16 +896,30 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	$scope.showUpcoming = function(){
 		$scope.showUpcomingView = true;
 		$scope.showHistoryView = false;
+		$scope.showPurchase = false;
 		upcoming.style.cssText="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;";
 		history.style.cssText ="background-color:#f8f8f8";
 	};	
 	
 	$scope.showHistory = function(){
 		$scope.showUpcomingView = false;
+		$scope.showPurchase = false;
 		$scope.showHistoryView = true;
 		history.style.cssText ="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;";
 		upcoming.style.cssText ="background-color:#f8f8f8";
 	};
+	
+	$scope.showBookingHistory = function(){
+		$scope.showHistoryView = true;
+		$scope.showPurchase = false;
+	};
+	
+	$scope.showPurchaseHistory = function(){
+		$scope.showHistoryView = false;
+		$scope.showPurchase = true;
+	};
+	
+	$scope.purchases = ["purchase 1","purchase 2"];
 	
 	$scope.removeClass = function(classId,userId){
 		 // A confirm dialog
@@ -904,16 +930,15 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		   });
 		   confirmPopup.then(function(res) {
 			 if(res) {
-				userScheduleService.removeScheduledClass(classId,userId);
+				removeBookingService.removeScheduledClass(classId,userId);
+				$state.go($state.current, {}, {reload: true});
 			 } else {
 				//press cancel
 				//alert("nope");
 			 }
 		   });
-		//$state.go($state.current, {}, {reload: true});
+		   
 	}
-	
-	
 	
 	
 	
