@@ -218,7 +218,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 
 //services
-app.factory('userService', function($http,$state) {
+app.factory('userService', function($http,$state,userScheduleService,historyService) {
 	var users = [];
 	var userDatabase = "";
 	
@@ -239,13 +239,14 @@ app.factory('userService', function($http,$state) {
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
 				userDatabase = data;
-				userID = userDatabase.ValidateLoginResult.Client.ID;
-				if(data.ValidateLoginResult.ErrorCode === 200){
-					//alert(data.ValidateLoginResult);
-					alert(data.ValidateLoginResult.Status);
+				if(userDatabase.ValidateLoginResult.ErrorCode === 200){
+					userID = userDatabase.ValidateLoginResult.Client.ID;
+					alert("Successful Login!");
+					userScheduleService.getUserSchedule(userID);
+					historyService.getUserHistory(userID);
 					$state.go("yoga-app.home");
 				}else{
-					alert("Login Failed");
+					alert(userDatabase.ValidateLoginResult.Message);
 				}	
 			})
 			
@@ -616,6 +617,7 @@ app.factory('userScheduleService', function($http,$state,$ionicPopup) {
 			if(JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit).charAt(0)!="["){
 				JSON.parse("["+JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit)+"]"); 
 			}else{
+				
 				return  userScheduleDatabase.GetClientScheduleResult.Visits.Visit; 
 			}
 		},
@@ -711,14 +713,13 @@ app.factory('appointmentService',function($http){
 
 
 
-app.controller('loginCtrl', function($scope, $state,userService,classesService,workshopsService,eventsService,challengesService) {
+app.controller('loginCtrl', function($scope, $state,userService,userScheduleService,classesService,workshopsService,eventsService,challengesService) {
 	$scope.signIn = function(user) {
 		userService.authentication(user);
 		classesService.getClassesDatabase();
 		workshopsService.getWorkshopsDatabase();
 		eventsService.getEventsDatabase();
 		challengesService.getChallengesDatabase();
-		$scope.userId = userService.getUserID();
 	};
 	
 	$scope.next = function(){
@@ -846,16 +847,13 @@ app.controller('barcodeCtrl',function($scope,userService){
 
 app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$timeout,$ionicLoading,$interval,userService,userScheduleService,historyService){
 
-	$scope.userId = userService.getUserID();
+	$scope.userId = userService.getUserID();;
 	$scope.username = userService.getUsername();
 	
 	var retrieveUserInfo = function(){
 		//retrieve user's scheduled classes
-		userScheduleService.getUserSchedule($scope.userId);
 		$scope.scheduledClasses = userScheduleService.getUserScheduleOutput();
-		
-		//retrieve user's history 
-		historyService.getUserHistory($scope.userId);
+		//retrieve user's history
 		$scope.userHistory = historyService.getUserHistoryResponse();
 	};
 	//retrieveUserInfo();
