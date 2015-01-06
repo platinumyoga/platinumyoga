@@ -1,4 +1,6 @@
-var app = angular.module('ionicApp', ['ionic','ui.router'])
+var app = angular.module('ionicApp', ['ionic','firebase','ui.router'])
+
+app.value('fbURL', 'https://healthtipstinkertest.firebaseio.com/')
 
 //CONFIGURATION+ROUTE
 //CONFIGURATION+ROUTE
@@ -168,6 +170,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       views: {
         'menuContent' :{
           templateUrl: "templates/promotions.html",
+		  controller: "promotionsCtrl"
         }
       }
     })
@@ -215,10 +218,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
     })
 })
 
-
-
 //services
-app.factory('userService', function($http,$state,userScheduleService,historyService) {
+app.factory('userService', function($http,$state,userScheduleService,historyService,purchaseHistoryService) {
 	var users = [];
 	var userDatabase = "";
 	
@@ -244,6 +245,7 @@ app.factory('userService', function($http,$state,userScheduleService,historyServ
 					alert("Successful Login!");
 					userScheduleService.getUserSchedule(userID);
 					historyService.getUserHistory(userID);
+					purchaseHistoryService.getPurchaseHistory(userID);
 					$state.go("yoga-app.home");
 				}else{
 					alert(userDatabase.ValidateLoginResult.Message);
@@ -264,6 +266,36 @@ app.factory('userService', function($http,$state,userScheduleService,historyServ
 		}
 	}
 })
+
+
+//firebase
+/*app.factory('healthtipsDBService',function ($http,$firebase) {
+      var ref = new Firebase("https://healthtipstinkertest.firebaseio.com/");
+      return {
+        getTips: function() {
+			return $firebase(ref).$asArray();
+        }
+      }
+})
+
+.factory('healthtipsDBService', ['$firebase', function ($firebase) {
+
+  var ref = new Firebase("https://healthtipstinkertest.firebaseio.com/");
+  var sync = $firebase(ref);
+
+  return {
+    getTips: function() {
+	  alert(sync);
+	  //alert(sync.$asArray());
+      return sync.$asArray();
+    }
+  }
+}])*/
+
+app.factory('HealthTip', function (fbURL, $firebase) {
+    return $firebase(new Firebase(fbURL)).$asArray();
+})
+
 
 
 app.factory('classesService', function($http,$ionicPopup,userScheduleService) {
@@ -701,6 +733,38 @@ app.factory('historyService', function($http) {
 	}
 })
 
+
+app.factory('purchaseHistoryService', function($http) {
+	return {
+		getPurchaseHistory: function(userId){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getClientPurchases.php",
+			data: {
+				userID: userId,
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				purchaseHistoryDatabase = data;
+			})
+			
+			//not working
+			request.error(function (data) {
+            })
+		},
+		getPurchaseResponse:function(){
+		//alert(purchaseHistoryDatabase.GetClientPurchasesResult.Purchases.SaleItem[0].Description);
+			return purchaseHistoryDatabase.GetClientPurchasesResult.Purchases.SaleItem;
+		}
+	}
+})
+
+
 app.factory('appointmentService',function($http){
 	return {
 		getAppointments: function(){
@@ -742,6 +806,7 @@ app.controller('loginCtrl', function($scope, $state,userService,userScheduleServ
 
 //$ionicSideMenuDelegate is the dependency for menu
 app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate) {
+
 	//left menu
 	$scope.toggleLeft = function() {
     $ionicSideMenuDelegate.toggleLeft();
@@ -761,6 +826,11 @@ app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate)
 		window.history.back();
 	};
 	
+	$scope.init = function(){
+		
+		//line below does not work
+		//alert($scope.healthTips[0]);
+	};
 })
 
 
@@ -858,7 +928,7 @@ app.controller('barcodeCtrl',function($scope,userService){
 	$scope.userId = userService.getUserID();
 })
 
-app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$timeout,$ionicLoading,$interval,userService,userScheduleService,removeBookingService,historyService){
+app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$timeout,$ionicLoading,$interval,userService,userScheduleService,removeBookingService,historyService,purchaseHistoryService){
 
 	$scope.userId = userService.getUserID();;
 	$scope.username = userService.getUsername();
@@ -868,6 +938,8 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		$scope.scheduledClasses = userScheduleService.getUserScheduleOutput();
 		//retrieve user's history
 		$scope.userHistory = historyService.getUserHistoryResponse();
+		//retrieve user's purchase history
+		$scope.saleItems = purchaseHistoryService.getPurchaseResponse();
 	};
 
 	// Setup the loader
@@ -918,8 +990,6 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		$scope.showHistoryView = false;
 		$scope.showPurchase = true;
 	};
-	
-	$scope.purchases = ["purchase 1","purchase 2"];
 	
 	$scope.removeClass = function(classId,userId){
 		 // A confirm dialog
@@ -1252,6 +1322,12 @@ app.controller('halloffameCtrl',function($scope){
 		]
 	};
 })
+
+
+app.controller('promotionsCtrl',function($scope,HealthTip){
+	$scope.tiplist = HealthTip;
+})
+
 
 app.controller('DateCtrl', function ($scope) {
   $scope.today = function() {
