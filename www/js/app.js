@@ -1,7 +1,5 @@
 var app = angular.module('ionicApp', ['ionic','firebase','ui.router'])
 
-app.value('fbURL', 'https://healthtipstinkertest.firebaseio.com/')
-
 //CONFIGURATION+ROUTE
 //CONFIGURATION+ROUTE
 app.config(function($stateProvider, $urlRouterProvider) {
@@ -269,31 +267,18 @@ app.factory('userService', function($http,$state,userScheduleService,historyServ
 
 
 //firebase
-/*app.factory('healthtipsDBService',function ($http,$firebase) {
-      var ref = new Firebase("https://healthtipstinkertest.firebaseio.com/");
-      return {
-        getTips: function() {
-			return $firebase(ref).$asArray();
-        }
-      }
-})
-
-.factory('healthtipsDBService', ['$firebase', function ($firebase) {
-
-  var ref = new Firebase("https://healthtipstinkertest.firebaseio.com/");
-  var sync = $firebase(ref);
-
-  return {
-    getTips: function() {
-	  alert(sync);
-	  //alert(sync.$asArray());
-      return sync.$asArray();
+app.factory('healthTipDb', function($firebase) {
+    var healthtipsLink = new Firebase("https://healthtipstinkertest.firebaseio.com/");
+	var dataArr = $firebase(healthtipsLink).$asArray();
+    return {
+        getHealthTipsData: function() {
+			return dataArr;
+        },
+		getTip:function(tipId){
+			//healthtipsLink.child('-JekEefgbGTQq_JdneAC').on('value', function(snapshot) { alert(snapshot.val().details); })
+			return 1;
+		}
     }
-  }
-}])*/
-
-app.factory('HealthTip', function (fbURL, $firebase) {
-    return $firebase(new Firebase(fbURL)).$asArray();
 })
 
 
@@ -825,12 +810,6 @@ app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate)
 	$scope.goBack = function() {
 		window.history.back();
 	};
-	
-	$scope.init = function(){
-		
-		//line below does not work
-		//alert($scope.healthTips[0]);
-	};
 })
 
 
@@ -1322,9 +1301,9 @@ app.controller('halloffameCtrl',function($scope){
 	};
 })
 
-
-app.controller('promotionsCtrl',function($scope,HealthTip){
-	$scope.tiplist = HealthTip;
+app.controller('promotionsCtrl',function($scope,healthTipDb){
+	$scope.healthtips = healthTipDb.getHealthTipsData();
+	$scope.tip = healthTipDb.getTip(2);
 })
 
 
