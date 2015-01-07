@@ -1074,33 +1074,32 @@ app.controller('classesCtrl', function($scope,$stateParams,classesService,userSe
 	
 	$scope.selectedStaff = classesService.getClassStaff($stateParams.classStaffID);
 	
-	//dummy classes data - filter enabled
-  $scope.classesData = {
-    "filter" : 'beginner',
-    "classes": [
-      {
-        type : "beginner",
-        name : "beginner class",
-		date : "12-12-14",
-		time : "12:30pm",
-		instructor: "Mrs Yuna"
-      },
-      {
-        type : "intermediate",
-        name : "intermediate class",
-		date : "12-12-14",
-		time : "12:30pm",
-		instructor: "Mrs Yuka"
-      },
-      {
-        type : "advance",
-        name : "advance class",
-		date : "12-12-14",
-		time : "12:30pm",
-		instructor: "Mrs Yuka"
-      }
-    ]
-  };
+	var byDate = document.getElementById('byDate');
+	var byInstructor = document.getElementById('byInstructor');
+	var byLevel = document.getElementById('byLevel');	
+	
+	$scope.showClassByDateView = true;
+	$scope.showClassByInstructorView = false;
+	$scope.showClassByLevelView = false;
+		
+	$scope.showClassByDate = function(){
+		$scope.showClassByDateView = true;
+		$scope.showClassByInstructorView = false;
+		$scope.showClassByLevelView = false;
+	};	
+	
+	$scope.showClassByInstructor = function(){
+		$scope.showClassByDateView = false;
+		$scope.showClassByInstructorView = true;
+		$scope.showClassByLevelView = false;
+	};
+	
+	$scope.showClassByLevel = function(){
+		$scope.showClassByDateView = false;
+		$scope.showClassByInstructorView = false;
+		$scope.showClassByLevelView = true;
+	};
+	
 })
 
 app.controller('workshopCtrl',function($scope,$stateParams,userService,workshopsService){

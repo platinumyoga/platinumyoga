@@ -286,34 +286,62 @@ About page
     <script id="templates/classes.html" type="text/ng-template">
       <ion-view title="Classes" has-header="true">
 			<ion-content padding="true">
-				<div ng-controller="DateCtrl">
-					<label class="item item-input">
-					 <span class="input-label">Date</span>
-					 <input type="date">
-					</label>
-				</div>
 
 				<div class="button-bar">
-					<a class="button button-small button-stable" ng-click="">Beginner</a>
-					<a class="button button-small button-stable" ng-click="">Intermediate</a>
-					<a class="button button-small button-stable" ng-click="">Advance</a>
+					<a class="button button-small button-stable" id="byDate" ng-click="showClassByDate()">By Date</a>
+					<a class="button button-small button-stable" id="ByInstructor" ng-click="showClassByInstructor()">By Instructor</a>
+					<a class="button button-small button-stable" id="ByLevel"ng-click="showClassByLevel()">By Level</a>
 				</div>
 				
-				<div class="list">
-				<div class="row" ng-repeat="class in totalClasses">
-					<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
-						<a href="#/yoga-app/selectedClass/{{class.ID}}">
-						<b>{{class.ClassDescription.Name}}</b><br/>			
-						{{(class.StartDateTime).slice(0,10)}}<br/>
-						{{(class.StartDateTime).slice(11,16)}} - {{(class.EndDateTime).slice(11,16)}}<br/>
-						{{class.Staff.Name}}<br/>
-						Class ID:&nbsp;{{class.ID}}
-						</a>
-					</div>
-					<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
-						<button class="button-right button-stable col" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
+				<div class="list" ng-show="showClassByDateView">
+					<div class="row" ng-repeat="class in totalClasses | orderBy:'StartDateTime'">
+						<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
+							<a href="#/yoga-app/selectedClass/{{class.ID}}">
+							<b>{{class.ClassDescription.Name}}</b><br/>			
+							{{(class.StartDateTime).slice(0,10)}}<br/>
+							{{(class.StartDateTime).slice(11,16)}} - {{(class.EndDateTime).slice(11,16)}}<br/>
+							{{class.Staff.Name}}<br/>
+							Class ID:&nbsp;{{class.ID}}
+							</a>
+						</div>
+						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
+							<button class="button-right button-stable col" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
+						</div>
 					</div>
 				</div>
+				
+				<div class="list" ng-show="showClassByInstructorView">
+					<div class="row" ng-repeat="class in totalClasses | orderBy:'Staff.Name'">
+						<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
+							<a href="#/yoga-app/selectedClass/{{class.ID}}">
+							<b>{{class.ClassDescription.Name}}</b><br/>			
+							{{(class.StartDateTime).slice(0,10)}}<br/>
+							{{(class.StartDateTime).slice(11,16)}} - {{(class.EndDateTime).slice(11,16)}}<br/>
+							{{class.Staff.Name}}<br/>
+							Class ID:&nbsp;{{class.ID}}
+							</a>
+						</div>
+						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
+							<button class="button-right button-stable col" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
+						</div>
+					</div>
+				</div>
+
+				<div class="list" ng-show="showClassByLevelView">
+					<div class="row" ng-repeat="class in totalClasses | orderBy:'ClassDescription.Level.Name'">
+						<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
+							<a href="#/yoga-app/selectedClass/{{class.ID}}">
+							<b>{{class.ClassDescription.Name}}</b><br/>			
+							{{(class.StartDateTime).slice(0,10)}}<br/>
+							{{(class.StartDateTime).slice(11,16)}} - {{(class.EndDateTime).slice(11,16)}}<br/>
+							{{class.Staff.Name}}<br/>
+							Class ID:&nbsp;{{class.ID}}
+							</a>
+						</div>
+						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
+							<button class="button-right button-stable col" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
+						</div>
+					</div>
 				</div>
 				
 				<!--OLD FILTER PORTION-->
