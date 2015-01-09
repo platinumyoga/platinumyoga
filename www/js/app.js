@@ -217,7 +217,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 })
 
 //services
-app.factory('userService', function($http,$state,userScheduleService,historyService,purchaseHistoryService,userDetailsService) {
+app.factory('userService', function($http,$state,$ionicPopup,userScheduleService,historyService,purchaseHistoryService,userDetailsService) {
 	var users = [];
 	var userDatabase = "";
 	
@@ -238,16 +238,19 @@ app.factory('userService', function($http,$state,userScheduleService,historyServ
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
 				userDatabase = data;
-				if(userDatabase.ValidateLoginResult.ErrorCode === 200){
+				if(userDatabase.ValidateLoginResult.ErrorCode === 200){				   
 					userID = userDatabase.ValidateLoginResult.Client.ID;
-					alert("Successful Login!");
 					userScheduleService.getUserSchedule(userID);
 					historyService.getUserHistory(userID);
 					purchaseHistoryService.getPurchaseHistory(userID);
 					userDetailsService.getUserDetails(userID);
 					$state.go("yoga-app.home");
 				}else{
-					alert(userDatabase.ValidateLoginResult.Message);
+					var alertPopup = $ionicPopup.alert({
+					 title: 'Error',
+					 template: userDatabase.ValidateLoginResult.Message
+				   });
+				   alertPopup.then(function(res) {});
 				}	
 			})
 			
@@ -340,7 +343,7 @@ app.factory('userDetailsService', function($http) {
 })
 
 
-app.factory('updateUserDetailsService', function($http) {
+app.factory('updateUserDetailsService', function($http,$ionicPopup) {
 	return {
 		updateUserDetails: function(user){
 			var request = $http({
@@ -372,12 +375,19 @@ app.factory('updateUserDetailsService', function($http) {
 				alert(JSON.stringify(updateData));*/
 				
 				if(updateData.AddOrUpdateClientsResult.ErrorCode === 200){
-					alert("Update Success!");
+					var alertPopup = $ionicPopup.alert({
+					 title: 'Setting',
+					 template: "Update Success!"
+				   });
+				   alertPopup.then(function(res) {});
 				}else{
-					alert(updateData.AddOrUpdateClientsResult.Clients.Client.Messages.string);
+					var alertPopup = $ionicPopup.alert({
+					 title: 'Setting',
+					 template: updateData.AddOrUpdateClientsResult.Clients.Client.Messages.string
+				   });
+				   alertPopup.then(function(res) {});
 				}
 			})
-			
 			//not working
 			request.error(function (data) {
 				//alert("fail");
@@ -385,9 +395,9 @@ app.factory('updateUserDetailsService', function($http) {
 		},
 		checkValidity:function(){
 			if(updateData.AddOrUpdateClientsResult.ErrorCode === 200){
-					return true;
+				return true;
 			}else{
-					return false;
+				return false;
 			}
 		}
 	}
@@ -444,14 +454,6 @@ app.factory('classesService', function($http,$ionicPopup,userScheduleService) {
 
 			/* Check whether the HTTP Request is successful or not. */
 			request1.success(function (data) {
-				var confirmBookingPopup = $ionicPopup.confirm({
-					 title: 'Book Class',
-					 template: 'Are you sure you want to book this class?',
-					 okText: 'Confirm'
-				   });
-				   confirmBookingPopup.then(function(res) {
-					 if(res){
-						//click on confirm
 						var returnMsg = "";
 						if (data.AddClientsToClassesResult.ErrorCode===200){
 							returnMsg = "Success!";
@@ -464,11 +466,6 @@ app.factory('classesService', function($http,$ionicPopup,userScheduleService) {
 							 template: returnMsg
 						   });
 						   alertPopup.then(function(res) {});
-					 }else{
-						//press cancel
-						//alert("nope");
-					 }
-				   });
 			})
 			//not working
 			request1.error(function (data) {
@@ -525,35 +522,21 @@ app.factory('workshopsService',function($http,$ionicPopup,userScheduleService){
 
 			/* Check whether the HTTP Request is successful or not. */
 			request1.success(function (data) {
-				var confirmBookingPopup = $ionicPopup.confirm({
-					 title: 'Book Workshop',
-					 template: 'Are you sure you want to book this workshop?',
-					 okText: 'Confirm'
-				   });
-				   confirmBookingPopup.then(function(res) {
-					 if(res){
-						//click on confirm
-						var returnMsg = "";
-						if (data.AddClientsToEnrollmentsResult.ErrorCode===200){
-							returnMsg = "Success!";
-							userScheduleService.getUserSchedule(userId);
-						}else{
-							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
-						}
-						 var alertPopup = $ionicPopup.alert({
-							 title: 'Book Workshop',
-							 template: returnMsg
-						   });
-						   alertPopup.then(function(res) {});
-					 }else{
-						//press cancel
-						//alert("nope");
-					 }
-				   });
-			})
+					var returnMsg ="";
+					if (data.AddClientsToEnrollmentsResult.ErrorCode===200){
+						returnMsg = "Success!";
+						userScheduleService.getUserSchedule(userId);
+					}else{
+						returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
+					}
+					 var alertPopup = $ionicPopup.alert({
+						 title: 'Book Workshop',
+						 template: returnMsg
+					   });
+					   alertPopup.then(function(res) {});
+			});
 			//not working
-			request1.error(function (data) {
-            })
+			request1.error(function (data) {})
 		}
 	}
 })
@@ -607,31 +590,19 @@ app.factory('eventsService',function($http,$ionicPopup,userScheduleService){
 
 			/* Check whether the HTTP Request is successful or not. */
 			request1.success(function (data) {
-				var confirmBookingPopup = $ionicPopup.confirm({
+				//click on confirm
+				var returnMsg = "";
+				if (data.AddClientsToEnrollmentsResult.ErrorCode===200){
+					returnMsg = "Success!";
+					userScheduleService.getUserSchedule(userId);
+				}else{
+					returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
+				}
+				 var alertPopup = $ionicPopup.alert({
 					 title: 'Book Event',
-					 template: 'Are you sure you want to book this event?',
-					 okText: 'Confirm'
+					 template: returnMsg
 				   });
-				   confirmBookingPopup.then(function(res) {
-					 if(res){
-						//click on confirm
-						var returnMsg = "";
-						if (data.AddClientsToEnrollmentsResult.ErrorCode===200){
-							returnMsg = "Success!";
-							userScheduleService.getUserSchedule(userId);
-						}else{
-							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
-						}
-						 var alertPopup = $ionicPopup.alert({
-							 title: 'Book Event',
-							 template: returnMsg
-						   });
-						   alertPopup.then(function(res) {});
-					 }else{
-						//press cancel
-						//alert("nope");
-					 }
-				   });
+				   alertPopup.then(function(res) {});	   
 			})
 			//not working
 			request1.error(function (data) {
@@ -689,35 +660,21 @@ app.factory('challengesService',function($http,$ionicPopup,userScheduleService){
 
 			/* Check whether the HTTP Request is successful or not. */
 			request1.success(function (data) {
-				var confirmBookingPopup = $ionicPopup.confirm({
+				var returnMsg = "";
+				if (data.AddClientsToEnrollmentsResult.ErrorCode===200){
+					returnMsg = "Success!";
+					userScheduleService.getUserSchedule(userId);
+				}else{
+					returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
+				}
+				 var alertPopup = $ionicPopup.alert({
 					 title: 'Book Challenge',
-					 template: 'Are you sure you want to book this challenge?',
-					 okText: 'Confirm'
+					 template: returnMsg
 				   });
-				   confirmBookingPopup.then(function(res) {
-					 if(res){
-						//click on confirm
-						var returnMsg = "";
-						if (data.AddClientsToEnrollmentsResult.ErrorCode===200){
-							returnMsg = "Success!";
-							userScheduleService.getUserSchedule(userId);
-						}else{
-							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
-						}
-						 var alertPopup = $ionicPopup.alert({
-							 title: 'Book Challenge',
-							 template: returnMsg
-						   });
-						   alertPopup.then(function(res) {});
-					 }else{
-						//press cancel
-						//alert("nope");
-					 }
-				   });
+				   alertPopup.then(function(res) {});		   
 			})
 			//not working
-			request1.error(function (data) {
-            })
+			request1.error(function (data) {})
 		}
 	}
 })
@@ -1151,12 +1108,18 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 
 	$scope.userId = userService.getUserID();;
 	$scope.username = userService.getUsername();
-	
-	var retrieveUserInfo = function(){
+		
+	var retrieveScheduledClasses = function(){
 		//retrieve user's scheduled classes
 		$scope.scheduledClasses = userScheduleService.getUserScheduleOutput();
+	};
+	
+	var retrieveUserHistory = function(){
 		//retrieve user's history
 		$scope.userHistory = historyService.getUserHistoryResponse();
+	};
+	
+	var retrievePurchaseHistory = function(){
 		//retrieve user's purchase history
 		$scope.saleItems = purchaseHistoryService.getPurchaseResponse();
 	};
@@ -1172,10 +1135,20 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	  
 	  // Set a timeout to clear loader, however you would actually call the $ionicLoading.hide(); method whenever everything is ready or loaded.
 	  $timeout(function () {
+	  $ionicLoading.hide();
+		retrieveScheduledClasses();
+	  }, 2700);
+	  
+	  $timeout(function () {
 		$ionicLoading.hide();
-		retrieveUserInfo();
-	  }, 2800);
-
+		retrieveUserHistory();
+	  }, 2700);
+	  
+	  $timeout(function () {
+		$ionicLoading.hide();
+		retrievePurchaseHistory();
+	  }, 2700);
+	
 	
 	var upcoming = document.getElementById('showUpcoming');
 	var history = document.getElementById('showHistory');
@@ -1282,13 +1255,27 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	/*ACCORDION END*/
 })
 
-app.controller('classesCtrl', function($scope,$stateParams,classesService,userService) {
+app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesService,userService) {
 	$scope.totalClasses = classesService.getClasses();
 	$scope.selectedclass = classesService.getSelectedClass($stateParams.classID);
 	$scope.userID = userService.getUserID();
 	
 	$scope.bookClass = function(selectedClassID,userID){
-		classesService.bookClass(selectedClassID,userID);
+		//classesService.bookClass(selectedClassID,userID);
+		var confirmBookingPopup = $ionicPopup.confirm({
+					 title: 'Book Class',
+					 template: 'Are you sure you want to book this class?',
+					 okText: 'Confirm'
+				   });
+				   confirmBookingPopup.then(function(res) {
+					 if(res){
+						//click on confirm
+						classesService.bookClass(selectedClassID,userID);
+					 }else{
+						//press cancel
+						//alert("nope");
+					 }
+				   });
 	};
 	
 	$scope.selectedStaff = classesService.getClassStaff($stateParams.classStaffID);
@@ -1321,35 +1308,75 @@ app.controller('classesCtrl', function($scope,$stateParams,classesService,userSe
 	
 })
 
-app.controller('workshopCtrl',function($scope,$stateParams,userService,workshopsService){
+app.controller('workshopCtrl',function($scope,$stateParams,$ionicPopup,userService,workshopsService){
 	$scope.workShopsData = workshopsService.getWorkshops();
 	$scope.selectedWorkshop = workshopsService.getSelectedWorkshop($stateParams.workshopID);
 	$scope.selectedWorkshopStaff = workshopsService.getWorkshopStaff($stateParams.workshopStaffID);
 	$scope.userID = userService.getUserID();
 	
 	$scope.bookSelectedWorkshop = function(workshopId,userId){
-		workshopsService.bookWorkshop(workshopId,userId);
+		var confirmBookingPopup = $ionicPopup.confirm({
+			 title: 'Book Workshop',
+			 template: 'Are you sure you want to book this workshop?',
+			 okText: 'Confirm'
+		   });
+		   confirmBookingPopup.then(function(res) {
+			 if(res){
+				//click on confirm
+				workshopsService.bookWorkshop(workshopId,userId);
+			 }else{
+				//press cancel
+				//alert("nope");
+			 }
+		   });
 	};
 })
 
-app.controller('eventsCtrl',function($scope,$stateParams,userService,eventsService){
+app.controller('eventsCtrl',function($scope,$stateParams,$ionicPopup,userService,eventsService){
 	$scope.eventsData = eventsService.getEvents();
 	$scope.selectedEvent = eventsService.getSelectedEvent($stateParams.eventID);
 	$scope.selectedEventStaff = eventsService.getEventStaff($stateParams.eventStaffID);
 	$scope.userID = userService.getUserID();
 	
 	$scope.bookEvent = function(eventId,userID){
-		eventsService.bookEvent(eventId,userID);
+		var confirmBookingPopup = $ionicPopup.confirm({
+					 title: 'Book Event',
+					 template: 'Are you sure you want to book this event?',
+					 okText: 'Confirm'
+				   });
+				   confirmBookingPopup.then(function(res) {
+					 if(res){
+						//click on confirm
+						eventsService.bookEvent(eventId,userID);
+					 }else{
+						//press cancel
+						//alert("nope");
+					 }
+				   });
 	};
 })
 
-app.controller('challengesCtrl',function($scope,$stateParams,userService,challengesService){
+app.controller('challengesCtrl',function($scope,$stateParams,$ionicPopup,userService,challengesService){
 	$scope.challengesData = challengesService.getChallenges();
 	$scope.selectedChallenge = challengesService.getSelectedChallenge($stateParams.challengeID);
 	$scope.userID = userService.getUserID();
 	
 	$scope.bookChallenge = function(challengeId,userID){
-		challengesService.bookChallenge(challengeId,userID);
+		var confirmBookingPopup = $ionicPopup.confirm({
+			 title: 'Book Challenge',
+			 template: 'Are you sure you want to book this challenge?',
+			 okText: 'Confirm'
+		});
+		
+	   confirmBookingPopup.then(function(res) {
+		 if(res){
+			//click on confirm
+			challengesService.bookChallenge(challengeId,userID);
+		 }else{
+			//press cancel
+			//alert("nope");
+		 }
+	   });
 	};
 })
 

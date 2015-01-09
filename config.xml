@@ -29,6 +29,7 @@
 	  <icon src="icons/android/res/drawable-xxxhdpi/appicon.png" width="192" height="192" />
   </platform>
   
+  <gap:splash src="icons/android/splash.png" />
   
   <platform name="ios">
 	  <!-- iOS 7.0+ -->
