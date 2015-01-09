@@ -911,33 +911,37 @@ About page
 	<script id="templates/setting.html" type="text/ng-template">
       <ion-view title="Setting">
         <ion-content has-header="true">
-			
-				
-		<div class="row">
-			<div class="col-sm-6">
-				<!-- ================================== -->
-				<!-- FORM ========================== -->
-				<!-- ================================= -->
-			  
-				<form name="userForm" ng-submit="submitForm(user)" novalidate>	  
-					  <!-- USERNAME -->
-					<div class="form-group">
-						<label>Address</label>
-						<input type="text" name="address" class="glowing-border" ng-model="user.address" style="color:gray">
+					<div class="list">
+						 <!--Address-->	
+						  <div class="item item-button-right">
+							Address:&nbsp;{{user.address}}
+							<button class="button button-energized" ng-click="editAddress()">
+								Edit
+							</button>
+						  </div>
+						  <!--Email-->	
+						  <div class="item item-button-right">
+							Email:&nbsp;{{user.email}}
+							<button class="button button-energized" ng-click="editEmail()">
+								Edit
+							</button>
+						  </div>
+						  <!--Postal Code-->	
+						  <div class="item item-button-right">
+							Postal Code:&nbsp;{{user.postalCode}}
+							<button class="button button-energized" ng-click="editPostal()">
+								Edit
+							</button>
+						  </div>
+						  <!--Mobile Phone-->	
+						  <div class="item item-button-right">
+							Mobile Phone:&nbsp;{{user.mobile}}
+							<button class="button button-energized" ng-click="editMobile()">
+								Edit
+							</button>
+						  </div>
 					</div>
-					
-					<!-- EMAIL -->
-					<div class="form-group" ng-class="{'has-error' : userForm.email.$invalid && !userForm.email.$pristine }">
-						<label>Email</label>
-						<input type="email" name="email" class="glowing-border" ng-model="user.email">
-						<p ng-show="userForm.email.$invalid && !userForm.email.$pristine" class="help-block">Enter a valid email.</p>
-					</div>
-					<br/>
-					<button type="submit" class="button" ng-disabled="userForm.$invalid">Submit</button>
-					<button class="button" ng-click="goBack()">Back</button>
-				</form>
-			  </div>
-			</div>
+					<button class="button" ng-click="goBack()">Go Back</button>
         </ion-content>
       </ion-view>
     </script>

@@ -210,14 +210,14 @@ app.config(function($stateProvider, $urlRouterProvider) {
       views: {
         'menuContent' :{
           templateUrl: "templates/setting.html",
-		  controller:"MainCtrl"
+		  controller:"settingCtrl"
         }
       }
     })
 })
 
 //services
-app.factory('userService', function($http,$state,userScheduleService,historyService,purchaseHistoryService) {
+app.factory('userService', function($http,$state,userScheduleService,historyService,purchaseHistoryService,userDetailsService) {
 	var users = [];
 	var userDatabase = "";
 	
@@ -244,6 +244,7 @@ app.factory('userService', function($http,$state,userScheduleService,historyServ
 					userScheduleService.getUserSchedule(userID);
 					historyService.getUserHistory(userID);
 					purchaseHistoryService.getPurchaseHistory(userID);
+					userDetailsService.getUserDetails(userID);
 					$state.go("yoga-app.home");
 				}else{
 					alert(userDatabase.ValidateLoginResult.Message);
@@ -280,6 +281,108 @@ app.factory('healthTipDb', function($firebase) {
 		}
     }
 })
+
+
+app.factory('userDetailsService', function($http) {
+	return {
+		getUserDetails: function(userId){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getClientDetails.php",
+			data: {
+				userID: userId,
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				userDetailsData = data;
+			})
+			//not working
+			request.error(function (data) {
+            })
+		},
+		getUserDetailsResponse:function(){
+			return userDetailsData;
+		},
+		getUserEmail:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.Email;
+		},
+		getUserAddress:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.AddressLine1;
+		},
+		geUserPostalCode:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.PostalCode;
+		},
+		getUserMobile:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.MobilePhone;
+		},
+		getUserBirth:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.BirthDate;
+		},
+		getUserGender:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.Gender;
+		}
+	}
+})
+
+
+app.factory('updateUserDetailsService', function($http) {
+	return {
+		updateUserDetails: function(user){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/updateClientDetails.php",
+			data: {
+				userID:	user.id,
+				address: user.address,
+				email: user.email,
+				mobilePhone: user.mobile,
+				birthDate: user.birthDate,
+				gender: user.gender,
+				postalCode: user.postalCode
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				updateData = data;
+				/*alert(user.id);
+				alert(user.address);
+				alert(user.mobile);
+				alert(user.birthDate);
+				alert(user.gender);
+				alert(user.postalCode);
+				alert(JSON.stringify(updateData));*/
+				
+				if(updateData.AddOrUpdateClientsResult.ErrorCode === 200){
+					alert("Update Success!");
+				}else{
+					alert(updateData.AddOrUpdateClientsResult.Clients.Client.Messages.string);
+				}
+			})
+			
+			//not working
+			request.error(function (data) {
+				//alert("fail");
+            })
+		},
+		checkValidity:function(){
+			if(updateData.AddOrUpdateClientsResult.ErrorCode === 200){
+					return true;
+			}else{
+					return false;
+			}
+		}
+	}
+})
+
 
 
 
@@ -798,14 +901,141 @@ app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate)
 	};
   
 	// function to submit the form after all validation has occurred			
-	$scope.submitForm = function(user) {
-		alert(user.email);
+	//$scope.submitForm = function(user) {
+		//alert(user.email);
 		
 		// check to make sure the form is completely valid
 		//if ($scope.userForm.$valid) {
 		//	alert('our form is amazing');
 		//}
+//	};
+	
+	/*$scope.goBack = function() {
+		window.history.back();
+	};*/
+})
+
+app.controller('settingCtrl', function($scope,$ionicPopup,userService,userDetailsService,updateUserDetailsService) {
+	$scope.user = {};
+	$scope.user.id = userService.getUserID();
+	$scope.user.address = userDetailsService.getUserAddress();
+	$scope.user.email = userDetailsService.getUserEmail();
+	$scope.user.postalCode = userDetailsService.geUserPostalCode();
+	$scope.user.mobile = userDetailsService.getUserMobile();
+	$scope.user.birthDate = userDetailsService.getUserBirth();
+	$scope.user.gender = userDetailsService.getUserGender();
+	
+	$scope.editAddress = function() {
+	  $scope.editData = {};
+	  // An elaborate, custom popup
+	  var myPopup = $ionicPopup.show({
+		template: '<input type="text" ng-model="editData.address">',
+		title: 'Enter new address',
+		scope: $scope,
+		buttons: [
+		  { text: 'Cancel' },
+		  {
+			text: '<b>Save</b>',
+			type: 'button-energized',
+			onTap: function(e) {
+			  if (!$scope.editData.address) {
+				//don't allow the user to save unless he enters something
+				e.preventDefault();
+			  } else {
+				$scope.backup = $scope.user.address;
+				$scope.user.address = $scope.editData.address;
+				updateUserDetailsService.updateUserDetails($scope.user);
+				/*if(!updateUserDetailsService.checkValidity()){
+					$scope.user.address = $scope.backup;
+				}*/
+			  }
+			}
+		  }
+		]
+	  });
 	};
+	
+	
+	$scope.editEmail = function() {
+	  $scope.editData = {};
+	  // An elaborate, custom popup
+	  var myPopup1 = $ionicPopup.show({
+		template: '<input type="text" ng-model="editData.email">',
+		title: 'Enter new email',
+		scope: $scope,
+		buttons: [
+		  { text: 'Cancel' },
+		  {
+			text: '<b>Save</b>',
+			type: 'button-energized',
+			onTap: function(e) {
+			  if (!$scope.editData.email) {
+				//don't allow the user to close unless he enters wifi password
+				e.preventDefault();
+			  } else {
+				$scope.user.email = $scope.editData.email;
+				updateUserDetailsService.updateUserDetails($scope.user);
+			  }
+			}
+		  }
+		]
+	  });
+	};
+	
+	
+	$scope.editPostal = function() {
+	  $scope.editData = {};
+	  // An elaborate, custom popup
+	  var myPopup2 = $ionicPopup.show({
+		template: '<input type="text" ng-model="editData.postal">',
+		title: 'Enter new postal code',
+		scope: $scope,
+		buttons: [
+		  { text: 'Cancel' },
+		  {
+			text: '<b>Save</b>',
+			type: 'button-energized',
+			onTap: function(e) {
+			  if (!$scope.editData.postal) {
+				//don't allow the user to close unless he enters wifi password
+				e.preventDefault();
+			  } else {
+				$scope.user.postalCode = $scope.editData.postal;
+				updateUserDetailsService.updateUserDetails($scope.user);
+			  }
+			}
+		  }
+		]
+	  });
+	};
+	
+	
+	$scope.editMobile = function() {
+	  $scope.editData = {};
+	  // An elaborate, custom popup
+	  var myPopup3 = $ionicPopup.show({
+		template: '<input type="text" ng-model="editData.mobile">',
+		title: 'Enter new mobile number',
+		scope: $scope,
+		buttons: [
+		  { text: 'Cancel' },
+		  {
+			text: '<b>Save</b>',
+			type: 'button-energized',
+			onTap: function(e) {
+			  if (!$scope.editData.mobile) {
+				//don't allow the user to close unless he enters wifi password
+				e.preventDefault();
+			  } else {
+				$scope.user.mobile = $scope.editData.mobile;
+				updateUserDetailsService.updateUserDetails($scope.user);
+			  }
+			}
+		  }
+		]
+	  });
+	};
+	
 	
 	$scope.goBack = function() {
 		window.history.back();
