@@ -18,8 +18,8 @@
   </feature>
   
   
-  <icon src="icons/android/res/drawable-hdpi/appicon.png" width="72" height="72" />
-  <splash src="icons/splash-port-hdpi.png"/>
+  <icon src="icons/android/res/drawable-hdpi/appicon.png" />
+  <splash src="icons/splash-port-hdpi.png" density="port-hdpi"/>
   
   <!--CORDOVA-->
   <!--<splash src="res/screen/android/splash-port-ldpi.png" density="port-ldpi"/>
