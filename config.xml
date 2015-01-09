@@ -19,7 +19,7 @@
   
   
   <icon src="icons/android/res/drawable-hdpi/appicon.png" width="72" height="72" />
-  <splash src="icons/splash-port-hdpi.png" density="port-hdpi"/>
+  <splash src="icons/splash-port-hdpi.png"/>
   
   <!--CORDOVA-->
   <!--<splash src="res/screen/android/splash-port-ldpi.png" density="port-ldpi"/>
