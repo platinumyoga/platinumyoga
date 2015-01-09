@@ -282,6 +282,16 @@ app.factory('healthTipDb', function($firebase) {
     }
 })
 
+app.factory('feedbackDb', function($firebase) {
+    var feedbackLink = new Firebase("https://feedbacktinkertest.firebaseio.com/");
+	var dataArr = $firebase(feedbackLink).$asArray();
+    return {
+        getFeedbackData: function() {
+			return dataArr;
+        }
+    }
+})
+
 
 app.factory('userDetailsService', function($http) {
 	return {
@@ -1531,9 +1541,28 @@ app.controller('halloffameCtrl',function($scope){
 	};
 })
 
-app.controller('promotionsCtrl',function($scope,healthTipDb){
+app.controller('promotionsCtrl',function($scope,healthTipDb,feedbackDb){
 	$scope.healthtips = healthTipDb.getHealthTipsData();
-	$scope.tip = healthTipDb.getTip(2);
+	$scope.feedbacks = feedbackDb.getFeedbackData();
+	//alert(feedbacks[0].booking);
+	//$scope.tip = healthTipDb.getTip(2);
+	
+	 $scope.addBooking = function(review) {
+			//alert(review.booking);
+        var save = $scope.feedbacks.$add({
+            booking:review.booking,
+            feedback:review.feedback
+        });
+        review.booking = "";
+        review.feedback = "";
+		
+		if(save) {
+		  alert("Submitted successfully");
+		} else {
+		  alert("Cannot Submit");
+		}
+		
+    };
 })
 
 
