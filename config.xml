@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="com.ionicframework.pytracker944743" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.ionicframework.pytracker944743" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
   <name>PY Tracker</name>
   <description>
         The best yoga application in Singapore!
@@ -18,10 +18,15 @@
   </feature>
   
   
-  <icon src="icon.png" />
-  <gap:splash src="splash.png" />
+  <icon src="icons/android/res/drawable-hdpi/appicon.png" />
+  <splash src="icons/splash-port-hdpi.png" density="port-hdpi"/>
   
-  <!--
+  <!--CORDOVA-->
+  <!--<splash src="res/screen/android/splash-port-ldpi.png" density="port-ldpi"/>
+  <splash src="res/screen/android/splash-port-mdpi.png" density="port-mdpi"/>
+  <splash src="res/screen/android/splash-port-xhdpi.png" density="port-xhdpi"/>-->
+  
+  
   <platform name="android">
 	  <icon src="icons/android/res/drawable-ldpi/appicon.png" width="36" height="36" />
 	  <icon src="icons/android/res/drawable-mdpi/appicon.png" width="48" height="48" />
@@ -29,18 +34,10 @@
 	  <icon src="icons/android/res/drawable-xhdpi/appicon.png" width="96" height="96" />
 	  <icon src="icons/android/res/drawable-xxhdpi/appicon.png" width="144" height="144" />
 	  <icon src="icons/android/res/drawable-xxxhdpi/appicon.png" width="192" height="192" />
-  </platform>-->
+  </platform>
   
   
-  <icon src="icons/android/res/drawable-ldpi/appicon.png" gap:platform="android" gap:qualifier="ldpi" />
-<icon src="icons/android/res/drawable-mdpi/appicon.png" gap:platform="android" gap:qualifier="mdpi" />
-<icon src="icons/android/res/drawable-hdpi/appicon.png" gap:platform="android" gap:qualifier="hdpi" />
-<icon src="icons/android/res/drawable-xhdpi/appicon.png" gap:platform="android" gap:qualifier="xhdpi" />
-<icon src="icons/android/res/drawable-xxhdpi/appicon.png" gap:platform="android" gap:qualifier="xxhdpi" />
-<icon src="icons/android/res/drawable-xxxhdpi/appicon.png" gap:platform="android" gap:qualifier="fr-xxhdpi" />
-  
-  <!--
-  <platform name="ios">
+  <!--<platform name="ios">
 	  <!-- iOS 7.0+ -->
 	  <!-- iPhone / iPod Touch -->
 	 <!-- <icon src="icons/ios/icon-60.png" width="60" height="60" />
@@ -71,9 +68,5 @@
 	 <!-- <icon src="icons/ios/icon-50.png" width="50" height="50" />
 	  <icon src="icons/ios/icon-50@2x.png" width="100" height="100" />
   </platform>-->
-  
-  
-  
-  
   
 </widget>
