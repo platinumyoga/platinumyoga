@@ -2,10 +2,10 @@
 <widget id="com.ionicframework.pytracker944743" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
   <name>PY Tracker</name>
   <description>
-        The best yoga application there is!
+        The best yoga application in Singapore!
     </description>
   <author email="hi@ionicframework" href="http://ionicframework.com/">
-      Tinkers
+      Platinum Yoga
     </author>
   <content src="index.html"/>
   <access origin="*"/>
