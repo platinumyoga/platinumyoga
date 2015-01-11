@@ -1137,17 +1137,17 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	  $timeout(function () {
 	  $ionicLoading.hide();
 		retrieveScheduledClasses();
-	  }, 2700);
+	  }, 2900);
 	  
 	  $timeout(function () {
 		$ionicLoading.hide();
 		retrieveUserHistory();
-	  }, 2700);
+	  }, 2900);
 	  
 	  $timeout(function () {
 		$ionicLoading.hide();
 		retrievePurchaseHistory();
-	  }, 2700);
+	  }, 2900);
 	
 	
 	var upcoming = document.getElementById('showUpcoming');
