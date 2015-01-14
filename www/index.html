@@ -208,10 +208,16 @@ About page
 				
 				<!--list displaying booked classes and workshops[this is a single list from the mindbodyonline service]-->
 				<div class="list" ng-show="showUpcomingView">
+				
+					<div class="button-bar">
+					  <a class="button button-small" ng-click="showEnrolled()">Enrolled</a>
+					  <a class="button button-small" ng-click="showWaitingList()">Waiting List</a>
+					</div>
+					
 					<div class="item" ng-repeat="class in scheduledClasses">
 						<div class="row">
 							<div class="col col-67">
-							{{(class.StartDateTime).slice(0,10)}}&nbsp;<br/>
+							{{(class.StartDateTime).slice(0,10)}}&nbsp;{{(class.StartDateTime).slice(12,19)}}<br/>
 							<b>Lesson:</b>&nbsp;{{class.Name}}<br/>
 							<b>Staff:</b>&nbsp;{{class.Staff.Name}}</div>
 							<div class="col col-33" style="padding-top:20px;padding-left:40px;">
@@ -220,6 +226,30 @@ About page
 						</div>
 					</div>
 				</div>
+				
+				<!--waitlist-->
+				<div class="list" ng-show="showWaitlist">
+				
+					<div class="button-bar">
+					  <a class="button button-small" ng-click="showEnrolled()">Enrolled</a>
+					  <a class="button button-small" ng-click="showWaitingList()">Waiting List</a>
+					</div>
+					
+					
+					<div class="item" ng-repeat="class in waitlist">
+						<div class="row">
+							<div class="col col-67">
+								{{(class.ClassDate).slice(0,10)}}&nbsp;{{(class.ClassSchedule.StartTime).slice(12,19)}}<br/>
+								<b>Lesson:</b>&nbsp;{{class.ClassSchedule.ClassDescription.Name}}<br/>
+								<b>Staff:</b>&nbsp;{{class.ClassSchedule.Staff.Name}}
+							</div>
+							<div class="col col-33" style="padding-top:20px;padding-left:40px;">
+								<div class="button button-small assertive" ng-click="removeWaitClass({{class.ID}})">Cancel</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
 				
 				<!--list showing the history-->
 				<div class="list" ng-show="showHistoryView">

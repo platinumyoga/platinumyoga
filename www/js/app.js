@@ -217,7 +217,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 })
 
 //services
-app.factory('userService', function($http,$state,$ionicPopup,userScheduleService,historyService,purchaseHistoryService,userDetailsService) {
+app.factory('userService', function($http,$state,$ionicPopup,userScheduleService,historyService,purchaseHistoryService,userDetailsService,waitlistService) {
 	var users = [];
 	var userDatabase = "";
 	
@@ -241,6 +241,7 @@ app.factory('userService', function($http,$state,$ionicPopup,userScheduleService
 				if(userDatabase.ValidateLoginResult.ErrorCode === 200){				   
 					userID = userDatabase.ValidateLoginResult.Client.ID;
 					userScheduleService.getUserSchedule(userID);
+					waitlistService.getWaitlist(userID);
 					historyService.getUserHistory(userID);
 					purchaseHistoryService.getPurchaseHistory(userID);
 					userDetailsService.getUserDetails(userID);
@@ -405,8 +406,7 @@ app.factory('updateUserDetailsService', function($http,$ionicPopup) {
 
 
 
-
-app.factory('classesService', function($http,$ionicPopup,userScheduleService) {
+app.factory('classesService', function($http,$ionicPopup,userScheduleService,waitlistService) {
 	return {
 		getClassesDatabase: function(){
 			var request = $http({
@@ -454,18 +454,23 @@ app.factory('classesService', function($http,$ionicPopup,userScheduleService) {
 
 			/* Check whether the HTTP Request is successful or not. */
 			request1.success(function (data) {
-						var returnMsg = "";
-						if (data.AddClientsToClassesResult.ErrorCode===200){
-							returnMsg = "Success!";
-							userScheduleService.getUserSchedule(userId);
+					var returnMsg = "";
+					if (data.AddClientsToClassesResult.ErrorCode===200){
+						if(JSON.stringify(data).indexOf("Added to Waitlist") > -1){
+							returnMsg = "You have been added to waitlist.";
 						}else{
-							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToClassesResult.Classes.Class.Clients.Client.Messages.string);
-						}
-						 var alertPopup = $ionicPopup.alert({
-							 title: 'Book Class',
-							 template: returnMsg
-						   });
-						   alertPopup.then(function(res) {});
+							returnMsg = "success"
+						};
+						userScheduleService.getUserSchedule(userId);
+						waitlistService.getWaitlist(userId);
+					}else{
+						returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToClassesResult.Classes.Class.Clients.Client.Messages.string);
+					}
+					 var alertPopup = $ionicPopup.alert({
+						 title: 'Book Class',
+						 template: returnMsg
+					   });
+					   alertPopup.then(function(res) {});
 			})
 			//not working
 			request1.error(function (data) {
@@ -547,7 +552,7 @@ app.factory('eventsService',function($http,$ionicPopup,userScheduleService){
 		getEventsDatabase: function(){
 			var request = $http({
 			method: "post",
-			url: "http://platinumyoga-rerawan.rhcloud.com/getWorkshops.php",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getEvents.php",
 			headers: { 
 				'Content-Type': 'application/x-www-form-urlencoded' 
 			}
@@ -617,7 +622,7 @@ app.factory('challengesService',function($http,$ionicPopup,userScheduleService){
 		getChallengesDatabase: function(){
 			var request = $http({
 			method: "post",
-			url: "http://platinumyoga-rerawan.rhcloud.com/getWorkshops.php",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getChallenges.php",
 			headers: { 
 				'Content-Type': 'application/x-www-form-urlencoded' 
 			}
@@ -716,6 +721,44 @@ app.factory('userScheduleService', function($http,$state) {
 	}
 })
 
+
+app.factory('waitlistService', function($http) {
+	return {
+		getWaitlist: function(userId){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getClientWaitlist.php",
+			data: {
+				userID: userId,
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				waitlistDatabase = data;
+			})
+			
+			//not working
+			request.error(function (data) {
+            })
+		},
+		getWaitlistOutput:function(){
+			//alert(waitlistDatabase.GetWaitlistEntriesResult.WaitlistEntries);
+			return waitlistDatabase.GetWaitlistEntriesResult.WaitlistEntries;
+			/*if(JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit).charAt(0)!="["){
+				return JSON.parse("["+JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit)+"]"); 
+			}else{
+				return userScheduleDatabase.GetClientScheduleResult.Visits.Visit; 
+				
+			}*/
+		}
+	}
+})
+
+
 app.factory('removeBookingService',function($http,userScheduleService,$ionicPopup){
 	return{
 		removeScheduledClass:function(classId,userId){
@@ -750,6 +793,49 @@ app.factory('removeBookingService',function($http,userScheduleService,$ionicPopu
 					   alertPopup.then(function(res){
 					   });
 				}
+			})
+			//not working
+			request2.error(function (data) {
+            })
+		}
+	}
+})
+
+
+app.factory('removeWaitlistService',function($http,$ionicPopup,waitlistService,userService){
+	return{
+		removeWaitlistClass:function(classID){
+			var request2 = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/removeClientFromWaitlist.php",
+			data: {
+				waitlistID: classID
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request2.success(function (data) {
+				waitlistService.getWaitlist(userService.getUserID());
+				
+				/*if(data.RemoveClientsFromClassesResult.ErrorCode===200){
+					//alert(data.RemoveClientsFromClassesResult.Classes.Class.Clients.Client.ID);
+					var successRemovePopUp = $ionicPopup.alert({
+						 title: 'Cancel Class',
+						 template: 'You have successfully cancelled this class!'
+					   });
+					   alertPopup.then(function(res){});
+					   
+				}else{
+					var unSuccessRemovePopUp = $ionicPopup.alert({
+						 title: 'Cancel Class',
+						 template: 'You cannot cancel this class!'
+					   });
+					   alertPopup.then(function(res){
+					   });
+				}*/
 			})
 			//not working
 			request2.error(function (data) {
@@ -1104,23 +1190,32 @@ app.controller('barcodeCtrl',function($scope,userService){
 	$scope.userId = userService.getUserID();
 })
 
-app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$timeout,$ionicLoading,$interval,userService,userScheduleService,removeBookingService,historyService,purchaseHistoryService){
+app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$timeout,$ionicLoading,$interval,userService,userScheduleService,removeBookingService,waitlistService,removeWaitlistService,historyService,purchaseHistoryService){
 
 	$scope.userId = userService.getUserID();;
 	$scope.username = userService.getUsername();
 		
 	var retrieveScheduledClasses = function(){
 		//retrieve user's scheduled classes
+		userScheduleService.getUserSchedule($scope.userId);
 		$scope.scheduledClasses = userScheduleService.getUserScheduleOutput();
+	};
+	
+	var retrieveWaitlist = function(){
+		//retrieve user's scheduled classes
+		waitlistService.getWaitlist($scope.userId);
+		$scope.waitlist = waitlistService.getWaitlistOutput();
 	};
 	
 	var retrieveUserHistory = function(){
 		//retrieve user's history
+		getUserHistory.getUserHistory($scope.userId);
 		$scope.userHistory = historyService.getUserHistoryResponse();
 	};
 	
 	var retrievePurchaseHistory = function(){
 		//retrieve user's purchase history
+		purchaseHistoryService.getPurchaseHistory($scope.userId);
 		$scope.saleItems = purchaseHistoryService.getPurchaseResponse();
 	};
 
@@ -1137,6 +1232,11 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	  $timeout(function () {
 	  $ionicLoading.hide();
 		retrieveScheduledClasses();
+	  }, 2900);
+	  
+	  $timeout(function () {
+	  $ionicLoading.hide();
+		retrieveWaitlist();
 	  }, 2900);
 	  
 	  $timeout(function () {
@@ -1161,16 +1261,32 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		$scope.showUpcomingView = true;
 		$scope.showHistoryView = false;
 		$scope.showPurchase = false;
+		$scope.showWaitlist = false;
 		upcoming.style.cssText="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;";
 		history.style.cssText ="background-color:#f8f8f8";
 	};	
 	
 	$scope.showHistory = function(){
 		$scope.showUpcomingView = false;
+		$scope.showWaitlist = false;
 		$scope.showPurchase = false;
 		$scope.showHistoryView = true;
 		history.style.cssText ="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;";
 		upcoming.style.cssText ="background-color:#f8f8f8";
+	};
+	
+	$scope.showWaitingList = function(){
+		$scope.showUpcomingView = false;
+		$scope.showWaitlist = true;
+		$scope.showPurchase = false;
+		$scope.showHistoryView = false;
+	};
+	
+	$scope.showEnrolled = function(){
+		$scope.showUpcomingView = true;
+		$scope.showWaitlist = false;
+		$scope.showPurchase = false;
+		$scope.showHistoryView = false;
 	};
 	
 	$scope.showBookingHistory = function(){
@@ -1201,6 +1317,24 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		   });
 		   
 	}
+	
+	$scope.removeWaitClass = function(classID){
+		 // A confirm dialog
+		   var confirmPopup = $ionicPopup.confirm({
+			 title: 'Cancel Class',
+			 template: 'Are you sure you want to cancel this class?',
+			 okText: 'Confirm'
+		   });
+		   confirmPopup.then(function(res) {
+			 if(res) {
+				removeWaitlistService.removeWaitlistClass(classID);
+				$state.go($state.current, {}, {reload: true});
+			 } else {
+				//press cancel
+				//alert("nope");
+			 }
+		   })
+	};
 	
 	
 	
