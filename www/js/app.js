@@ -1,4 +1,4 @@
-var app = angular.module('ionicApp', ['ionic','firebase','ui.router', 'pickadate'])
+var app = angular.module('ionicApp', ['ionic','firebase','ui.router'])
 
 //CONFIGURATION+ROUTE
 //CONFIGURATION+ROUTE
@@ -117,6 +117,24 @@ app.config(function($stateProvider, $urlRouterProvider) {
       views: {
         'menuContent' :{
           templateUrl: "templates/appointments.html",
+		  controller:"appointmentCtrl"
+        }
+      }
+    })
+	.state('yoga-app.appointmentType', {
+      url: "/appointmentType/:sessionTypeID",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/appointmentType.html",
+		  controller:"appointmentCtrl"
+        }
+      }
+    })
+	.state('yoga-app.selectedSessionStaff', {
+      url: "/selectedSessionStaff/:instructorID",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/appointmentInstructor.html",
 		  controller:"appointmentCtrl"
         }
       }
@@ -459,7 +477,7 @@ app.factory('classesService', function($http,$ionicPopup,userScheduleService,wai
 						if(JSON.stringify(data).indexOf("Added to Waitlist") > -1){
 							returnMsg = "You have been added to waitlist.";
 						}else{
-							returnMsg = "success"
+							returnMsg = "Success!"
 						};
 						userScheduleService.getUserSchedule(userId);
 						waitlistService.getWaitlist(userId);
@@ -908,10 +926,14 @@ app.factory('purchaseHistoryService', function($http) {
 
 app.factory('appointmentService',function($http){
 	return {
-		getAppointments: function(){
+		getAppointments: function(sessionTypeID,instructorID){
 			var request = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/getAppointments.php",
+			data: {
+				staffID:instructorID,
+				sessionTypeID:sessionTypeID
+			},
 			headers: { 
 				'Content-Type': 'application/x-www-form-urlencoded' 
 			}
@@ -920,24 +942,86 @@ app.factory('appointmentService',function($http){
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
 				apptDatabase = data;
+				alert(apptDatabase);
 			})
 			
 			//not working
 			request.error(function (data) {
             })
+		},
+		getApptResponse:function(){
+			return apptDatabase;
 		}
 	}
 })
 
 
+app.factory('sessionService',function($http){
+	return {
+		getSession: function(){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getSessionType.php",
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
 
-app.controller('loginCtrl', function($scope, $state,userService,userScheduleService,classesService,workshopsService,eventsService,challengesService) {
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				//alert(JSON.stringify(data));
+				sessionDatabase = data;
+			})
+			
+			//not working
+			request.error(function (data) {
+            })
+		},
+		getSessionResponse:function(){
+			return sessionDatabase.SessionTypes.SessionType;
+		}
+	}
+})
+
+
+app.factory('sessionStaffService',function($http){
+	return {
+		getSessionStaff: function(SessionTypeID){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getStaff.php",
+			data: {
+				SessionTypeID: SessionTypeID,
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				instructors = data.StaffMembers.Staff;
+			})
+			
+			//not working
+			request.error(function (data) {
+            })
+		},
+		getSessionStaffResponse:function(){
+			return instructors;
+		}
+	}
+})
+
+
+app.controller('loginCtrl', function($scope, $state,userService,userScheduleService,classesService,workshopsService,eventsService,challengesService,sessionService) {
 	$scope.signIn = function(user) {
 		userService.authentication(user);
 		classesService.getClassesDatabase();
 		workshopsService.getWorkshopsDatabase();
 		eventsService.getEventsDatabase();
 		challengesService.getChallengesDatabase();
+		sessionService.getSession();
 	};
 	
 	$scope.next = function(){
@@ -947,7 +1031,6 @@ app.controller('loginCtrl', function($scope, $state,userService,userScheduleServ
 
 //$ionicSideMenuDelegate is the dependency for menu
 app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate) {
-
 	//left menu
 	$scope.toggleLeft = function() {
     $ionicSideMenuDelegate.toggleLeft();
@@ -1209,7 +1292,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	
 	var retrieveUserHistory = function(){
 		//retrieve user's history
-		getUserHistory.getUserHistory($scope.userId);
+		historyService.getUserHistory($scope.userId);
 		$scope.userHistory = historyService.getUserHistoryResponse();
 	};
 	
@@ -1412,7 +1495,34 @@ app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesSe
 				   });
 	};
 	
-	$scope.selectedStaff = classesService.getClassStaff($stateParams.classStaffID);	
+	$scope.selectedStaff = classesService.getClassStaff($stateParams.classStaffID);
+	
+	var byDate = document.getElementById('byDate');
+	var byInstructor = document.getElementById('byInstructor');
+	var byLevel = document.getElementById('byLevel');	
+	
+	$scope.showClassByDateView = true;
+	$scope.showClassByInstructorView = false;
+	$scope.showClassByLevelView = false;
+		
+	$scope.showClassByDate = function(){
+		$scope.showClassByDateView = true;
+		$scope.showClassByInstructorView = false;
+		$scope.showClassByLevelView = false;
+	};	
+	
+	$scope.showClassByInstructor = function(){
+		$scope.showClassByDateView = false;
+		$scope.showClassByInstructorView = true;
+		$scope.showClassByLevelView = false;
+	};
+	
+	$scope.showClassByLevel = function(){
+		$scope.showClassByDateView = false;
+		$scope.showClassByInstructorView = false;
+		$scope.showClassByLevelView = true;
+	};
+	
 })
 
 app.controller('workshopCtrl',function($scope,$stateParams,$ionicPopup,userService,workshopsService){
@@ -1640,9 +1750,21 @@ app.controller('aboutCtrl',function($scope){
 	
 })
 
-app.controller('appointmentCtrl',function($scope,appointmentService){
-	$scope.showAppt = function(){
-		appointmentService.getAppointments();
+app.controller('appointmentCtrl',function($scope,appointmentService,sessionService,$stateParams,sessionStaffService){
+	$scope.sessionTypes = sessionService.getSessionResponse();
+	$scope.sessionID = $stateParams.sessionTypeID;
+	
+	$scope.selectedInstructor = function(){
+		alert($scope.sessionID);
+		sessionStaffService.getSessionStaff($scope.sessionID);
+		$scope.instructors = sessionStaffService.getSessionStaffResponse();
+	};
+	
+	$scope.bookInstructor = function(sessionID,instructorId){
+	alert(sessionID);
+	alert(instructorId);
+		appointmentService.getAppointments(sessionID,instructorId);
+		$scope.schedule = appointmentService.getApptResponse();
 	};
 })
 
@@ -1675,11 +1797,27 @@ app.controller('halloffameCtrl',function($scope){
 	};
 })
 
-app.controller('promotionsCtrl',function($scope,healthTipDb,feedbackDb){
-	$scope.healthtips = healthTipDb.getHealthTipsData();
+app.controller('promotionsCtrl',function($scope,healthTipDb,feedbackDb,$firebase){
+	//$scope.healthtips = healthTipDb.getHealthTipsData();
 	$scope.feedbacks = feedbackDb.getFeedbackData();
-	//alert(feedbacks[0].booking);
-	//$scope.tip = healthTipDb.getTip(2);
+	
+	var arrayList = new Array();
+	$scope.test = function(){
+		var healthtipsLink = new Firebase("https://healthtipstinkertest.firebaseio.com/");
+		healthtipsLink.once('value', function(allMessagesSnapshot) {
+			allMessagesSnapshot.forEach(function(messageSnapshot) {
+				 // Will be called with a messageSnapshot for each message under message_list.
+					var message = messageSnapshot.child('tips').val();
+					arrayList.push(message);
+			});
+			  
+		   var randomnumber = Math.floor(Math.random() * (arrayList.length));
+		   alert(arrayList[randomnumber]);
+			  
+		});
+	};
+
+	
 	
 	 $scope.addBooking = function(review) {
 			//alert(review.booking);
@@ -1700,18 +1838,42 @@ app.controller('promotionsCtrl',function($scope,healthTipDb,feedbackDb){
 })
 
 
-app.controller('DateCtrl', function($scope) {
-		  var today = new Date();
-		  var dd = today.getDate();
-		  var mm = today.getMonth()+1; //January is 0!
-		  var yyyy = today.getFullYear();
-		  var todayString = yyyy + "-" + mm + "-" + dd;
-		  $scope.dateDefault = todayString;
-          $scope.date = todayString;
-          $scope.minDate = todayString;
-          $scope.maxDate = '2015-12-04';
-          $scope.disabledDates = ['2014-11-19', todayString];
+app.controller('DateCtrl', function ($scope) {
+  $scope.today = function() {
+    $scope.dt = new Date();
+  };
+  $scope.today();
+
+  $scope.clear = function () {
+    $scope.dt = null;
+  };
+
+  // Disable weekend selection
+  $scope.disabled = function(date, mode) {
+    return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
+  };
+
+  $scope.toggleMin = function() {
+    $scope.minDate = $scope.minDate ? null : new Date();
+  };
+  $scope.toggleMin();
+
+  $scope.open = function($event) {
+    $event.preventDefault();
+    $event.stopPropagation();
+
+    $scope.opened = true;
+  };
+
+  $scope.dateOptions = {
+    formatYear: 'yy',
+    startingDay: 1
+  };
+
+  $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+  $scope.format = $scope.formats[0];
 })
+
 
 //search filter
 .directive('ionSearch', function() {
@@ -1754,4 +1916,3 @@ app.controller('DateCtrl', function($scope) {
                       '</div>'
         };
 })
-
