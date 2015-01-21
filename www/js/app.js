@@ -1,4 +1,4 @@
-var app = angular.module('ionicApp', ['ionic','firebase','ui.router'])
+var app = angular.module('ionicApp', ['ionic','firebase','ui.router', 'pickadate'])
 
 //CONFIGURATION+ROUTE
 //CONFIGURATION+ROUTE
@@ -1412,34 +1412,7 @@ app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesSe
 				   });
 	};
 	
-	$scope.selectedStaff = classesService.getClassStaff($stateParams.classStaffID);
-	
-	var byDate = document.getElementById('byDate');
-	var byInstructor = document.getElementById('byInstructor');
-	var byLevel = document.getElementById('byLevel');	
-	
-	$scope.showClassByDateView = true;
-	$scope.showClassByInstructorView = false;
-	$scope.showClassByLevelView = false;
-		
-	$scope.showClassByDate = function(){
-		$scope.showClassByDateView = true;
-		$scope.showClassByInstructorView = false;
-		$scope.showClassByLevelView = false;
-	};	
-	
-	$scope.showClassByInstructor = function(){
-		$scope.showClassByDateView = false;
-		$scope.showClassByInstructorView = true;
-		$scope.showClassByLevelView = false;
-	};
-	
-	$scope.showClassByLevel = function(){
-		$scope.showClassByDateView = false;
-		$scope.showClassByInstructorView = false;
-		$scope.showClassByLevelView = true;
-	};
-	
+	$scope.selectedStaff = classesService.getClassStaff($stateParams.classStaffID);	
 })
 
 app.controller('workshopCtrl',function($scope,$stateParams,$ionicPopup,userService,workshopsService){
@@ -1727,42 +1700,18 @@ app.controller('promotionsCtrl',function($scope,healthTipDb,feedbackDb){
 })
 
 
-app.controller('DateCtrl', function ($scope) {
-  $scope.today = function() {
-    $scope.dt = new Date();
-  };
-  $scope.today();
-
-  $scope.clear = function () {
-    $scope.dt = null;
-  };
-
-  // Disable weekend selection
-  $scope.disabled = function(date, mode) {
-    return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
-  };
-
-  $scope.toggleMin = function() {
-    $scope.minDate = $scope.minDate ? null : new Date();
-  };
-  $scope.toggleMin();
-
-  $scope.open = function($event) {
-    $event.preventDefault();
-    $event.stopPropagation();
-
-    $scope.opened = true;
-  };
-
-  $scope.dateOptions = {
-    formatYear: 'yy',
-    startingDay: 1
-  };
-
-  $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
-  $scope.format = $scope.formats[0];
+app.controller('DateCtrl', function($scope) {
+		  var today = new Date();
+		  var dd = today.getDate();
+		  var mm = today.getMonth()+1; //January is 0!
+		  var yyyy = today.getFullYear();
+		  var todayString = yyyy + "-" + mm + "-" + dd;
+		  $scope.dateDefault = todayString;
+          $scope.date = todayString;
+          $scope.minDate = todayString;
+          $scope.maxDate = '2015-12-04';
+          $scope.disabledDates = ['2014-11-19', todayString];
 })
-
 
 //search filter
 .directive('ionSearch', function() {
@@ -1805,3 +1754,4 @@ app.controller('DateCtrl', function ($scope) {
                       '</div>'
         };
 })
+
