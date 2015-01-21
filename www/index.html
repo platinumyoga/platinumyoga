@@ -323,55 +323,28 @@ About page
       <ion-view title="Classes" has-header="true">
 			<ion-content padding="true">
 
-				<div class="button-bar">
-					<a class="button button-small button-stable" id="byDate" ng-click="showClassByDate()">By Date</a>
-					<a class="button button-small button-stable" id="ByInstructor" ng-click="showClassByInstructor()">By Instructor</a>
-					<a class="button button-small button-stable" id="ByLevel"ng-click="showClassByLevel()">By Level</a>
-				</div>
-				
-				<div class="list" ng-show="showClassByDateView">
-					<div class="row" ng-repeat="class in totalClasses | orderBy:'StartDateTime'">
-						<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
-							<a href="#/yoga-app/selectedClass/{{class.ID}}">
-							<b>{{class.ClassDescription.Name}}</b><br/>			
-							{{(class.StartDateTime).slice(0,10)}}<br/>
-							{{(class.StartDateTime).slice(11,16)}} - {{(class.EndDateTime).slice(11,16)}}<br/>
-							{{class.Staff.Name}}<br/>
-							Class ID:&nbsp;{{class.ID}}
-							</a>
-						</div>
-						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
-							<button class="button-right button-stable col" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
-						</div>
-					</div>
-				</div>
-				
-				<div class="list" ng-show="showClassByInstructorView">
-					<div class="row" ng-repeat="class in totalClasses | orderBy:'Staff.Name'">
-						<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
-							<a href="#/yoga-app/selectedClass/{{class.ID}}">
-							<b>{{class.ClassDescription.Name}}</b><br/>			
-							{{(class.StartDateTime).slice(0,10)}}<br/>
-							{{(class.StartDateTime).slice(11,16)}} - {{(class.EndDateTime).slice(11,16)}}<br/>
-							{{class.Staff.Name}}<br/>
-							Class ID:&nbsp;{{class.ID}}
-							</a>
-						</div>
-						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
-							<button class="button-right button-stable col" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
-						</div>
-					</div>
-				</div>
+			<div class="container" ng-controller="DateCtrl">
+			  <div pickadate ng-model="date" min-date="minDate" max-date="maxDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" no-extra-rows></div>
 
-				<div class="list" ng-show="showClassByLevelView">
-					<div class="row" ng-repeat="class in totalClasses | orderBy:'ClassDescription.Level.Name'">
+			  <div class="selected-date">
+				Selected date is {{date || dateDefault}}
+			  </div>
+			</div>
+			
+				<div class="bar bar-header item-input-inset">
+					<ion-search placeholder="Search for Instructor/Class name" filter="searchClass"></ion-search>
+				</div>
+			
+				<div class="list"">
+					<div class="row" ng-repeat="class in totalClasses | orderBy:'StartDateTime'| filter: searchClass.value">
 						<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
 							<a href="#/yoga-app/selectedClass/{{class.ID}}">
 							<b>{{class.ClassDescription.Name}}</b><br/>			
 							{{(class.StartDateTime).slice(0,10)}}<br/>
 							{{(class.StartDateTime).slice(11,16)}} - {{(class.EndDateTime).slice(11,16)}}<br/>
 							{{class.Staff.Name}}<br/>
-							Class ID:&nbsp;{{class.ID}}
+							{{class.ClassDescription.Level.Name}}<br>
+							{{class.MaxCapacity-class.TotalBooked}} available
 							</a>
 						</div>
 						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
@@ -409,7 +382,7 @@ About page
 				</div>
 
 				<div class="row">
-				  <div class="col">25/30 Enrolled (dummy)</div>
+				  <div class="col">{{selectedclass.TotalBooked}}/{{selectedclass.MaxCapacity}} Enrolled</div>
 				</div>
 
 				<div class="row">
@@ -476,13 +449,17 @@ About page
       <ion-view title="Staff">
         <ion-content>
 			
+			<div class="row">
+				  <div class="col"><b>{{selectedStaff.Name}}</b></div>
+			</div>
+			
 			<div align="center">
 				<div class="row">
 				  <div class="col"><img src="{{selectedStaff.ImageURL}}" /></div>
 				</div>
 				
 				<div class="row">
-				  <div class="col"><b>{{selectedStaff.Name}}</b></div>
+				  <div class="col"><b>{{selectedStaff.Bio}}</b></div>
 				</div>
 				
 			</div>

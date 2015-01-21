@@ -1,4 +1,4 @@
-var app = angular.module('ionicApp', ['ionic','firebase','ui.router'])
+var app = angular.module('ionicApp', ['ionic','firebase','ui.router', 'pickadate'])
 
 //CONFIGURATION+ROUTE
 //CONFIGURATION+ROUTE
@@ -1838,40 +1838,17 @@ app.controller('promotionsCtrl',function($scope,healthTipDb,feedbackDb,$firebase
 })
 
 
-app.controller('DateCtrl', function ($scope) {
-  $scope.today = function() {
-    $scope.dt = new Date();
-  };
-  $scope.today();
-
-  $scope.clear = function () {
-    $scope.dt = null;
-  };
-
-  // Disable weekend selection
-  $scope.disabled = function(date, mode) {
-    return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
-  };
-
-  $scope.toggleMin = function() {
-    $scope.minDate = $scope.minDate ? null : new Date();
-  };
-  $scope.toggleMin();
-
-  $scope.open = function($event) {
-    $event.preventDefault();
-    $event.stopPropagation();
-
-    $scope.opened = true;
-  };
-
-  $scope.dateOptions = {
-    formatYear: 'yy',
-    startingDay: 1
-  };
-
-  $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
-  $scope.format = $scope.formats[0];
+app.controller('DateCtrl', function($scope) {
+		  var today = new Date();
+		  var dd = today.getDate();
+		  var mm = today.getMonth()+1; //January is 0!
+		  var yyyy = today.getFullYear();
+		  var todayString = yyyy + "-" + mm + "-" + dd;
+		  $scope.dateDefault = todayString;
+          $scope.date = todayString;
+          $scope.minDate = todayString;
+          $scope.maxDate = '2015-12-04';
+          $scope.disabledDates = ['2014-11-19', todayString];
 })
 
 
