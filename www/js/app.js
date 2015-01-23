@@ -130,15 +130,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
         }
       }
     })
-	.state('yoga-app.selectedSessionStaff', {
-      url: "/selectedSessionStaff/:instructorID",
-      views: {
-        'menuContent' :{
-          templateUrl: "templates/appointmentInstructor.html",
-		  controller:"appointmentCtrl"
-        }
-      }
-    })
 	.state('yoga-app.challenges', {
       url: "/Challenges",
       views: {
@@ -941,16 +932,25 @@ app.factory('appointmentService',function($http){
 
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
-				apptDatabase = data;
-				alert(apptDatabase);
+				apptDatabase = data.ScheduleItems.ScheduleItem;
+				//alert(JSON.stringify(apptDatabase.ScheduleItems.ScheduleItem));
+				//alert(JSON.stringify(apptDatabase));
 			})
-			
 			//not working
 			request.error(function (data) {
             })
 		},
-		getApptResponse:function(){
-			return apptDatabase;
+		getApptResponse:function(chosenDate){
+			var availSlots = [];
+			var j=0;
+			for(var i=0;i<apptDatabase.length;i++){
+				if(apptDatabase[i].StartDateTime.slice(0,10)==chosenDate){
+					availSlots[j]=apptDatabase[i];
+					j=j+1;
+				}
+			}
+			//alert(availSlots[0].Staff.ID);
+			return availSlots;
 		}
 	}
 })
@@ -979,6 +979,13 @@ app.factory('sessionService',function($http){
 		},
 		getSessionResponse:function(){
 			return sessionDatabase.SessionTypes.SessionType;
+		},
+		getSessionName:function(sessionID){
+			for(var i=0;i<sessionDatabase.SessionTypes.SessionType.length;i++){
+				if(sessionDatabase.SessionTypes.SessionType[i].ID==sessionID){
+					return sessionDatabase.SessionTypes.SessionType[i].Name;
+				}
+			}
 		}
 	}
 })
@@ -1052,14 +1059,20 @@ app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate)
 })
 
 app.controller('settingCtrl', function($scope,$ionicPopup,userService,userDetailsService,updateUserDetailsService) {
-	$scope.user = {};
-	$scope.user.id = userService.getUserID();
-	$scope.user.address = userDetailsService.getUserAddress();
-	$scope.user.email = userDetailsService.getUserEmail();
-	$scope.user.postalCode = userDetailsService.geUserPostalCode();
-	$scope.user.mobile = userDetailsService.getUserMobile();
-	$scope.user.birthDate = userDetailsService.getUserBirth();
-	$scope.user.gender = userDetailsService.getUserGender();
+	
+	
+	$scope.renew =function(){	
+		$scope.user = {};
+		$scope.user.id = userService.getUserID();
+		userDetailsService.getUserDetails($scope.user.id);
+		$scope.user.address = userDetailsService.getUserAddress();
+		$scope.user.email = userDetailsService.getUserEmail();
+		$scope.user.postalCode = userDetailsService.geUserPostalCode();
+		$scope.user.mobile = userDetailsService.getUserMobile();
+		$scope.user.birthDate = userDetailsService.getUserBirth();
+		$scope.user.gender = userDetailsService.getUserGender();
+	};
+
 	
 	$scope.editAddress = function() {
 	  $scope.editData = {};
@@ -1081,6 +1094,7 @@ app.controller('settingCtrl', function($scope,$ionicPopup,userService,userDetail
 				$scope.backup = $scope.user.address;
 				$scope.user.address = $scope.editData.address;
 				updateUserDetailsService.updateUserDetails($scope.user);
+				userDetailsService.getUserDetails($scope.user.id);
 				/*if(!updateUserDetailsService.checkValidity()){
 					$scope.user.address = $scope.backup;
 				}*/
@@ -1111,6 +1125,7 @@ app.controller('settingCtrl', function($scope,$ionicPopup,userService,userDetail
 			  } else {
 				$scope.user.email = $scope.editData.email;
 				updateUserDetailsService.updateUserDetails($scope.user);
+				userDetailsService.getUserDetails($scope.user.id);
 			  }
 			}
 		  }
@@ -1138,6 +1153,7 @@ app.controller('settingCtrl', function($scope,$ionicPopup,userService,userDetail
 			  } else {
 				$scope.user.postalCode = $scope.editData.postal;
 				updateUserDetailsService.updateUserDetails($scope.user);
+				userDetailsService.getUserDetails($scope.user.id);
 			  }
 			}
 		  }
@@ -1165,6 +1181,7 @@ app.controller('settingCtrl', function($scope,$ionicPopup,userService,userDetail
 			  } else {
 				$scope.user.mobile = $scope.editData.mobile;
 				updateUserDetailsService.updateUserDetails($scope.user);
+				userDetailsService.getUserDetails($scope.user.id);
 			  }
 			}
 		  }
@@ -1750,22 +1767,115 @@ app.controller('aboutCtrl',function($scope){
 	
 })
 
-app.controller('appointmentCtrl',function($scope,appointmentService,sessionService,$stateParams,sessionStaffService){
+app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,sessionService,$stateParams,sessionStaffService,$ionicModal,$ionicPopup){
 	$scope.sessionTypes = sessionService.getSessionResponse();
 	$scope.sessionID = $stateParams.sessionTypeID;
+	$scope.displayTime = false;
+	$scope.displayDate = true;
 	
 	$scope.selectedInstructor = function(){
-		alert($scope.sessionID);
 		sessionStaffService.getSessionStaff($scope.sessionID);
 		$scope.instructors = sessionStaffService.getSessionStaffResponse();
 	};
 	
-	$scope.bookInstructor = function(sessionID,instructorId){
-	alert(sessionID);
-	alert(instructorId);
-		appointmentService.getAppointments(sessionID,instructorId);
-		$scope.schedule = appointmentService.getApptResponse();
+	$scope.showDate = function(){
+		$scope.displayTime = false;
+		$scope.displayDate = true;
 	};
+	
+	$scope.showTime = function(){
+		$scope.displayTime = true;
+		$scope.displayDate = false;
+	};
+	
+	//calendar start
+	  var today = new Date();
+	  var dd = today.getDate();
+	  var mm = today.getMonth()+1;	  //January is 0!
+	  if(mm<10){
+		mm = "0"+mm;
+	  }
+	  var yyyy = today.getFullYear();
+	  var todayString = yyyy + "-" + mm + "-" + dd;
+	  $scope.dateDefault = todayString;
+	  $scope.date = todayString;
+	  $scope.minDate = todayString;
+	  $scope.maxDate = '2015-12-04';
+	  $scope.disabledDates = ['2014-11-19', todayString];
+	   //calender end   
+	   
+	$ionicModal.fromTemplateUrl('my-modal.html', {
+		scope: $scope,
+		animation: 'slide-in-up'
+	  }).then(function(modal) {
+		$scope.modal = modal;
+	  });
+	  $scope.openModal = function() {
+		$scope.modal.show();
+	  };
+	  $scope.closeModal = function() {
+		$scope.modal.hide();
+	  };
+	  //Cleanup the modal when we're done with it!
+	  $scope.$on('$destroy', function() {
+		$scope.modal.remove();
+	  });
+	  // Execute action on hide modal
+	  $scope.$on('modal.hidden', function() {
+		// Execute action
+	  });
+	  // Execute action on remove modal
+	  $scope.$on('modal.removed', function() {
+		// Execute action
+	  });
+	
+	$scope.bookInstructor = function(sessionID,instructorId){
+		$scope.sessionName = sessionService.getSessionName(sessionID);
+		
+			for(var i=0;i<$scope.instructors.length;i++){
+				if($scope.instructors[i].ID==instructorId){
+					$scope.instructorName = $scope.instructors[i].Name;
+				}
+			}
+			
+		$scope.openModal();
+		
+		$scope.test=function(date){
+			appointmentService.getAppointments(sessionID,instructorId);
+			$scope.schedules = appointmentService.getApptResponse(date);
+			//$scope.displayDate = false;
+			$scope.displayTime = true;
+		};
+	};
+	
+	
+	     // Triggered on a button click, or some other target
+		$scope.showPopup = function() {
+		   $scope.data = {}
+		   // An elaborate, custom popup
+		   var myPopup = $ionicPopup.show({
+			 template: '<textarea type="text" ng-model="data.notes">',
+			 title: 'BOOKING',
+			 subTitle: 'Notes:',
+			 scope: $scope,
+			 buttons: [
+			   { text: 'Cancel' },
+			   {
+				 text: '<b>Save</b>',
+				 type: 'button-positive',
+				 onTap: function(e) {
+				   if ($scope.data.notes!=null) {
+						//method trigger here
+					   return $scope.data.notes;
+				   }
+				 }
+			   },
+			 ]
+		   });
+		   myPopup.then(function(res) {
+			 console.log('Tapped!', res);
+		   });
+		};
 })
 
 app.controller('halloffameCtrl',function($scope){
@@ -1838,7 +1948,7 @@ app.controller('promotionsCtrl',function($scope,healthTipDb,feedbackDb,$firebase
 })
 
 
-app.controller('DateCtrl', function($scope) {
+app.controller('DateCtrl', function($scope,appointmentService) {
 		  var today = new Date();
 		  var dd = today.getDate();
 		  var mm = today.getMonth()+1; //January is 0!
@@ -1849,6 +1959,11 @@ app.controller('DateCtrl', function($scope) {
           $scope.minDate = todayString;
           $scope.maxDate = '2015-12-04';
           $scope.disabledDates = ['2014-11-19', todayString];
+		  
+		   $scope.test=function(){
+				alert($scope.date);
+			  };
+
 })
 
 

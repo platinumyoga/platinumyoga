@@ -290,29 +290,6 @@ About page
 					</div>
 				</div>
 				
-				
-			<!--<ion-list ng-show="showUpcomingView">
-					<div ng-repeat="group in groups">
-					  <ion-item class="item-stable"
-								ng-click="toggleGroup(group)"
-								ng-class="{active: isGroupShown(group)}">
-						  <i class="icon" ng-class="isGroupShown(group) ? 'ion-minus' : 'ion-plus'"></i>
-						&nbsp;
-						{{group.name}}
-					  </ion-item>
-					  <ion-item class="item-accordion"
-								ng-repeat="item in group.items"
-								ng-show="isGroupShown(group)"  ng-repeat="" href="" type="item-link">
-						{{group.name}} {{item}}
-					  </ion-item>
-					</div>
-				</ion-list>
-				//history list
-				<ion-list ng-if="showHistoryView">
-					<ion-item href="#/movie/{{movie.id}}">History 1</ion-item>
-					<ion-item href="#/movie/{{movie.id}}">History 2</ion-item>
-					<ion-item href="#/movie/{{movie.id}}">History 3</ion-item>
-				</ion-list>-->
 			</ion-content>
       </ion-view>
     </script>
@@ -322,14 +299,6 @@ About page
     <script id="templates/classes.html" type="text/ng-template">
       <ion-view title="Classes" has-header="true">
 			<ion-content padding="true">
-
-			<div class="container" ng-controller="DateCtrl">
-			  <div pickadate ng-model="date" min-date="minDate" max-date="maxDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" no-extra-rows></div>
-
-			  <div class="selected-date">
-				Selected date is {{date || dateDefault}}
-			  </div>
-			</div>
 			
 				<div class="bar bar-header item-input-inset">
 					<ion-search placeholder="Search for Instructor/Class name" filter="searchClass"></ion-search>
@@ -347,26 +316,11 @@ About page
 							{{class.MaxCapacity-class.TotalBooked}} available
 							</a>
 						</div>
-						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
+						<div class="item col col-center col-33" style="padding-top:55px;padding-bottom:43px;border-left-style: none;">
 							<button class="button-right button-stable col" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
 						</div>
 					</div>
 				</div>
-				
-				<!--OLD FILTER PORTION-->
-				<!--
-				<div class="button-bar">
-					<a class="button button-small button-stable" ng-click="classesData.filter='beginner'">Beginner</a>
-					<a class="button button-small button-stable" ng-click="classesData.filter='intermediate'">Intermediate</a>
-					<a class="button button-small button-stable" ng-click="classesData.filter='advance'">Advance</a>
-				</div>-->
-				
-				<!--<div class="list">
-					<a class="item" ng-repeat="class in classesData.classes | filter : classesData.filter">
-						<b>{{class.name}}</b><br>{{class.date}}<br>{{class.time}}<br>{{class.instructor}}
-						<button class="button-right button-stable col col-33 col-offset-67">Book</button>
-					</a>
-				</div>-->
 			</ion-content>	
       </ion-view>
     </script>
@@ -690,34 +644,73 @@ About page
 	<!--SELECTED APPOINTMENT TYPE-->
     <script id="templates/appointmentType.html" type="text/ng-template">
       <ion-view title="Instructors">
-        <ion-content has-header="true" ng-init="selectedInstructor()">
-			<div class="row" ng-repeat="instructor in instructors">
-			
-				<div class="item col">
-						<img src="{{instructor.ImageURL}}" height="30px" height="30px"/>
+        <ion-content has-header="true" ng-init="selectedInstructor()">	
+			<div class="list">
+				<div class="item" ng-repeat="instructor in instructors">
+					<div class="row">
+					  <div class="col col-25">
+						<img src="{{instructor.ImageURL}}" width="30px"/></div>	
+							<div class="col col-75">
+							  <h2>{{instructor.FirstName}} {{instructor.LastName}}</h2>
+							  <br/>
+							  <!--<a class="button" href="#/yoga-app/selectedSessionStaff/{{instructor.ID}}" ng-click="bookInstructor({{sessionID}},{{instructor.ID}})">Book</a>-->
+							  <div class="button button-small" ng-click="bookInstructor({{sessionID}},{{instructor.ID}})">Book</a>
+							  </div>
+							</div>
+					</div>
 				</div>
-				<div class="item col">
+        </ion-content>
+      </ion-view>
+    </script>
+	
+	
+	<script id="my-modal.html" type="text/ng-template">
+	  <ion-modal-view>
+		<ion-header-bar class="bar-assertive">
+		  <h1 class="title">Appointment</h1>
+		  
+		  <div class="buttons">
+			<a class="button button-icon ion-close" ng-click="closeModal()"></a>
+		  </div>
+				
+		</ion-header-bar>
+		<ion-content>
+		<div class="row"><b>Instructor: </b>{{instructorName}}</div>
+		<div class="row"><b>Appointment: </b>{{sessionName}}</div><br/>
+		<!--
+		<div class="button-bar">
+			  <a class="button button-small" id="showUpcoming" ng-click="showDate()">Date</a>
+			  <a class="button button-small" id="showHistory" ng-click="showTime()">Time</a>
+		</div>
+		-->
+		
+		<div class="container">
+				  <div pickadate ng-model="date" min-date="minDate" max-date="maxDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" no-extra-rows ng-click="test(date)">
+				  </div>
 
-						{{instructor.FirstName}} {{instructor.LastName}}
-
-				</div>
-				<div class="item col">
-					<button class="button-right button-stable col" ng-click="bookInstructor({{sessionID}},{{instructor.ID}})">Book</button>
-				</div>
+				  <!--
+				  <div class="selected-date">
+					Selected date is {{date || dateDefault}}
+				</div>-->
+		</div>
+		<b>Available Timeslots for selected date:</b><br/>
+		<!--list showing instructors free timeslots-->
+		<div class="list" ng-show="displayTime">
+			<div class="item" ng-repeat="schedule in schedules">
+					<a class="" style="color:green" ng-click="showPopup()">
+						{{(schedule.StartDateTime).slice(11,16)}} - 
+						{{(schedule.EndDateTime).slice(11,16)}}
+					</a>
 			</div>
-        </ion-content>
-      </ion-view>
-    </script>
+		</div>
+		
+		
+		
+		</ion-content>
+	  </ion-modal-view>
+	</script>
 	
 	
-	<!--SELECTED APPOINTMENT INSTRUCTOR-->
-    <script id="templates/appointmentInstructor.html" type="text/ng-template">
-      <ion-view title="Instructor">
-        <ion-content has-header="true" ng-init="">
-			
-        </ion-content>
-      </ion-view>
-    </script>
 	
 	<!--CHALLENGES PAGE(under workshops but has its own tab)-->
     <script id="templates/challenges.html" type="text/ng-template">
@@ -969,7 +962,7 @@ About page
 	<!--SETTING PAGE-->
 	<script id="templates/setting.html" type="text/ng-template">
       <ion-view title="Setting">
-        <ion-content has-header="true">
+        <ion-content has-header="true" ng-init="renew()">
 					<div class="list">
 						 <!--Address-->	
 						  <div class="item item-button-right">
