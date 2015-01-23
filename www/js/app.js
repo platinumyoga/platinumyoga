@@ -1514,31 +1514,8 @@ app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesSe
 	
 	$scope.selectedStaff = classesService.getClassStaff($stateParams.classStaffID);
 	
-	var byDate = document.getElementById('byDate');
-	var byInstructor = document.getElementById('byInstructor');
-	var byLevel = document.getElementById('byLevel');	
-	
-	$scope.showClassByDateView = true;
-	$scope.showClassByInstructorView = false;
-	$scope.showClassByLevelView = false;
-		
-	$scope.showClassByDate = function(){
-		$scope.showClassByDateView = true;
-		$scope.showClassByInstructorView = false;
-		$scope.showClassByLevelView = false;
-	};	
-	
-	$scope.showClassByInstructor = function(){
-		$scope.showClassByDateView = false;
-		$scope.showClassByInstructorView = true;
-		$scope.showClassByLevelView = false;
-	};
-	
-	$scope.showClassByLevel = function(){
-		$scope.showClassByDateView = false;
-		$scope.showClassByInstructorView = false;
-		$scope.showClassByLevelView = true;
-	};
+	$scope.options = [{ name: "Beginner", value: "Beginner"}, { name: "Intermediate", value: "Intermediate"}, { name: "Advanced", value: "Advanced"}, {name: "All", value: ""}];
+	$scope.selectedOption = $scope.options[0];
 	
 })
 
