@@ -1567,24 +1567,36 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		
 		//loading the feedback/review DB
 	  $scope.feedbacks = feedbackDb.getFeedbackData();
-	  var userFeedbacks = [];
 	  var a=0;
+	  $scope.userFeeds="";
 	  for(var b=0;b<$scope.feedbacks.length;b++){
 		if($scope.feedbacks[b].userid==$scope.userId && $scope.feedbacks[b].historyid==$scope.historyId){
-			userFeedbacks[a] = $scope.feedbacks[b];
-			a++;
+			$scope.userFeeds = $scope.feedbacks[b];
+			break;
 		}
 	  }
-	  $scope.userFeeds = userFeedbacks;
 	};
 	
-	
-	  
 	  
 	  //saving to feedback database
-	   $scope.addBooking = function(review) {
-			//alert(review.booking);
-        var save = $scope.feedbacks.$add({
+	   $scope.addReview = function(review) {
+		
+		var result = 0;
+		
+		if(review.feedback==""){
+			result = 1;
+		}
+		
+		//alert(review.booking);
+		for(var b=0;b<$scope.feedbacks.length;b++){
+		if($scope.feedbacks[b].userid==$scope.userId && $scope.feedbacks[b].historyid==$scope.historyId){
+		   result = 1;
+		   break;
+		}
+	  }
+		
+		if(result==0){
+			var save = $scope.feedbacks.$add({
            // booking:review.booking,
 		   historyid:$scope.historyId,
 		   userid:$scope.userId,
@@ -1594,19 +1606,29 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		   lesson:$scope.lessonName,
 		   staff:$scope.staffName,
            feedback:review.feedback
-        });
-        //review.booking = "";
-        review.feedback = "";
-		
-		if(save) {
-		  var alertPopup = $ionicPopup.alert({
+			});
+			//review.booking = "";
+			review.feedback = "";
+			
+			//alert
+			var alertPopup = $ionicPopup.alert({
 			 title: 'Review',
 			 template: "Review has been posted!"
 		   });
 		   alertPopup.then(function(res) {});
+		}
+	  	
+		
+		if(save) {
 		  $scope.closeModal();
 		} else {
-		  alert("Cannot Submit");
+			review.feedback = "";
+		  var alert1 = $ionicPopup.alert({
+			 title: 'Review',
+			 template: "Sorry, you can only review once per class."
+		   });
+		   alert1.then(function(res) {});
+		   $scope.closeModal();
 		}
 		
     };
@@ -1641,8 +1663,31 @@ app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesSe
 	
 	$scope.selectedStaff = classesService.getClassStaff($stateParams.classStaffID);
 	
-	$scope.options = [{ name: "Beginner", value: "Beginner"}, { name: "Intermediate", value: "Intermediate"}, { name: "Advanced", value: "Advanced"}, {name: "All", value: ""}];
-	$scope.selectedOption = $scope.options[0];
+	var byDate = document.getElementById('byDate');
+	var byInstructor = document.getElementById('byInstructor');
+	var byLevel = document.getElementById('byLevel');	
+	
+	$scope.showClassByDateView = true;
+	$scope.showClassByInstructorView = false;
+	$scope.showClassByLevelView = false;
+		
+	$scope.showClassByDate = function(){
+		$scope.showClassByDateView = true;
+		$scope.showClassByInstructorView = false;
+		$scope.showClassByLevelView = false;
+	};	
+	
+	$scope.showClassByInstructor = function(){
+		$scope.showClassByDateView = false;
+		$scope.showClassByInstructorView = true;
+		$scope.showClassByLevelView = false;
+	};
+	
+	$scope.showClassByLevel = function(){
+		$scope.showClassByDateView = false;
+		$scope.showClassByInstructorView = false;
+		$scope.showClassByLevelView = true;
+	};
 	
 	
 	

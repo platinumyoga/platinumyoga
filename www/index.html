@@ -319,33 +319,16 @@ About page
 						<b>Lesson Name: </b>{{lessonName}}<br/>
 						<b>Staff staffName: </b>{{staffName}}<br/>
 						<input ng-model='review.feedback' type="text" placeholder='enter feedback'/>
-						<button class="button button-small" ng-click="addBooking(review)">&nbsp;&nbsp;Add&nbsp;&nbsp;</button>
+						<button class="button button-small" ng-click="addReview(review)">&nbsp;&nbsp;Add&nbsp;&nbsp;</button>
 					</div>
 				</div>
 				
 				<br/>
 				<b>Personal Review:</b>
-				<div class="row" ng-repeat="feedback in userFeeds">
+				<div class="row">
 					<div class="col">
-							Review:{{feedback.feedback}}<br/>
+							{{userFeeds.feedback}}<br/>
 					</div>
-				
-						<!--
-						<div ng-show="feedback.userid==userId && feedback.classid!==0 && feedback.classid==classID">
-							Review:{{feedback.feedback}}<br/>
-						</div>-->
-						
-						<!--<div ng-show="feedback.userid==userId && feedback.appointmentid!==0 && feedback.appointmentid==appointmentID">
-							Review:{{feedback.feedback}}<br/>
-						</div>-->
-						
-						<!--<div ng-show="{{feedback.userid}}=={{userId}}">
-							UserID:{{feedback.userid}}<br/>
-							Lesson Name:{{feedback.lesson}}<br/>
-							Staff Name:{{feedback.staff}}<br/>
-							Review:{{feedback.feedback}}<br/>
-						</div>-->
-						<br/>
 				</div>
 			
 			</ion-content>
@@ -358,13 +341,6 @@ About page
       <ion-view title="Classes" has-header="true">
 			<ion-content padding="true">
 			
-			<div class="container" ng-controller="DateCtrl">
-			  <div pickadate ng-model="date" min-date="minDate" max-date="maxDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" no-extra-rows></div>
-			</div>
-			
-			<div class="item">
-				<select data-ng-options="o.name for o in options" data-ng-model="selectedOption"></select>
-			</div>
 				<div class="bar bar-header item-input-inset">
 					<ion-search placeholder="Search for Instructor/Class name" filter="searchClass"></ion-search>
 				</div>
@@ -381,7 +357,7 @@ About page
 							{{class.MaxCapacity-class.TotalBooked}} available
 							</a>
 						</div>
-						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
+						<div class="item col col-center col-33" style="padding-top:55px;padding-bottom:43px;border-left-style: none;">
 							<button class="button-right button-stable col" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
 						</div>
 					</div>
