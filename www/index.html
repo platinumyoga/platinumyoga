@@ -137,9 +137,10 @@ About page
 								<i class="icon ion-man" style="padding-top:2px;"></></i>
 							  </a>
 							  <!--lucky draw-->
+							  <!--
 							  <a class="tab-item" href="#/yoga-app/luckydraw">
 								<i class="icon ion-cash" style="padding-top:2px;"></></i>
-							  </a>
+							  </a>-->
 					</ion-tabs>
 				</ion-footer-bar>
 				<!--
@@ -266,12 +267,19 @@ About page
 					</div>
 					
 					<div class="item" ng-repeat="history in userHistory">
-						{{(history.StartDateTime).slice(0,10)}}<br/>
-						<b>Lesson:</b>&nbsp;{{history.Name}}<br/>
-						<b>Staff:</b>&nbsp;{{history.Staff.Name}}<br/>
-						<b>Attendance:&nbsp;</b>
-						<span ng-show={{history.SignedIn}}>Present</span>
-						<span ng-show=!{{history.SignedIn}}>Absent</span>
+						<div class="row">
+							<div class="col col-67">
+							{{(history.StartDateTime).slice(0,10)}}<br/>
+							<b>Lesson:</b>&nbsp;{{history.Name}}<br/>
+							<b>Staff:</b>&nbsp;{{history.Staff.Name}}<br/>
+							<b>Attendance:&nbsp;</b>
+							<span ng-show={{history.SignedIn}}>Present</span>
+							<span ng-show=!{{history.SignedIn}}>Absent</span>
+							</div>
+							<div class="col col-33">
+								<div class="button button-small" ng-click="writeReview({{history}})">Review</div>
+							</div>
+						</div>
 					</div>
 				</div>
 				
@@ -293,6 +301,56 @@ About page
 			</ion-content>
       </ion-view>
     </script>
+	
+	
+	<!--SHOW REVIEW MODAL-->
+	<script id="review-modal.html" type="text/ng-template">
+	  <ion-modal-view>
+		<ion-header-bar class="bar-assertive">
+			<h1 class="title">Review</h1>
+			  <div class="buttons">
+					<a class="button button-icon ion-close" ng-click="closeModal()"></a>
+			  </div>
+		</ion-header-bar>
+			
+			<ion-content>
+				<div class="row">
+					<div class="col">
+						<b>Lesson Name: </b>{{lessonName}}<br/>
+						<b>Staff staffName: </b>{{staffName}}<br/>
+						<input ng-model='review.feedback' type="text" placeholder='enter feedback'/>
+						<button class="button button-small" ng-click="addBooking(review)">&nbsp;&nbsp;Add&nbsp;&nbsp;</button>
+					</div>
+				</div>
+				
+				<br/>
+				<b>Personal Review:</b>
+				<div class="row" ng-repeat="feedback in userFeeds">
+					<div class="col">
+							Review:{{feedback.feedback}}<br/>
+					</div>
+				
+						<!--
+						<div ng-show="feedback.userid==userId && feedback.classid!==0 && feedback.classid==classID">
+							Review:{{feedback.feedback}}<br/>
+						</div>-->
+						
+						<!--<div ng-show="feedback.userid==userId && feedback.appointmentid!==0 && feedback.appointmentid==appointmentID">
+							Review:{{feedback.feedback}}<br/>
+						</div>-->
+						
+						<!--<div ng-show="{{feedback.userid}}=={{userId}}">
+							UserID:{{feedback.userid}}<br/>
+							Lesson Name:{{feedback.lesson}}<br/>
+							Staff Name:{{feedback.staff}}<br/>
+							Review:{{feedback.feedback}}<br/>
+						</div>-->
+						<br/>
+				</div>
+			
+			</ion-content>
+	  </ion-modal-view>
+	</script>
 	
 
 	<!--CLASSES PAGE-->
@@ -361,6 +419,9 @@ About page
 					<a href="#yoga-app/classStaff/{{selectedclass.Staff.ID}}" class="button button-small">{{selectedclass.Staff.Name}}
 					</a>
 				  </div>
+				  <div class="col">
+					<div class="button button-small" ng-click="openModal()">Reviews</div>
+					</div>
 				</div>
 				
 				<!--rating stars-->
@@ -403,6 +464,30 @@ About page
 			});
 		});
 	</script>
+	
+	
+	
+	<!--SHOW REVIEW MODAL-->
+	<script id="classReviews_modal.html" type="text/ng-template">
+	  <ion-modal-view>
+		<ion-header-bar class="bar-assertive">
+			<h1 class="title">Reviews</h1>
+			  <div class="buttons">
+					<a class="button button-icon ion-close" ng-click="closeModal()"></a>
+			  </div>
+		</ion-header-bar>			
+			<ion-content>
+				<div class="row" ng-repeat="feed in classReviews">
+					<div class="col">
+						<b>Username:</b>{{feed.username}}<br/>
+						<b>Review:</b>{{feed.feedback}}<br/>
+					</div>
+				</div>
+			</ion-content>
+	  </ion-modal-view>
+	</script>
+	
+	
 	
 	
 	<!--CLASS STAFF INFO-->
@@ -661,7 +746,7 @@ About page
 							  <h2>{{instructor.FirstName}} {{instructor.LastName}}</h2>
 							  <br/>
 							  <!--<a class="button" href="#/yoga-app/selectedSessionStaff/{{instructor.ID}}" ng-click="bookInstructor({{sessionID}},{{instructor.ID}})">Book</a>-->
-							  <div class="button button-small" ng-click="bookInstructor({{sessionID}},{{instructor.ID}})">Book</a>
+							  <div class="button button-small" ng-click="bookInstructor({{sessionID}},{{instructor}})">Book</a>
 							  </div>
 							</div>
 					</div>
@@ -670,7 +755,7 @@ About page
       </ion-view>
     </script>
 	
-	
+	<!--MODAL SHOWING CALENDAR FOR APPOINTMENT-->
 	<script id="my-modal.html" type="text/ng-template">
 	  <ion-modal-view>
 		<ion-header-bar class="bar-assertive">
@@ -683,7 +768,7 @@ About page
 		</ion-header-bar>
 		<ion-content>
 		<div class="row"><b>Instructor: </b>{{instructorName}}</div>
-		<div class="row"><b>Appointment: </b>{{sessionName}}</div><br/>
+		<div class="row"><b>Appointment: </b>{{sessionName}}</div>
 		<!--
 		<div class="button-bar">
 			  <a class="button button-small" id="showUpcoming" ng-click="showDate()">Date</a>
@@ -692,7 +777,7 @@ About page
 		-->
 		
 		<div class="container">
-				  <div pickadate ng-model="date" min-date="minDate" max-date="maxDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" no-extra-rows ng-click="test(date)">
+				  <div pickadate ng-model="date" min-date="minDate" max-date="maxDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" no-extra-rows ng-click="selectedDate(date)">
 				  </div>
 
 				  <!--
@@ -701,18 +786,14 @@ About page
 				</div>-->
 		</div>
 		<b>Available Timeslots for selected date:</b><br/>
-		<!--list showing instructors free timeslots-->
-		<div class="list" ng-show="displayTime">
-			<div class="item" ng-repeat="schedule in schedules">
-					<a class="" style="color:green" ng-click="showPopup()">
-						{{(schedule.StartDateTime).slice(11,16)}} - 
-						{{(schedule.EndDateTime).slice(11,16)}}
-					</a>
+			<!--list showing instructors free timeslots-->
+			<div class="list" ng-show="displayTime">
+				<div class="item" ng-repeat="schedule in schedules">
+						<a style="color:green" ng-click="showPopup(schedule)">
+							{{schedule.slice(11, 18)}}0
+						</a>
+				</div>
 			</div>
-		</div>
-		
-		
-		
 		</ion-content>
 	  </ion-modal-view>
 	</script>
@@ -808,6 +889,7 @@ About page
     </script>
 	
 	<!--LUCKY DRAW PAGE-->
+	<!--
     <script id="templates/luckydraw.html" type="text/ng-template">
       <ion-view title="Lucky Draw">
         <ion-content has-header="true">
@@ -816,7 +898,7 @@ About page
 			</p>
         </ion-content>
       </ion-view>
-    </script>
+    </script>-->
 	
 	<!--HALL OF FAME PAGE-->
     <script id="templates/halloffame.html" type="text/ng-template">
@@ -841,23 +923,10 @@ About page
       <ion-view title="Promotions">
         <ion-content has-header="true">
 			<p align="center">PROMOTIONS</p>
-				<!--
-				<input ng-model='review.booking' type='text' placeholder='enter booking' />
-				<input ng-model='review.feedback' type="text" placeholder='enter feedback'/>
-				<button class="button icon-left ion-plus" ng-click="addBooking(review)">Add</button>
-				
-				
-				<div class="row" ng-repeat="feedback in feedbacks">
-					{{feedback.booking}}<br/>
-					{{feedback.feedback}}
-				</div>
-			
-			
-				<div class="row" ng-repeat="(id, details) in healthtips">
-					{{id}}<br/>
-					{{details.tips}}
-				</div>-->
 				<button class="button button-small" ng-click="test()">Test Health Tip</button>
+				
+				
+				
         </ion-content>
       </ion-view>
     </script>

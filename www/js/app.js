@@ -785,8 +785,9 @@ app.factory('removeBookingService',function($http,userScheduleService,$ionicPopu
 
 			/* Check whether the HTTP Request is successful or not. */
 			request2.success(function (data) {
-					   userScheduleService.getUserSchedule(userId);
+					  
 				if(data.RemoveClientsFromClassesResult.ErrorCode===200){
+					 userScheduleService.getUserSchedule(userId);
 					//alert(data.RemoveClientsFromClassesResult.Classes.Class.Clients.Client.ID);
 					var successRemovePopUp = $ionicPopup.alert({
 						 title: 'Cancel Class',
@@ -932,6 +933,7 @@ app.factory('appointmentService',function($http){
 
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
+				//alert(JSON.stringify(data));
 				apptDatabase = data.ScheduleItems.ScheduleItem;
 				//alert(JSON.stringify(apptDatabase.ScheduleItems.ScheduleItem));
 				//alert(JSON.stringify(apptDatabase));
@@ -943,14 +945,102 @@ app.factory('appointmentService',function($http){
 		getApptResponse:function(chosenDate){
 			var availSlots = [];
 			var j=0;
+			
 			for(var i=0;i<apptDatabase.length;i++){
 				if(apptDatabase[i].StartDateTime.slice(0,10)==chosenDate){
+					//alert("Start date:"+apptDatabase[i].StartDateTime);
+					//alert("End date:"+apptDatabase[i].EndDateTime);
 					availSlots[j]=apptDatabase[i];
-					j=j+1;
+					j++;
 				}
 			}
-			//alert(availSlots[0].Staff.ID);
-			return availSlots;
+			
+			var timeslots = [];
+			var k=0;
+			
+			for(var a=0;a<availSlots.length;a++){
+				//alert(availSlots[a].StartDateTime.slice(0,19).toString());
+				//alert(availSlots[a].EndDateTime.slice(0,19).toString());
+				
+				var startDate = new Date(availSlots[a].StartDateTime.slice(0,19).toString());
+				var hr1 = startDate.getHours();
+				startDate.setHours(hr1-8);
+				
+				var endDate = new Date(availSlots[a].EndDateTime.slice(0,19).toString());
+				var hr2 = endDate.getHours();
+				endDate.setHours(hr2-8);
+				//alert("new start: "+startDate);
+				//alert("new end: "+endDate);
+				
+				//the new dates are malaysian times, converted from the api string by sun system.
+					
+					while(startDate.getTime()<endDate.getTime()){
+						//alert(startDate.getTime());
+						//alert(endDate.getTime());
+						timeslots[k]=chosenDate+" "+startDate.toString().slice(16,24);
+						//alert("save"+startDate);
+						//alert("1: "+startDate);
+						
+						var newValue = startDate.getMinutes()+30;
+						startDate.setMinutes(newValue);
+						//alert("2: "+startDate);
+						k++;
+					}
+					
+			}
+			return timeslots;
+		}
+	}
+})
+
+
+app.factory('bookApptService',function($http,userScheduleService,$ionicPopup){
+	return {
+		bookAppointment: function(isMale,instructorID,sessionID,userID,startDateTime){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/bookClientIntoAppointment.php",
+			data: {
+				isMale:isMale,
+				instructorId:instructorID,
+				sessionId:sessionID,
+				userId:userID,
+				startdatetime:startDateTime
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				//alert(JSON.stringify(data));
+				//console.log(JSON.stringify(data));
+				//alert(data.AddOrUpdateAppointmentsResult.ErrorCode);
+				if(data.AddOrUpdateAppointmentsResult.ErrorCode==200){
+					userScheduleService.getUserSchedule(userID);
+					var alertPopup = $ionicPopup.alert({
+					 title: 'Book Appoinment',
+					 template: "Success!"
+				   });
+				   alertPopup.then(function(res) {});
+					
+				}else{
+					var alertPopup = $ionicPopup.alert({
+					 title: 'Book Appoinment',
+					 template:data.Appointments.Appointment.Messages.string
+				   });
+				   alertPopup.then(function(res) {});
+				}
+				
+				apptdatabase = data;
+			})
+			//not working
+			request.error(function (data) {
+            })
+		},
+		bookAppointmentResponse:function(){
+			
 		}
 	}
 })
@@ -1290,7 +1380,7 @@ app.controller('barcodeCtrl',function($scope,userService){
 	$scope.userId = userService.getUserID();
 })
 
-app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$timeout,$ionicLoading,$interval,userService,userScheduleService,removeBookingService,waitlistService,removeWaitlistService,historyService,purchaseHistoryService){
+app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$timeout,$ionicLoading,$interval,userService,userScheduleService,removeBookingService,waitlistService,removeWaitlistService,historyService,purchaseHistoryService,$ionicModal,feedbackDb,$firebase){
 
 	$scope.userId = userService.getUserID();;
 	$scope.username = userService.getUsername();
@@ -1348,7 +1438,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		$ionicLoading.hide();
 		retrievePurchaseHistory();
 	  }, 2900);
-	
+	  
 	
 	var upcoming = document.getElementById('showUpcoming');
 	var history = document.getElementById('showHistory');
@@ -1436,65 +1526,102 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		   })
 	};
 	
-	
-	
-	/*ACCORDION START*/
-	$scope.groups = [];
-	  for (var i=0; i<3; i++) {
-		if(i==0){
-			$scope.groups[i] = {
-			name: 'Classes',
-			items: []
-			};
-			/*loop through all the classes*/
-			for (var j=0; j<3; j++) {
-				//var id = $scope.scheduledClasses[j].ID;
-				$scope.groups[i].items.push('item '+j);
-			}
-		}else if(i==1){
-			$scope.groups[i] = {
-			name: 'Appointments',
-			items1: []
-			};
-			/*loop through all the appts*/
-			for (var j=0; j<3; j++) {
-				$scope.groups[i].items1.push('item '+j);
-			}
-		}else{
-			$scope.groups[i] = {
-			name: 'Others',
-			items2: []
-			};
-			/*loop through all the classes*/
-			for (var j=0; j<3; j++) {
-				$scope.groups[i].items2.push('item '+j);
-			}
+    //MODAL START
+	$ionicModal.fromTemplateUrl('review-modal.html', {
+		scope: $scope,
+		animation: 'slide-in-up'
+	  }).then(function(modal) {
+		$scope.modal = modal;
+	  });
+	  $scope.openModal = function() {
+		$scope.modal.show();
+	  };
+	  $scope.closeModal = function() {
+		$scope.modal.hide();
+	  };
+	  //Cleanup the modal when we're done with it!
+	  $scope.$on('$destroy', function() {
+		$scope.modal.remove();
+	  });
+	  // Execute action on hide modal
+	  $scope.$on('modal.hidden', function() {
+		// Execute action
+	  });
+	  // Execute action on remove modal
+	  $scope.$on('modal.removed', function() {
+		// Execute action
+	  });
+	  //MODAL END
+	  
+	  
+	  $scope.writeReview = function(history){
+		//alert(JSON.stringify(history));
+		$scope.historyId = history.ID;
+		$scope.lessonName = history.Name;
+		$scope.staffName = history.Staff.Name;
+		$scope.classID = history.ClassID;
+		//alert("class ID:"+$scope.classID);
+		$scope.appointmentID = history.AppointmentID;
+		//alert("appt ID:"+$scope.appointmentID);
+		$scope.openModal();
+		
+		//loading the feedback/review DB
+	  $scope.feedbacks = feedbackDb.getFeedbackData();
+	  var userFeedbacks = [];
+	  var a=0;
+	  for(var b=0;b<$scope.feedbacks.length;b++){
+		if($scope.feedbacks[b].userid==$scope.userId && $scope.feedbacks[b].historyid==$scope.historyId){
+			userFeedbacks[a] = $scope.feedbacks[b];
+			a++;
 		}
 	  }
+	  $scope.userFeeds = userFeedbacks;
+	};
+	
+	
 	  
-	  /*
-	   * if given group is the selected group, deselect it
-	   * else, select the given group
-	   */
-	  $scope.toggleGroup = function(group) {
-		if ($scope.isGroupShown(group)) {
-		  $scope.shownGroup = null;
+	  
+	  //saving to feedback database
+	   $scope.addBooking = function(review) {
+			//alert(review.booking);
+        var save = $scope.feedbacks.$add({
+           // booking:review.booking,
+		   historyid:$scope.historyId,
+		   userid:$scope.userId,
+		   username:$scope.username,
+		   classid:$scope.classID,
+		   appointmentid:$scope.appointmentID,
+		   lesson:$scope.lessonName,
+		   staff:$scope.staffName,
+           feedback:review.feedback
+        });
+        //review.booking = "";
+        review.feedback = "";
+		
+		if(save) {
+		  var alertPopup = $ionicPopup.alert({
+			 title: 'Review',
+			 template: "Review has been posted!"
+		   });
+		   alertPopup.then(function(res) {});
+		  $scope.closeModal();
 		} else {
-		  $scope.shownGroup = group;
+		  alert("Cannot Submit");
 		}
-	  };
-	  $scope.isGroupShown = function(group) {
-		return $scope.shownGroup === group;
-	  };
-	/*ACCORDION END*/
+		
+    };
+	  
 })
 
-app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesService,userService) {
+app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesService,userService,feedbackDb,$ionicModal) {
 	$scope.totalClasses = classesService.getClasses();
 	$scope.selectedclass = classesService.getSelectedClass($stateParams.classID);
 	$scope.userID = userService.getUserID();
-	
+	//loading the feedback/review DB
+	 $scope.feedbacks = feedbackDb.getFeedbackData();
+	 
 	$scope.bookClass = function(selectedClassID,userID){
+		$scope.selectedClassId = selectedClassID;
 		//classesService.bookClass(selectedClassID,userID);
 		var confirmBookingPopup = $ionicPopup.confirm({
 					 title: 'Book Class',
@@ -1516,6 +1643,51 @@ app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesSe
 	
 	$scope.options = [{ name: "Beginner", value: "Beginner"}, { name: "Intermediate", value: "Intermediate"}, { name: "Advanced", value: "Advanced"}, {name: "All", value: ""}];
 	$scope.selectedOption = $scope.options[0];
+	
+	
+	
+	
+	//MODAL START
+	$ionicModal.fromTemplateUrl('classReviews_modal.html', {
+		scope: $scope,
+		animation: 'slide-in-up'
+	  }).then(function(modal) {
+		$scope.modal = modal;
+	  });
+	  $scope.openModal = function() {
+		
+		var userFeedbacks = [];
+		var a=0;
+		  for(var b=0;b<$scope.feedbacks.length;b++){
+			/*alert($scope.feedbacks[b].staff);
+			alert($scope.selectedclass.Staff.Name);
+			alert($scope.feedbacks[b].lesson);
+			alert($scope.selectedclass.ClassDescription.Name);*/
+			if($scope.feedbacks[b].staff==$scope.selectedclass.Staff.Name && $scope.feedbacks[b].lesson==$scope.selectedclass.ClassDescription.Name){
+				userFeedbacks[a] = $scope.feedbacks[b];
+				a++;
+			}
+		  }
+		$scope.classReviews = userFeedbacks;  
+		$scope.modal.show();	
+	  };
+	  $scope.closeModal = function() {
+		$scope.modal.hide();
+	  };
+	  //Cleanup the modal when we're done with it!
+	  $scope.$on('$destroy', function() {
+		$scope.modal.remove();
+	  });
+	  // Execute action on hide modal
+	  $scope.$on('modal.hidden', function() {
+		// Execute action
+	  });
+	  // Execute action on remove modal
+	  $scope.$on('modal.removed', function() {
+		// Execute action
+	  });
+	  //MODAL END
+	
 	
 })
 
@@ -1744,7 +1916,7 @@ app.controller('aboutCtrl',function($scope){
 	
 })
 
-app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,sessionService,$stateParams,sessionStaffService,$ionicModal,$ionicPopup){
+app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,sessionService,$stateParams,sessionStaffService,$ionicModal,$ionicPopup,userService,bookApptService){
 	$scope.sessionTypes = sessionService.getSessionResponse();
 	$scope.sessionID = $stateParams.sessionTypeID;
 	$scope.displayTime = false;
@@ -1781,6 +1953,8 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 	  $scope.disabledDates = ['2014-11-19', todayString];
 	   //calender end   
 	   
+	   
+	   //MODAL START
 	$ionicModal.fromTemplateUrl('my-modal.html', {
 		scope: $scope,
 		animation: 'slide-in-up'
@@ -1805,54 +1979,59 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 	  $scope.$on('modal.removed', function() {
 		// Execute action
 	  });
+	  //MODAL END
 	
-	$scope.bookInstructor = function(sessionID,instructorId){
+	
+	$scope.bookInstructor = function(sessionID,instructor){
+		$scope.instructorVar = instructor;
 		$scope.sessionName = sessionService.getSessionName(sessionID);
-		
+		//call this earlier to attain the timeslots faster
+		appointmentService.getAppointments($scope.sessionID,$scope.instructorVar.ID);
 			for(var i=0;i<$scope.instructors.length;i++){
-				if($scope.instructors[i].ID==instructorId){
+				if($scope.instructors[i].ID==instructor.ID){
 					$scope.instructorName = $scope.instructors[i].Name;
 				}
 			}
-			
 		$scope.openModal();
-		
-		$scope.test=function(date){
-			appointmentService.getAppointments(sessionID,instructorId);
-			$scope.schedules = appointmentService.getApptResponse(date);
-			//$scope.displayDate = false;
-			$scope.displayTime = true;
-		};
 	};
 	
+	//when a date is selected
+	$scope.selectedDate=function(date){
+		$scope.schedules = appointmentService.getApptResponse(date);
+		//$scope.displayDate = false;
+		$scope.displayTime = true;
+	};
 	
-	     // Triggered on a button click, or some other target
-		$scope.showPopup = function() {
-		   $scope.data = {}
-		   // An elaborate, custom popup
-		   var myPopup = $ionicPopup.show({
-			 template: '<textarea type="text" ng-model="data.notes">',
-			 title: 'BOOKING',
-			 subTitle: 'Notes:',
-			 scope: $scope,
-			 buttons: [
-			   { text: 'Cancel' },
-			   {
-				 text: '<b>Save</b>',
-				 type: 'button-positive',
-				 onTap: function(e) {
-				   if ($scope.data.notes!=null) {
-						//method trigger here
-					   return $scope.data.notes;
-				   }
-				 }
-			   },
-			 ]
-		   });
-		   myPopup.then(function(res) {
-			 console.log('Tapped!', res);
-		   });
-		};
+	// Triggered on a button click, or some other target
+	$scope.showPopup = function(schedule) {
+	   $scope.data = {}
+	   // An elaborate, custom popup
+	   var myPopup = $ionicPopup.show({
+		 template: '<textarea type="text" ng-model="data.notes">',
+		 title: 'BOOKING',
+		 subTitle: 'Notes:',
+		 scope: $scope,
+		 buttons: [
+		   { text: 'Cancel' },
+		   {
+			 text: '<b>Book</b>',
+			 type: 'button-assertive',
+			 onTap: function(e) {
+				//method trigger here
+					bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule);
+					bookApptService.bookAppointmentResponse();  
+			   /*if ($scope.data.notes!=null) {
+					return $scope.data.notes;
+			   }*/
+			 }
+		   },
+		 ]
+	   });
+	   myPopup.then(function(res) {
+		 console.log('Tapped!', res);
+	   });
+	};
+
 })
 
 app.controller('halloffameCtrl',function($scope){
@@ -1884,9 +2063,8 @@ app.controller('halloffameCtrl',function($scope){
 	};
 })
 
-app.controller('promotionsCtrl',function($scope,healthTipDb,feedbackDb,$firebase){
+app.controller('promotionsCtrl',function($scope,healthTipDb,$firebase){
 	//$scope.healthtips = healthTipDb.getHealthTipsData();
-	$scope.feedbacks = feedbackDb.getFeedbackData();
 	
 	var arrayList = new Array();
 	$scope.test = function(){
@@ -1903,25 +2081,6 @@ app.controller('promotionsCtrl',function($scope,healthTipDb,feedbackDb,$firebase
 			  
 		});
 	};
-
-	
-	
-	 $scope.addBooking = function(review) {
-			//alert(review.booking);
-        var save = $scope.feedbacks.$add({
-            booking:review.booking,
-            feedback:review.feedback
-        });
-        review.booking = "";
-        review.feedback = "";
-		
-		if(save) {
-		  alert("Submitted successfully");
-		} else {
-		  alert("Cannot Submit");
-		}
-		
-    };
 })
 
 
