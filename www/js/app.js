@@ -994,7 +994,7 @@ app.factory('appointmentService',function($http){
 })
 
 
-app.factory('bookApptService',function($http,userScheduleService,$ionicPopup){
+app.factory('bookApptService',function($http,userScheduleService,$ionicPopup,$state){
 	return {
 		bookAppointment: function(isMale,instructorID,sessionID,userID,startDateTime){
 			var request = $http({
@@ -1024,7 +1024,7 @@ app.factory('bookApptService',function($http,userScheduleService,$ionicPopup){
 					 template: "Success!"
 				   });
 				   alertPopup.then(function(res) {});
-					
+					$state.go("yoga-app.home");
 				}else{
 					var alertPopup = $ionicPopup.alert({
 					 title: 'Book Appoinment',
@@ -2045,38 +2045,39 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 		$scope.schedules = appointmentService.getApptResponse(date);
 		//$scope.displayDate = false;
 		$scope.displayTime = true;
-	};
-	
-	// Triggered on a button click, or some other target
-	$scope.showPopup = function(schedule) {
-	   $scope.data = {}
-	   // An elaborate, custom popup
-	   var myPopup = $ionicPopup.show({
-		 template: '<textarea type="text" ng-model="data.notes">',
-		 title: 'BOOKING',
-		 subTitle: 'Notes:',
-		 scope: $scope,
-		 buttons: [
-		   { text: 'Cancel' },
-		   {
-			 text: '<b>Book</b>',
-			 type: 'button-assertive',
-			 onTap: function(e) {
-				//method trigger here
-					bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule);
-					bookApptService.bookAppointmentResponse();  
-			   /*if ($scope.data.notes!=null) {
-					return $scope.data.notes;
-			   }*/
-			 }
-		   },
-		 ]
-	   });
-	   myPopup.then(function(res) {
-		 console.log('Tapped!', res);
-	   });
-	};
 
+		// Triggered on a button click, or some other target
+		$scope.showPopup = function(schedule) {
+		   $scope.data = {}
+		   // An elaborate, custom popup
+		   var myPopup = $ionicPopup.show({
+			 template: '<textarea type="text" ng-model="data.notes">',
+			 title: 'BOOKING',
+			 subTitle: 'Notes:',
+			 scope: $scope,
+			 buttons: [
+			   { text: 'Cancel' },
+			   {
+				 text: '<b>Book</b>',
+				 type: 'button-assertive',
+				 onTap: function(e) {
+					//method trigger here
+						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule);
+						bookApptService.bookAppointmentResponse(); 
+
+				   /*if ($scope.data.notes!=null) {
+						return $scope.data.notes;
+				   }*/
+				 }
+			   },
+			 ]
+		   });
+		   myPopup.then(function(res) {
+			 console.log('Tapped!', res);
+		   });
+		};
+		
+	};
 })
 
 app.controller('halloffameCtrl',function($scope){
