@@ -1,4 +1,26 @@
-var app = angular.module('ionicApp', ['ionic','firebase','ui.router', 'pickadate'])
+angular.module('ionic.utils', [])
+
+.factory('$localstorage', ['$window', function($window) {
+  return {
+    set: function(key, value) {
+      $window.localStorage[key] = value;
+    },
+    get: function(key, defaultValue) {
+      return $window.localStorage[key] || defaultValue;
+    },
+    setObject: function(key, value) {
+      $window.localStorage[key] = JSON.stringify(value);
+    },
+    getObject: function(key) {
+      return JSON.parse($window.localStorage[key] || '{}');
+    }
+  }
+}]);
+
+
+
+
+var app = angular.module('ionicApp', ['ionic','ionic.utils','firebase','ui.router', 'pickadate'])
 
 //CONFIGURATION+ROUTE
 //CONFIGURATION+ROUTE
@@ -224,24 +246,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
       }
     })
 })
-
-
-app.factory('$localstorage', ['$window', function($window) {
-  return {
-    set: function(key, value) {
-      $window.localStorage[key] = value;
-    },
-    get: function(key, defaultValue) {
-      return $window.localStorage[key] || defaultValue;
-    },
-    setObject: function(key, value) {
-      $window.localStorage[key] = JSON.stringify(value);
-    },
-    getObject: function(key) {
-      return JSON.parse($window.localStorage[key] || '{}');
-    }
-  }
-}]);
 
 
 //services
