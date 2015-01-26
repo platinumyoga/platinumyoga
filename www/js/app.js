@@ -248,211 +248,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 })
 
 
-//services
-app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userScheduleService,historyService,purchaseHistoryService,userDetailsService,waitlistService) {
-	var users = [];
-	var userDatabase = "";
-	
-	return {
-		authentication: function(user){
-			var request = $http({
-			method: "post",
-			url: "http://platinumyoga-rerawan.rhcloud.com/login.php",
-			data: {
-				username: user.username,
-				password: user.password
-			},
-			headers: { 
-				'Content-Type': 'application/x-www-form-urlencoded' 
-			}
-			});
-
-			/* Check whether the HTTP Request is successful or not. */
-			request.success(function (data) {
-				userDatabase = data;
-				if(userDatabase.ValidateLoginResult.ErrorCode === 200){	
-					$localstorage.set('name', user.username);
-					$localstorage.set('password', user.password);
-					userID = userDatabase.ValidateLoginResult.Client.ID;
-					userScheduleService.getUserSchedule(userID);
-					waitlistService.getWaitlist(userID);
-					historyService.getUserHistory(userID);
-					purchaseHistoryService.getPurchaseHistory(userID);
-					userDetailsService.getUserDetails(userID);
-					$state.go("yoga-app.home");
-				}else{
-					var alertPopup = $ionicPopup.alert({
-					 title: 'Error',
-					 template: userDatabase.ValidateLoginResult.Message
-				   });
-				   alertPopup.then(function(res) {});
-				}	
-			})
-			
-			//not working
-			request.error(function (data) {
-				//alert(data);
-                loginFail();
-            })
-		},
-		getUserID: function(){
-			return userDatabase.ValidateLoginResult.Client.ID;
-		},
-		getUsername: function(){
-			return userDatabase.ValidateLoginResult.Client.FirstName+" "+userDatabase.ValidateLoginResult.Client.LastName;
-		}
-	}
-})
-
-
-
-
-.run(function($localstorage,userService){
-   if($localstorage.get('name')==null){
-    console.log("namenull");
-  }else{
-	  var userInfo = {};	
-	  userInfo.username = $localstorage.get('name');
-	  userInfo.password = $localstorage.get('password');
-	  
-	  userService.authentication(userInfo);
-  }
-});
-
-//firebase
-app.factory('healthTipDb', function($firebase) {
-    var healthtipsLink = new Firebase("https://healthtipstinkertest.firebaseio.com/");
-	var dataArr = $firebase(healthtipsLink).$asArray();
-    return {
-        getHealthTipsData: function() {
-			return dataArr;
-        },
-		getTip:function(tipId){
-			//healthtipsLink.child('-JekEefgbGTQq_JdneAC').on('value', function(snapshot) { alert(snapshot.val().details); })
-			return 1;
-		}
-    }
-})
-
-app.factory('feedbackDb', function($firebase) {
-    var feedbackLink = new Firebase("https://feedbacktinkertest.firebaseio.com/");
-	var dataArr = $firebase(feedbackLink).$asArray();
-    return {
-        getFeedbackData: function() {
-			return dataArr;
-        }
-    }
-})
-
-
-app.factory('userDetailsService', function($http) {
-	return {
-		getUserDetails: function(userId){
-			var request = $http({
-			method: "post",
-			url: "http://platinumyoga-rerawan.rhcloud.com/getClientDetails.php",
-			data: {
-				userID: userId,
-			},
-			headers: { 
-				'Content-Type': 'application/x-www-form-urlencoded' 
-			}
-			});
-
-			/* Check whether the HTTP Request is successful or not. */
-			request.success(function (data) {
-				userDetailsData = data;
-			})
-			//not working
-			request.error(function (data) {
-            })
-		},
-		getUserDetailsResponse:function(){
-			return userDetailsData;
-		},
-		getUserEmail:function(){
-			return userDetailsData.GetClientsResult.Clients.Client.Email;
-		},
-		getUserAddress:function(){
-			return userDetailsData.GetClientsResult.Clients.Client.AddressLine1;
-		},
-		geUserPostalCode:function(){
-			return userDetailsData.GetClientsResult.Clients.Client.PostalCode;
-		},
-		getUserMobile:function(){
-			return userDetailsData.GetClientsResult.Clients.Client.MobilePhone;
-		},
-		getUserBirth:function(){
-			return userDetailsData.GetClientsResult.Clients.Client.BirthDate;
-		},
-		getUserGender:function(){
-			return userDetailsData.GetClientsResult.Clients.Client.Gender;
-		}
-	}
-})
-
-
-app.factory('updateUserDetailsService', function($http,$ionicPopup) {
-	return {
-		updateUserDetails: function(user){
-			var request = $http({
-			method: "post",
-			url: "http://platinumyoga-rerawan.rhcloud.com/updateClientDetails.php",
-			data: {
-				userID:	user.id,
-				address: user.address,
-				email: user.email,
-				mobilePhone: user.mobile,
-				birthDate: user.birthDate,
-				gender: user.gender,
-				postalCode: user.postalCode
-			},
-			headers: { 
-				'Content-Type': 'application/x-www-form-urlencoded' 
-			}
-			});
-
-			/* Check whether the HTTP Request is successful or not. */
-			request.success(function (data) {
-				updateData = data;
-				/*alert(user.id);
-				alert(user.address);
-				alert(user.mobile);
-				alert(user.birthDate);
-				alert(user.gender);
-				alert(user.postalCode);
-				alert(JSON.stringify(updateData));*/
-				
-				if(updateData.AddOrUpdateClientsResult.ErrorCode === 200){
-					var alertPopup = $ionicPopup.alert({
-					 title: 'Setting',
-					 template: "Update Success!"
-				   });
-				   alertPopup.then(function(res) {});
-				}else{
-					var alertPopup = $ionicPopup.alert({
-					 title: 'Setting',
-					 template: updateData.AddOrUpdateClientsResult.Clients.Client.Messages.string
-				   });
-				   alertPopup.then(function(res) {});
-				}
-			})
-			//not working
-			request.error(function (data) {
-				//alert("fail");
-            })
-		},
-		checkValidity:function(){
-			if(updateData.AddOrUpdateClientsResult.ErrorCode === 200){
-				return true;
-			}else{
-				return false;
-			}
-		}
-	}
-})
-
-
 
 app.factory('classesService', function($http,$ionicPopup,userScheduleService,waitlistService) {
 	return {
@@ -732,6 +527,255 @@ app.factory('challengesService',function($http,$ionicPopup,userScheduleService){
 	}
 })
 
+
+app.factory('sessionService',function($http){
+	return {
+		getSession: function(){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getSessionType.php",
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				//alert(JSON.stringify(data));
+				sessionDatabase = data;
+			})
+			
+			//not working
+			request.error(function (data) {
+            })
+		},
+		getSessionResponse:function(){
+			return sessionDatabase.SessionTypes.SessionType;
+		},
+		getSessionName:function(sessionID){
+			for(var i=0;i<sessionDatabase.SessionTypes.SessionType.length;i++){
+				if(sessionDatabase.SessionTypes.SessionType[i].ID==sessionID){
+					return sessionDatabase.SessionTypes.SessionType[i].Name;
+				}
+			}
+		}
+	}
+})
+
+
+
+
+
+//services
+app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userScheduleService,historyService,purchaseHistoryService,userDetailsService,waitlistService,classesService,workshopsService,eventsService,challengesService,sessionService) {
+	var users = [];
+	var userDatabase = "";
+	
+	return {
+		authentication: function(user){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/login.php",
+			data: {
+				username: user.username,
+				password: user.password
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				userDatabase = data;
+				if(userDatabase.ValidateLoginResult.ErrorCode === 200){	
+					$localstorage.set('name', user.username);
+					$localstorage.set('password', user.password);
+					userID = userDatabase.ValidateLoginResult.Client.ID;
+					userScheduleService.getUserSchedule(userID);
+					waitlistService.getWaitlist(userID);
+					historyService.getUserHistory(userID);
+					purchaseHistoryService.getPurchaseHistory(userID);
+					userDetailsService.getUserDetails(userID);
+					
+					classesService.getClassesDatabase();
+					workshopsService.getWorkshopsDatabase();
+					eventsService.getEventsDatabase();
+					challengesService.getChallengesDatabase();
+					sessionService.getSession();
+					
+					$state.go("yoga-app.home");
+				}else{
+					var alertPopup = $ionicPopup.alert({
+					 title: 'Error',
+					 template: userDatabase.ValidateLoginResult.Message
+				   });
+				   alertPopup.then(function(res) {});
+				}	
+			})
+			
+			//not working
+			request.error(function (data) {
+				//alert(data);
+                loginFail();
+            })
+		},
+		getUserID: function(){
+			return userDatabase.ValidateLoginResult.Client.ID;
+		},
+		getUsername: function(){
+			return userDatabase.ValidateLoginResult.Client.FirstName+" "+userDatabase.ValidateLoginResult.Client.LastName;
+		}
+	}
+})
+
+
+
+
+.run(function($localstorage,userService){
+   if($localstorage.get('name')==null){
+    console.log("namenull");
+  }else{
+	  var userInfo = {};	
+	  userInfo.username = $localstorage.get('name');
+	  userInfo.password = $localstorage.get('password');
+	  
+	  userService.authentication(userInfo);
+  }
+});
+
+//firebase
+app.factory('healthTipDb', function($firebase) {
+    var healthtipsLink = new Firebase("https://healthtipstinkertest.firebaseio.com/");
+	var dataArr = $firebase(healthtipsLink).$asArray();
+    return {
+        getHealthTipsData: function() {
+			return dataArr;
+        },
+		getTip:function(tipId){
+			//healthtipsLink.child('-JekEefgbGTQq_JdneAC').on('value', function(snapshot) { alert(snapshot.val().details); })
+			return 1;
+		}
+    }
+})
+
+app.factory('feedbackDb', function($firebase) {
+    var feedbackLink = new Firebase("https://feedbacktinkertest.firebaseio.com/");
+	var dataArr = $firebase(feedbackLink).$asArray();
+    return {
+        getFeedbackData: function() {
+			return dataArr;
+        }
+    }
+})
+
+
+app.factory('userDetailsService', function($http) {
+	return {
+		getUserDetails: function(userId){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getClientDetails.php",
+			data: {
+				userID: userId,
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				userDetailsData = data;
+			})
+			//not working
+			request.error(function (data) {
+            })
+		},
+		getUserDetailsResponse:function(){
+			return userDetailsData;
+		},
+		getUserEmail:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.Email;
+		},
+		getUserAddress:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.AddressLine1;
+		},
+		geUserPostalCode:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.PostalCode;
+		},
+		getUserMobile:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.MobilePhone;
+		},
+		getUserBirth:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.BirthDate;
+		},
+		getUserGender:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.Gender;
+		}
+	}
+})
+
+
+app.factory('updateUserDetailsService', function($http,$ionicPopup) {
+	return {
+		updateUserDetails: function(user){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/updateClientDetails.php",
+			data: {
+				userID:	user.id,
+				address: user.address,
+				email: user.email,
+				mobilePhone: user.mobile,
+				birthDate: user.birthDate,
+				gender: user.gender,
+				postalCode: user.postalCode
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				updateData = data;
+				/*alert(user.id);
+				alert(user.address);
+				alert(user.mobile);
+				alert(user.birthDate);
+				alert(user.gender);
+				alert(user.postalCode);
+				alert(JSON.stringify(updateData));*/
+				
+				if(updateData.AddOrUpdateClientsResult.ErrorCode === 200){
+					var alertPopup = $ionicPopup.alert({
+					 title: 'Setting',
+					 template: "Update Success!"
+				   });
+				   alertPopup.then(function(res) {});
+				}else{
+					var alertPopup = $ionicPopup.alert({
+					 title: 'Setting',
+					 template: updateData.AddOrUpdateClientsResult.Clients.Client.Messages.string
+				   });
+				   alertPopup.then(function(res) {});
+				}
+			})
+			//not working
+			request.error(function (data) {
+				//alert("fail");
+            })
+		},
+		checkValidity:function(){
+			if(updateData.AddOrUpdateClientsResult.ErrorCode === 200){
+				return true;
+			}else{
+				return false;
+			}
+		}
+	}
+})
 
 
 app.factory('userScheduleService', function($http,$state) {
@@ -1077,41 +1121,6 @@ app.factory('bookApptService',function($http,userScheduleService,$ionicPopup,$st
 			//not working
 			request.error(function (data) {
             })
-		}
-	}
-})
-
-
-app.factory('sessionService',function($http){
-	return {
-		getSession: function(){
-			var request = $http({
-			method: "post",
-			url: "http://platinumyoga-rerawan.rhcloud.com/getSessionType.php",
-			headers: { 
-				'Content-Type': 'application/x-www-form-urlencoded' 
-			}
-			});
-
-			/* Check whether the HTTP Request is successful or not. */
-			request.success(function (data) {
-				//alert(JSON.stringify(data));
-				sessionDatabase = data;
-			})
-			
-			//not working
-			request.error(function (data) {
-            })
-		},
-		getSessionResponse:function(){
-			return sessionDatabase.SessionTypes.SessionType;
-		},
-		getSessionName:function(sessionID){
-			for(var i=0;i<sessionDatabase.SessionTypes.SessionType.length;i++){
-				if(sessionDatabase.SessionTypes.SessionType[i].ID==sessionID){
-					return sessionDatabase.SessionTypes.SessionType[i].Name;
-				}
-			}
 		}
 	}
 })
