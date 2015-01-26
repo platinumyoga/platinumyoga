@@ -225,8 +225,27 @@ app.config(function($stateProvider, $urlRouterProvider) {
     })
 })
 
+
+app.factory('$localstorage', ['$window', function($window) {
+  return {
+    set: function(key, value) {
+      $window.localStorage[key] = value;
+    },
+    get: function(key, defaultValue) {
+      return $window.localStorage[key] || defaultValue;
+    },
+    setObject: function(key, value) {
+      $window.localStorage[key] = JSON.stringify(value);
+    },
+    getObject: function(key) {
+      return JSON.parse($window.localStorage[key] || '{}');
+    }
+  }
+}]);
+
+
 //services
-app.factory('userService', function($http,$state,$ionicPopup,userScheduleService,historyService,purchaseHistoryService,userDetailsService,waitlistService) {
+app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userScheduleService,historyService,purchaseHistoryService,userDetailsService,waitlistService) {
 	var users = [];
 	var userDatabase = "";
 	
@@ -247,7 +266,9 @@ app.factory('userService', function($http,$state,$ionicPopup,userScheduleService
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
 				userDatabase = data;
-				if(userDatabase.ValidateLoginResult.ErrorCode === 200){				   
+				if(userDatabase.ValidateLoginResult.ErrorCode === 200){	
+					$localstorage.set('name', user.username);
+					$localstorage.set('password', user.password);
 					userID = userDatabase.ValidateLoginResult.Client.ID;
 					userScheduleService.getUserSchedule(userID);
 					waitlistService.getWaitlist(userID);
@@ -279,6 +300,20 @@ app.factory('userService', function($http,$state,$ionicPopup,userScheduleService
 	}
 })
 
+
+
+
+.run(function($localstorage,userService){
+   if($localstorage.get('name')==null){
+    console.log("namenull");
+  }else{
+	  var userInfo = {};	
+	  userInfo.username = $localstorage.get('name');
+	  userInfo.password = $localstorage.get('password');
+	  
+	  userService.authentication(userInfo);
+  }
+});
 
 //firebase
 app.factory('healthTipDb', function($firebase) {
@@ -720,6 +755,7 @@ app.factory('userScheduleService', function($http,$state) {
             })
 		},
 		getUserScheduleOutput:function(){
+			
 			if(JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit).charAt(0)!="["){
 				return JSON.parse("["+JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit)+"]"); 
 			}else{
@@ -754,15 +790,14 @@ app.factory('waitlistService', function($http) {
 			request.error(function (data) {
             })
 		},
-		getWaitlistOutput:function(){
-			//alert(waitlistDatabase.GetWaitlistEntriesResult.WaitlistEntries);
-			return waitlistDatabase.GetWaitlistEntriesResult.WaitlistEntries;
-			/*if(JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit).charAt(0)!="["){
-				return JSON.parse("["+JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit)+"]"); 
+		getWaitlistOutput:function(){	
+			
+			if(JSON.stringify(waitlistDatabase.GetWaitlistEntriesResult.WaitlistEntries.WaitlistEntry).charAt(0)!="["){
+				return JSON.parse("["+JSON.stringify(waitlistDatabase.GetWaitlistEntriesResult.WaitlistEntries.WaitlistEntry)+"]"); 
 			}else{
-				return userScheduleDatabase.GetClientScheduleResult.Visits.Visit; 
-				
-			}*/
+				return waitlistDatabase.GetWaitlistEntriesResult.WaitlistEntries.WaitlistEntry; 
+			}
+			
 		}
 	}
 })
@@ -933,7 +968,6 @@ app.factory('appointmentService',function($http){
 
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
-				//alert(JSON.stringify(data));
 				apptDatabase = data.ScheduleItems.ScheduleItem;
 				//alert(JSON.stringify(apptDatabase.ScheduleItems.ScheduleItem));
 				//alert(JSON.stringify(apptDatabase));
@@ -996,7 +1030,7 @@ app.factory('appointmentService',function($http){
 
 app.factory('bookApptService',function($http,userScheduleService,$ionicPopup,$state){
 	return {
-		bookAppointment: function(isMale,instructorID,sessionID,userID,startDateTime){
+		bookAppointment: function(isMale,instructorID,sessionID,userID,startDateTime,notesStr){
 			var request = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/bookClientIntoAppointment.php",
@@ -1005,7 +1039,8 @@ app.factory('bookApptService',function($http,userScheduleService,$ionicPopup,$st
 				instructorId:instructorID,
 				sessionId:sessionID,
 				userId:userID,
-				startdatetime:startDateTime
+				startdatetime:startDateTime,
+				notes:notesStr
 			},
 			headers: { 
 				'Content-Type': 'application/x-www-form-urlencoded' 
@@ -1038,9 +1073,6 @@ app.factory('bookApptService',function($http,userScheduleService,$ionicPopup,$st
 			//not working
 			request.error(function (data) {
             })
-		},
-		bookAppointmentResponse:function(){
-			
 		}
 	}
 })
@@ -1286,7 +1318,13 @@ app.controller('settingCtrl', function($scope,$ionicPopup,userService,userDetail
 })
 
 
-app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet){
+app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet,$localstorage){
+	
+	$scope.logout = function(){
+		$localstorage.set('name', '');
+		$localstorage.set('password', '');
+	};
+	
 	
 	/*ACCORDION START*/
 		$scope.groups = [];
@@ -1964,7 +2002,7 @@ app.controller('aboutCtrl',function($scope){
 app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,sessionService,$stateParams,sessionStaffService,$ionicModal,$ionicPopup,userService,bookApptService){
 	$scope.sessionTypes = sessionService.getSessionResponse();
 	$scope.sessionID = $stateParams.sessionTypeID;
-	$scope.displayTime = false;
+	//$scope.displayTime = false;
 	$scope.displayDate = true;
 	
 	$scope.selectedInstructor = function(){
@@ -1980,23 +2018,41 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 	$scope.showTime = function(){
 		$scope.displayTime = true;
 		$scope.displayDate = false;
-	};
+	};   
 	
-	//calendar start
-	  var today = new Date();
-	  var dd = today.getDate();
-	  var mm = today.getMonth()+1;	  //January is 0!
-	  if(mm<10){
-		mm = "0"+mm;
-	  }
-	  var yyyy = today.getFullYear();
-	  var todayString = yyyy + "-" + mm + "-" + dd;
-	  $scope.dateDefault = todayString;
-	  $scope.date = todayString;
-	  $scope.minDate = todayString;
-	  $scope.maxDate = '2015-12-04';
-	  $scope.disabledDates = ['2014-11-19', todayString];
-	   //calender end   
+	
+	$scope.bookInstructor = function(sessionID,instructor){
+		$scope.instructorVar = instructor;
+		$scope.sessionName = sessionService.getSessionName(sessionID);
+		//call this earlier to attain the timeslots faster
+		appointmentService.getAppointments($scope.sessionID,$scope.instructorVar.ID);
+			for(var i=0;i<$scope.instructors.length;i++){
+				if($scope.instructors[i].ID==instructor.ID){
+					$scope.instructorName = $scope.instructors[i].Name;
+				}
+			}
+		$scope.openModal();
+	};
+	   
+	   $scope.initSelectDate=function(){
+			//calendar start
+		  var today = new Date();
+		  var dd = today.getDate();
+		  var mm = today.getMonth()+1;	  //January is 0!
+		  if(mm<10){
+			mm = "0"+mm;
+		  }
+		  var yyyy = today.getFullYear();
+		  var todayString = yyyy + "-" + mm + "-" + dd;
+		  $scope.dateDefault = todayString;
+		  $scope.date = todayString;
+		  $scope.minDate = todayString;
+		  $scope.maxDate = '2015-12-04';
+		  $scope.disabledDates = ['2014-11-19'];
+		   //calender end
+			$scope.schedules = appointmentService.getApptResponse($scope.dateDefault);
+		//$scope.displayDate = false;
+	   };
 	   
 	   
 	   //MODAL START
@@ -2027,18 +2083,7 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 	  //MODAL END
 	
 	
-	$scope.bookInstructor = function(sessionID,instructor){
-		$scope.instructorVar = instructor;
-		$scope.sessionName = sessionService.getSessionName(sessionID);
-		//call this earlier to attain the timeslots faster
-		appointmentService.getAppointments($scope.sessionID,$scope.instructorVar.ID);
-			for(var i=0;i<$scope.instructors.length;i++){
-				if($scope.instructors[i].ID==instructor.ID){
-					$scope.instructorName = $scope.instructors[i].Name;
-				}
-			}
-		$scope.openModal();
-	};
+	
 	
 	//when a date is selected
 	$scope.selectedDate=function(date){
@@ -2062,18 +2107,22 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 				 type: 'button-assertive',
 				 onTap: function(e) {
 					//method trigger here
-						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule);
-						bookApptService.bookAppointmentResponse(); 
+						
 
-				   /*if ($scope.data.notes!=null) {
-						return $scope.data.notes;
-				   }*/
+				   if ($scope.data.notes!=null) {
+						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule,$scope.data.notes);
+						$scope.data.notes=null;
+						//return $scope.data.notes;
+				   }else{
+						$scope.data.notes="";
+						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule,$scope.data.notes);
+						$scope.data.notes=null;
+				   }
 				 }
 			   },
 			 ]
 		   });
 		   myPopup.then(function(res) {
-			 console.log('Tapped!', res);
 		   });
 		};
 		
@@ -2190,3 +2239,5 @@ app.controller('DateCtrl', function($scope,appointmentService) {
                       '</div>'
         };
 })
+
+

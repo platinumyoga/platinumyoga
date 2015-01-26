@@ -188,7 +188,7 @@ About page
 			  <a href="#/yoga-app/promotions" class="item" menu-close>Promotions</a>
 			  <a href="#/yoga-app/contactus" class="item" menu-close>Contact us</a>
 			  <a href="#/yoga-app/faq" class="item" menu-close>FAQ</a>
-			  <a href="#/login" class="item" menu-close>Log Out</a>
+			  <a href="#/login" class="item" ng-click="logout()" menu-close>Log Out</a>
             </ul>
           </ion-content>
         </ion-side-menu>
@@ -742,7 +742,7 @@ About page
 		  </div>
 				
 		</ion-header-bar>
-		<ion-content>
+		<ion-content ng-init="initSelectDate()">
 		<div class="row"><b>Instructor: </b>{{instructorName}}</div>
 		<div class="row"><b>Appointment: </b>{{sessionName}}</div>
 		<!--
@@ -755,7 +755,6 @@ About page
 		<div class="container">
 				  <div pickadate ng-model="date" min-date="minDate" max-date="maxDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" no-extra-rows ng-click="selectedDate(date)">
 				  </div>
-
 				  <!--
 				  <div class="selected-date">
 					Selected date is {{date || dateDefault}}
