@@ -341,12 +341,25 @@ About page
       <ion-view title="Classes" has-header="true">
 			<ion-content padding="true">
 			
+			<div class="container" ng-controller="DateCtrl">
+			  <div pickadate id="classDate" ng-model="date" min-date="minDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" date="dateDefault" no-extra-rows></div>
+
+			<div class="item">
+				<select data-ng-options="o.name for o in options" data-ng-model="selectedOption"></select>
+			</div>
+			
 				<div class="bar bar-header item-input-inset">
-					<ion-search placeholder="Search for Instructor/Class name" filter="searchClass"></ion-search>
+					<input type="text" ng-model="search" placeholder="Search for Class/Instructor name">
+				</div>
+				<div class="bar bar-header item-input-inset ng-hide">
+					<ion-search placeholder="Search for Instructor/Class name" filter="(date)"></ion-search>
+				</div>
+				<div class="bar bar-header item-input-inset ng-hide">
+					<ion-search filter="(selectedOption.value)"></ion-search>
 				</div>
 			
-				<div class="list"">
-					<div class="row" ng-repeat="class in totalClasses | orderBy:'StartDateTime'| filter: searchClass.value">
+				<div class="list">
+					<div class="row" ng-repeat="class in totalClasses | orderBy:'StartDateTime'| filter:(date) | filter:(selectedOption.value)|contains:search">
 						<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
 							<a href="#/yoga-app/selectedClass/{{class.ID}}">
 							<b>{{class.ClassDescription.Name}}</b><br/>			
@@ -357,7 +370,7 @@ About page
 							{{class.MaxCapacity-class.TotalBooked}} available
 							</a>
 						</div>
-						<div class="item col col-center col-33" style="padding-top:55px;padding-bottom:43px;border-left-style: none;">
+						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
 							<button class="button-right button-stable col" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
 						</div>
 					</div>

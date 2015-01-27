@@ -1714,33 +1714,8 @@ app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesSe
 	
 	$scope.selectedStaff = classesService.getClassStaff($stateParams.classStaffID);
 	
-	var byDate = document.getElementById('byDate');
-	var byInstructor = document.getElementById('byInstructor');
-	var byLevel = document.getElementById('byLevel');	
-	
-	$scope.showClassByDateView = true;
-	$scope.showClassByInstructorView = false;
-	$scope.showClassByLevelView = false;
-		
-	$scope.showClassByDate = function(){
-		$scope.showClassByDateView = true;
-		$scope.showClassByInstructorView = false;
-		$scope.showClassByLevelView = false;
-	};	
-	
-	$scope.showClassByInstructor = function(){
-		$scope.showClassByDateView = false;
-		$scope.showClassByInstructorView = true;
-		$scope.showClassByLevelView = false;
-	};
-	
-	$scope.showClassByLevel = function(){
-		$scope.showClassByDateView = false;
-		$scope.showClassByInstructorView = false;
-		$scope.showClassByLevelView = true;
-	};
-	
-	
+	$scope.options = [{ name: "Beginner", value: "Beginner"}, { name: "Intermediate", value: "Intermediate"}, { name: "Advanced", value: "Advanced"}, {name: "All", value: ""}];
+	$scope.selectedOption = $scope.options[0].value;	
 	
 	
 	//MODAL START
@@ -1785,7 +1760,23 @@ app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesSe
 	  //MODAL END
 	
 	
-})
+});
+
+app.filter('contains', function () {
+  return function (totalClasses, search) {
+	//var searchValue = document.getElementById('searchClass');
+	var filtered = [];
+	var letterMatch = new RegExp(search, 'i');
+	
+    for (var i = 0; i < totalClasses.length; i++) {
+      var item = totalClasses[i];
+      if (letterMatch.test(item.ClassDescription.Name.substring(0,item.ClassDescription.Name.length))||letterMatch.test(item.Staff.Name.substring(0,item.Staff.Name.length))) {
+        filtered.push(item);
+      }
+    }
+    return filtered;
+  };
+});
 
 app.controller('workshopCtrl',function($scope,$stateParams,$ionicPopup,userService,workshopsService){
 	$scope.workShopsData = workshopsService.getWorkshops();
