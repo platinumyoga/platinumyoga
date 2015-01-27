@@ -228,7 +228,7 @@ About page
 							<b>Lesson:</b>&nbsp;{{class.Name}}<br/>
 							<b>Staff:</b>&nbsp;{{class.Staff.Name}}</div>
 							<div class="col col-33" style="padding-top:20px;padding-left:40px;">
-								<div class="button button-small assertive" ng-click="removeClass({{class.ClassID}},{{userId}})">Cancel</div>
+								<div class="button button-small assertive" ng-click="removeClass({{class}},{{userId}})">Cancel</div>
 							</div>
 						</div>
 					</div>
@@ -755,7 +755,7 @@ About page
 		  </div>
 				
 		</ion-header-bar>
-		<ion-content ng-init="initSelectDate()">
+		<ion-content>
 		<div class="row"><b>Instructor: </b>{{instructorName}}</div>
 		<div class="row"><b>Appointment: </b>{{sessionName}}</div>
 		<!--
@@ -773,9 +773,10 @@ About page
 					Selected date is {{date || dateDefault}}
 				</div>-->
 		</div>
-		<b>Available Timeslots for selected date:</b><br/>
+		
 			<!--list showing instructors free timeslots-->
 			<div class="list" ng-show="displayTime">
+			<b>Available Timeslots for {{date}}:</b><br/>
 				<div class="item" ng-repeat="schedule in schedules">
 						<a style="color:green" ng-click="showPopup(schedule)">
 							{{schedule.slice(11, 18)}}0

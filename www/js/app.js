@@ -853,12 +853,12 @@ app.factory('waitlistService', function($http) {
 
 app.factory('removeBookingService',function($http,userScheduleService,$ionicPopup){
 	return{
-		removeScheduledClass:function(classId,userId){
+		removeScheduledClass:function(classInfo,userId){
 			var request2 = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/removeClientFromClass.php",
 			data: {
-				classID: classId,
+				classID: classInfo.ClassID,
 				userID: userId
 			},
 			headers: { 
@@ -882,6 +882,48 @@ app.factory('removeBookingService',function($http,userScheduleService,$ionicPopu
 					var unSuccessRemovePopUp = $ionicPopup.alert({
 						 title: 'Cancel Class',
 						 template: 'You cannot cancel this class!'
+					   });
+					   alertPopup.then(function(res){
+					   });
+				}
+			})
+			//not working
+			request2.error(function (data) {
+            })
+		}
+	}
+})
+
+
+app.factory('removeAppointmentService',function($http,userScheduleService,$ionicPopup){
+	return{
+		removeScheduledAppt:function(classInfo,userId){
+			var request2 = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/removeClientFromAppointment.php",
+			data: {
+				appointmentID: classInfo.AppointmentID,
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request2.success(function (data) {
+				console.log(data);
+					  
+				if(data.AddOrUpdateAppointmentsResult.ErrorCode===200){
+					 userScheduleService.getUserSchedule(userId);
+					var successRemovePopUp = $ionicPopup.alert({
+						 title: 'Cancel Appointment',
+						 template: 'You have successfully cancelled this appointment!'
+					   });
+					   alertPopup.then(function(res){});
+				}else{
+					var unSuccessRemovePopUp = $ionicPopup.alert({
+						 title: 'Cancel Appointment',
+						 template: 'You cannot cancel this appointment!'
 					   });
 					   alertPopup.then(function(res){
 					   });
@@ -1000,8 +1042,9 @@ app.factory('purchaseHistoryService', function($http) {
 
 
 app.factory('appointmentService',function($http){
+var timeslots = [];
 	return {
-		getAppointments: function(sessionTypeID,instructorID){
+		getAppointments: function(sessionTypeID,instructorID,chosenDate){
 			var request = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/getAppointments.php",
@@ -1019,12 +1062,9 @@ app.factory('appointmentService',function($http){
 				apptDatabase = data.ScheduleItems.ScheduleItem;
 				//alert(JSON.stringify(apptDatabase.ScheduleItems.ScheduleItem));
 				//alert(JSON.stringify(apptDatabase));
-			})
-			//not working
-			request.error(function (data) {
-            })
-		},
-		getApptResponse:function(chosenDate){
+				
+				
+				
 			var availSlots = [];
 			var j=0;
 			
@@ -1037,7 +1077,7 @@ app.factory('appointmentService',function($http){
 				}
 			}
 			
-			var timeslots = [];
+			
 			var k=0;
 			
 			for(var a=0;a<availSlots.length;a++){
@@ -1069,8 +1109,47 @@ app.factory('appointmentService',function($http){
 						k++;
 					}
 					
-			}
+			}	
+			})
+			//not working
+			request.error(function (data) {
+            })
+		},
+		getApptResponse:function(){
 			return timeslots;
+		},
+		getApptResponse1:function(chosendate){
+			var availSlots = [];
+			var j=0;
+			
+			for(var i=0;i<apptDatabase.length;i++){
+				if(apptDatabase[i].StartDateTime.slice(0,10)==chosendate){
+					availSlots[j]=apptDatabase[i];
+					j++;
+				}
+			}
+			
+			var timeSlots=[];
+			var k=0;
+			
+			for(var a=0;a<availSlots.length;a++){			
+				var startDate = new Date(availSlots[a].StartDateTime.slice(0,19).toString());
+				var hr1 = startDate.getHours();
+				startDate.setHours(hr1-8);
+				
+				var endDate = new Date(availSlots[a].EndDateTime.slice(0,19).toString());
+				var hr2 = endDate.getHours();
+				endDate.setHours(hr2-8);
+				
+					while(startDate.getTime()<endDate.getTime()){
+						timeSlots[k]=chosendate+" "+startDate.toString().slice(16,24);
+						
+						var newValue = startDate.getMinutes()+30;
+						startDate.setMinutes(newValue);
+						k++;
+					}
+			return timeSlots;
+			}
 		}
 	}
 })
@@ -1431,7 +1510,7 @@ app.controller('barcodeCtrl',function($scope,userService){
 	$scope.userId = userService.getUserID();
 })
 
-app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$timeout,$ionicLoading,$interval,userService,userScheduleService,removeBookingService,waitlistService,removeWaitlistService,historyService,purchaseHistoryService,$ionicModal,feedbackDb,$firebase){
+app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$timeout,$ionicLoading,$interval,userService,userScheduleService,removeBookingService,waitlistService,removeWaitlistService,historyService,purchaseHistoryService,$ionicModal,feedbackDb,$firebase,removeAppointmentService){
 
 	$scope.userId = userService.getUserID();;
 	$scope.username = userService.getUsername();
@@ -1540,7 +1619,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		$scope.showPurchase = true;
 	};
 	
-	$scope.removeClass = function(classId,userId){
+	$scope.removeClass = function(classInfo,userId){
 		 // A confirm dialog
 		   var confirmPopup = $ionicPopup.confirm({
 			 title: 'Cancel Class',
@@ -1549,7 +1628,12 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		   });
 		   confirmPopup.then(function(res) {
 			 if(res) {
-				removeBookingService.removeScheduledClass(classId,userId);
+				if(classInfo.ClassID==0){
+					removeAppointmentService.removeScheduledAppt(classInfo,userId);
+				}else{
+					removeBookingService.removeScheduledClass(classInfo,userId);
+				}
+				
 				$state.go($state.current, {}, {reload: true});
 			 } else {
 				//press cancel
@@ -2006,7 +2090,7 @@ app.controller('aboutCtrl',function($scope){
 app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,sessionService,$stateParams,sessionStaffService,$ionicModal,$ionicPopup,userService,bookApptService){
 	$scope.sessionTypes = sessionService.getSessionResponse();
 	$scope.sessionID = $stateParams.sessionTypeID;
-	//$scope.displayTime = false;
+	$scope.displayTime = true;
 	$scope.displayDate = true;
 	
 	$scope.selectedInstructor = function(){
@@ -2024,24 +2108,9 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 		$scope.displayDate = false;
 	};   
 	
-	
-	$scope.bookInstructor = function(sessionID,instructor){
-		$scope.instructorVar = instructor;
-		$scope.sessionName = sessionService.getSessionName(sessionID);
-		//call this earlier to attain the timeslots faster
-		appointmentService.getAppointments($scope.sessionID,$scope.instructorVar.ID);
-			for(var i=0;i<$scope.instructors.length;i++){
-				if($scope.instructors[i].ID==instructor.ID){
-					$scope.instructorName = $scope.instructors[i].Name;
-				}
-			}
-		$scope.openModal();
-	};
-	   
-	   $scope.initSelectDate=function(){
-			//calendar start
+	//calendar start
 		  var today = new Date();
-		  var dd = today.getDate();
+		  var dd = today.getDate()+1;
 		  var mm = today.getMonth()+1;	  //January is 0!
 		  if(mm<10){
 			mm = "0"+mm;
@@ -2054,10 +2123,24 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 		  $scope.maxDate = '2015-12-04';
 		  $scope.disabledDates = ['2014-11-19'];
 		   //calender end
-			$scope.schedules = appointmentService.getApptResponse($scope.dateDefault);
-		//$scope.displayDate = false;
-	   };
-	   
+	
+	
+	$scope.bookInstructor = function(sessionID,instructor){
+		$scope.instructorVar = instructor;
+		$scope.sessionName = sessionService.getSessionName(sessionID);
+		//call this earlier to attain the timeslots faster
+		appointmentService.getAppointments($scope.sessionID,$scope.instructorVar.ID,$scope.date);
+			for(var i=0;i<$scope.instructors.length;i++){
+				if($scope.instructors[i].ID==instructor.ID){
+					$scope.instructorName = $scope.instructors[i].Name;
+				}
+			}
+			
+			$scope.schedules = appointmentService.getApptResponse();
+			$scope.openModal();
+			//$scope.displayTime = true;
+			
+	};  
 	   
 	   //MODAL START
 	$ionicModal.fromTemplateUrl('my-modal.html', {
@@ -2091,7 +2174,8 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 	
 	//when a date is selected
 	$scope.selectedDate=function(date){
-		$scope.schedules = appointmentService.getApptResponse(date);
+		$scope.schedules = appointmentService.getApptResponse1(date);
+		
 		//$scope.displayDate = false;
 		$scope.displayTime = true;
 
