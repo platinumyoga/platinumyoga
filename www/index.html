@@ -517,6 +517,8 @@ About page
 				<div class="row" ng-repeat="feed in classReviews">
 					<div class="col">
 						<b>Username:</b>{{feed.username}}<br/>
+						<b>Rating:</b>{{feed.stars}}
+						<span ng-show="classReviews!=null"><img src="star-on.png"/><br/></span>
 						<b>Review:</b>{{feed.feedback}}<br/>
 					</div>
 				</div>
