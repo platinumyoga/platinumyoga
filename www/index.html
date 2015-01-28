@@ -14,8 +14,8 @@
 	<script src='https://cdn.firebase.com/libs/angularfire/0.8.0/angularfire.min.js'></script>
 	<!--star review[start]-->
 	<!--http://runnable.com/UfH637_djX9LAAAt/how-to-add-5-star-rating-using-jquery--> 
-	<script src="js/jquery.min.js"></script>
-	<script src="js/jquery.raty.js"></script>
+	<!--<script src="js/jquery.min.js"></script>
+	<script src="js/jquery.raty.js"></script>-->
 	<!--star review[end]-->
 	
     <!-- cordova script (this will be a 404 during development) -->
@@ -28,6 +28,38 @@
     <script type="text/javascript" src="test/lib/angular-1.3.6.js"></script>
     <script type="text/javascript" src="src/angular-pickadate.js"></script>
 	
+	<!--Stars for review-->
+	<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+	<style>
+	.rating {
+		overflow: hidden;
+		display: inline-block;
+		font-size: 0;
+		position: relative;
+	}
+	.rating-input {
+		float: right;
+		width: 16px;
+		height: 16px;
+		padding: 0;
+		margin: 0 0 0 -16px;
+		opacity: 0;
+	}
+	.rating:hover .rating-star:hover,
+	.rating:hover .rating-star:hover ~ .rating-star,
+	.rating-input:checked ~ .rating-star {
+		background-position: 0 0;
+	}
+	.rating-star,
+	.rating:hover .rating-star {
+		position: relative;
+		float: right;
+		display: block;
+		width: 16px;
+		height: 16px;
+		background: url('http://kubyshkin.ru/samples/star-rating/star.png') 0 -16px;
+	}
+	</style>
   </head>
   <!--APP STRUCTURE-->
 <!--
@@ -143,16 +175,6 @@ About page
 							  </a>-->
 					</ion-tabs>
 				</ion-footer-bar>
-				<!--
-				<ion-footer-bar>	
-				<ion-tabs class="tabs-energized">
-					<ion-tab href="#/yoga-app/home"><i class="icon ion-home"></i></ion-tab>
-					<ion-tab ng-click="showActionsheet()"><i class="ion-upload"></i></ion-tab>
-					<ion-tab title="Barcode" href="#/yoga-app/barcode"></ion-tab>
-					<ion-tab title="Pose Tree" href="#/yoga-app/posetree"></ion-tab>
-					<ion-tab title="Lucky Draw" href="#/yoga-app/luckydraw"></ion-tab>
-				</ion-tabs>
-				</ion-footer-bar>-->
 			
         </ion-side-menu-content>	  
 
@@ -318,16 +340,38 @@ About page
 					<div class="col">
 						<b>Lesson Name: </b>{{lessonName}}<br/>
 						<b>Staff staffName: </b>{{staffName}}<br/>
-						<input ng-model='review.feedback' type="text" placeholder='enter feedback'/>
+						<textarea rows="4" cols="40" ng-model='review.feedback' type="text" placeholder='enter feedback'></textarea>
+						
+						<span class="rating">
+							<input type="radio" class="rating-input" id="rating-input-1-5" name="rating-input-1" value="5" ng-model='review.stars'/>
+							<label for="rating-input-1-5" class="rating-star"></label>
+							<input type="radio" class="rating-input" id="rating-input-1-4" name="rating-input-1" value="4" ng-model='review.stars'/>
+							<label for="rating-input-1-4" class="rating-star"></label>
+							<input type="radio" class="rating-input" id="rating-input-1-3" name="rating-input-1" value="3" ng-model='review.stars'/>
+							<label for="rating-input-1-3" class="rating-star"></label>
+							<input type="radio" class="rating-input" id="rating-input-1-2" name="rating-input-1" value="2" ng-model='review.stars'/>
+							<label for="rating-input-1-2" class="rating-star"></label>
+							<input type="radio" class="rating-input" id="rating-input-1-1" name="rating-input-1" value="1" ng-model='review.stars'/>
+							<label for="rating-input-1-1" class="rating-star"></label>
+						</span>
+						<br/>
 						<button class="button button-small" ng-click="addReview(review)">&nbsp;&nbsp;Add&nbsp;&nbsp;</button>
 					</div>
 				</div>
 				
 				<br/>
-				<b>Personal Review:</b>
-				<div class="row">
-					<div class="col">
-							{{userFeeds.feedback}}<br/>
+				<div ng-show="displayReviews">
+					<b>Personal Review:</b>
+					<div class="row">
+						<div class="col">
+								{{userFeeds.feedback}}
+								<!--
+								<div class="item" ng-repeat="star in starsTotal">
+								<div class="row">
+										{{star}}<img src="star-on.png"/></div>
+								</div>-->
+								&nbsp;&nbsp;{{userStars}}<img src="star-on.png"/>
+						</div>
 					</div>
 				</div>
 			
@@ -340,6 +384,10 @@ About page
     <script id="templates/classes.html" type="text/ng-template">
       <ion-view title="Classes" has-header="true">
 			<ion-content padding="true">
+			
+			<!--pull to refresh(start)-->
+			<ion-refresher on-refresh="refreshClasses()"></ion-refresher>
+			<!--pull to refresh(end)-->
 			
 			<div class="container" ng-controller="DateCtrl">
 			  <div pickadate id="classDate" ng-model="date" min-date="minDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" date="dateDefault" no-extra-rows></div>
@@ -507,6 +555,11 @@ About page
     <script id="templates/workshops.html" type="text/ng-template">
       <ion-view title="Workshops">
         <ion-content has-header="true">
+		
+			<!--pull to refresh workshops(start)-->
+			<ion-refresher on-refresh="refreshWorkshops()"></ion-refresher>
+			<!--pull to refresh workshops(end)-->
+		
 			<div class="list">
 				<div class="bar bar-header item-input-inset">
 					<ion-search placeholder="Search for workshop" filter="search"></ion-search>
@@ -609,6 +662,11 @@ About page
     <script id="templates/events.html" type="text/ng-template">
       <ion-view title="Events">
 			<ion-content has-header="true">
+			
+			<!--pull to refresh events(start)-->
+			<ion-refresher on-refresh="refreshEvents()"></ion-refresher>
+			<!--pull to refresh events(end)-->
+			
 			<div class="list">
 				<div class="bar bar-header item-input-inset">
 					<ion-search placeholder="Search for events" filter="search"></ion-search>
@@ -793,6 +851,10 @@ About page
     <script id="templates/challenges.html" type="text/ng-template">
       <ion-view title="Challenges">
         <ion-content has-header="true">
+			<!--pull to refresh events(start)-->
+			<ion-refresher on-refresh="refreshChallenges()"></ion-refresher>
+			<!--pull to refresh events(end)-->
+			
 			<div class="list">
 				<div class="bar bar-header item-input-inset">
 					<ion-search placeholder="Search for challenge" filter="search"></ion-search>

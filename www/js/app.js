@@ -1514,7 +1514,8 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 
 	$scope.userId = userService.getUserID();;
 	$scope.username = userService.getUsername();
-		
+	$scope.displayReviews = false;
+	
 	var retrieveScheduledClasses = function(){
 		//retrieve user's scheduled classes
 		userScheduleService.getUserSchedule($scope.userId);
@@ -1690,6 +1691,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	  
 	  
 	  $scope.writeReview = function(history){
+	  $scope.displayReviews = false;
 		//alert(JSON.stringify(history));
 		$scope.historyId = history.ID;
 		$scope.lessonName = history.Name;
@@ -1707,15 +1709,31 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	  for(var b=0;b<$scope.feedbacks.length;b++){
 		if($scope.feedbacks[b].userid==$scope.userId && $scope.feedbacks[b].historyid==$scope.historyId){
 			$scope.userFeeds = $scope.feedbacks[b];
+			$scope.userStars = $scope.feedbacks[b].stars;
 			break;
 		}
 	  }
+	  
+	  $scope.starsTotal=[];
+	  var count = 0;
+	  for(var c=0;c<$scope.userStars;c++){
+		$scope.starsTotal[count]=1;
+		count=count+1;
+	  }
+	  //alert($scope.starsTotal.length);
+	  
+	  
+	  
+	  if($scope.userFeeds!=""){
+		$scope.displayReviews = true;
+	  }
+	  
 	};
 	
 	  
 	  //saving to feedback database
 	   $scope.addReview = function(review) {
-		
+		//alert(review.stars);
 		var result = 0;
 		
 		if(review.feedback==""){
@@ -1740,11 +1758,12 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		   appointmentid:$scope.appointmentID,
 		   lesson:$scope.lessonName,
 		   staff:$scope.staffName,
-           feedback:review.feedback
+           feedback:review.feedback,
+		   stars:review.stars
 			});
 			//review.booking = "";
 			review.feedback = "";
-			
+			review.stars = 0;
 			//alert
 			var alertPopup = $ionicPopup.alert({
 			 title: 'Review',
@@ -1756,8 +1775,11 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		
 		if(save) {
 		  $scope.closeModal();
+		  review.feedback = "";
+			review.stars = 0;
 		} else {
 			review.feedback = "";
+			review.stars = 0;
 		  var alert1 = $ionicPopup.alert({
 			 title: 'Review',
 			 template: "Sorry, you can only review once per class."
@@ -1770,12 +1792,28 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	  
 })
 
-app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesService,userService,feedbackDb,$ionicModal) {
+app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesService,userService,feedbackDb,$ionicModal,$timeout) {
 	$scope.totalClasses = classesService.getClasses();
 	$scope.selectedclass = classesService.getSelectedClass($stateParams.classID);
 	$scope.userID = userService.getUserID();
 	//loading the feedback/review DB
 	 $scope.feedbacks = feedbackDb.getFeedbackData();
+	 
+	 
+	//pull to refresh classes(start)
+	$scope.refreshClasses = function() {
+		$timeout( function() {
+		  //simulate async response
+		  classesService.getClassesDatabase();
+		  $scope.totalClasses = classesService.getClasses();
+		  //Stop the ion-refresher from spinning
+		  $scope.$broadcast('scroll.refreshComplete');
+		
+		}, 2000);
+	};
+	//pull to refresh end classes(end)
+	 
+	 
 	 
 	$scope.bookClass = function(selectedClassID,userID){
 		$scope.selectedClassId = selectedClassID;
@@ -1862,11 +1900,26 @@ app.filter('contains', function () {
   };
 });
 
-app.controller('workshopCtrl',function($scope,$stateParams,$ionicPopup,userService,workshopsService){
+app.controller('workshopCtrl',function($scope,$stateParams,$ionicPopup,userService,workshopsService,$timeout){
 	$scope.workShopsData = workshopsService.getWorkshops();
 	$scope.selectedWorkshop = workshopsService.getSelectedWorkshop($stateParams.workshopID);
 	$scope.selectedWorkshopStaff = workshopsService.getWorkshopStaff($stateParams.workshopStaffID);
 	$scope.userID = userService.getUserID();
+	
+	
+	//pull to refresh workshops(start)
+	$scope.refreshWorkshops = function() {
+		$timeout( function() {
+		  //simulate async response
+		  workshopsService.getWorkshopsDatabase();
+		  $scope.workShopsData = workshopsService.getWorkshops();
+		  //Stop the ion-refresher from spinning
+		  $scope.$broadcast('scroll.refreshComplete');
+		
+		}, 2000);
+	};
+	//pull to refresh end workshops(end)
+	
 	
 	$scope.bookSelectedWorkshop = function(workshopId,userId){
 		var confirmBookingPopup = $ionicPopup.confirm({
@@ -1886,11 +1939,24 @@ app.controller('workshopCtrl',function($scope,$stateParams,$ionicPopup,userServi
 	};
 })
 
-app.controller('eventsCtrl',function($scope,$stateParams,$ionicPopup,userService,eventsService){
+app.controller('eventsCtrl',function($scope,$stateParams,$ionicPopup,userService,eventsService,$timeout){
 	$scope.eventsData = eventsService.getEvents();
 	$scope.selectedEvent = eventsService.getSelectedEvent($stateParams.eventID);
 	$scope.selectedEventStaff = eventsService.getEventStaff($stateParams.eventStaffID);
 	$scope.userID = userService.getUserID();
+	
+	
+	//pull to refresh events(start)
+	$scope.refreshEvents = function() {
+		$timeout( function() {
+		  //simulate async response
+		  eventsService.getEventsDatabase();
+		  $scope.eventsData = eventsService.getEvents();
+		  //Stop the ion-refresher from spinning
+		  $scope.$broadcast('scroll.refreshComplete');
+		}, 2000);
+	};
+	//pull to refresh end events(end)
 	
 	$scope.bookEvent = function(eventId,userID){
 		var confirmBookingPopup = $ionicPopup.confirm({
@@ -1910,10 +1976,23 @@ app.controller('eventsCtrl',function($scope,$stateParams,$ionicPopup,userService
 	};
 })
 
-app.controller('challengesCtrl',function($scope,$stateParams,$ionicPopup,userService,challengesService){
+app.controller('challengesCtrl',function($scope,$stateParams,$ionicPopup,userService,challengesService,$timeout){
 	$scope.challengesData = challengesService.getChallenges();
 	$scope.selectedChallenge = challengesService.getSelectedChallenge($stateParams.challengeID);
 	$scope.userID = userService.getUserID();
+	
+	
+	//pull to refresh challenges(start)
+	$scope.refreshChallenges = function() {
+		$timeout( function() {
+		  //simulate async response
+		  challengesService.getChallengesDatabase();
+		  $scope.challengesData = challengesService.getChallenges();
+		  //Stop the ion-refresher from spinning
+		  $scope.$broadcast('scroll.refreshComplete');
+		}, 2000);
+	};
+	//pull to refresh end challenges(end)
 	
 	$scope.bookChallenge = function(challengeId,userID){
 		var confirmBookingPopup = $ionicPopup.confirm({
