@@ -17,9 +17,6 @@ angular.module('ionic.utils', [])
   }
 }]);
 
-
-
-
 var app = angular.module('ionicApp', ['ionic','ionic.utils','firebase','ui.router', 'pickadate'])
 
 //CONFIGURATION+ROUTE
@@ -54,7 +51,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       }
     })
     .state('yoga-app.classes', {
-      url: '/Classes',
+      url: '/CLASSES',
       views: {
         'menuContent' :{
           templateUrl: "templates/classes.html",
@@ -81,7 +78,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       }
     })
 	.state('yoga-app.workshops', {
-      url: '/Workshops',
+      url: '/WORKSHOPS',
       views: {
         'menuContent' :{
           templateUrl: "templates/workshops.html",
@@ -107,8 +104,35 @@ app.config(function($stateProvider, $urlRouterProvider) {
         }
       }
     })
+	.state('yoga-app.retreat', {
+      url: '/RETREATS/TT',
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/retreats.html",
+		  controller:"retreatCtrl"
+        }
+      }
+    })
+	.state('yoga-app.selectedRetreat', {
+      url: '/selectedRetreat/:retreatID',
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/selectedRetreat.html",
+		  controller: "retreatCtrl"
+        }
+      }
+    })
+	.state('yoga-app.retreatStaff', {
+      url: '/retreatStaff/:retreatStaffID',
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/retreatStaff.html",
+		  controller: "retreatCtrl"
+        }
+      }
+    })
 	.state('yoga-app.events', {
-      url: "/Events",
+      url: "/SPECIAL EVENTS",
       views: {
         'menuContent' :{
           templateUrl: "templates/events.html",
@@ -135,7 +159,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       }
     })
 	.state('yoga-app.appointments', {
-      url: "/Appointments",
+      url: "/APPOINTMENTS",
       views: {
         'menuContent' :{
           templateUrl: "templates/appointments.html",
@@ -170,11 +194,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
         }
       }
     })
-	.state('yoga-app.posetree', {
-      url: "/posetree",
+	.state('yoga-app.yogapedia', {
+      url: "/yogapedia",
       views: {
         'menuContent' :{
-          templateUrl: "templates/posetree.html",
+          templateUrl: "templates/yogapedia.html",
         }
       }
     })
@@ -249,9 +273,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 
 
-app.factory('classesService', function($http,$ionicPopup,userScheduleService,waitlistService) {
+app.factory('classesService', function($http,$ionicPopup,userScheduleService,waitlistService,$localstorage) {
+var availClasses = [];
 	return {
 		getClassesDatabase: function(){
+
 			var request = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/getClasses.php",
@@ -262,7 +288,18 @@ app.factory('classesService', function($http,$ionicPopup,userScheduleService,wai
 
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
-				classesDatabase = data.Classes.Class;
+
+				$localstorage.set('classesDb', JSON.stringify(data.Classes.Class));
+				classesDatabase = JSON.parse($localstorage.get('classesDb'));
+
+				//alert(JSON.stringify(classesDatabase));
+				/*var j = 0;
+				for(var i=0;i<classesDatabase.length;i++){
+					if(classesDatabase[i].IsAvailable){
+						availClasses[j]=classesDatabase[i];
+						j=j+1;
+					}
+				}*/
 			})
 		},
 		getClasses:function(){
@@ -370,8 +407,9 @@ app.factory('workshopsService',function($http,$ionicPopup,userScheduleService){
 
 			/* Check whether the HTTP Request is successful or not. */
 			request1.success(function (data) {
+			//console.log(JSON.stringify(data));
 					var returnMsg ="";
-					if (data.AddClientsToEnrollmentsResult.ErrorCode===200){
+					if (data.AddClientsToEnrollmentsResult.Status=="Success"){
 						returnMsg = "Success!";
 						userScheduleService.getUserSchedule(userId);
 					}else{
@@ -388,6 +426,77 @@ app.factory('workshopsService',function($http,$ionicPopup,userScheduleService){
 		}
 	}
 })
+
+
+app.factory('retreatsService',function($http,$ionicPopup,userScheduleService){
+	return {
+		getRetreatsDatabase: function(){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/getRetreatsTT.php",
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				retreatsDatabase = data;
+				console.log(JSON.stringify(retreatsDatabase));
+			})
+		},
+		getRetreats:function(){
+			return retreatsDatabase;
+		},
+		getSelectedRetreat:function(retreatID){
+			for(var i=0;i<retreatsDatabase.length;i++){
+				if(retreatsDatabase[i].ID==retreatID){
+					return retreatsDatabase[i];
+				}
+			}
+		},
+		getRetreatStaff:function(retreatStaffID){
+			for(var i=0;i<retreatsDatabase.length;i++){
+				if(retreatsDatabase[i].Staff.ID==retreatStaffID){
+					return retreatsDatabase[i].Staff;
+				}
+			}
+		},
+		bookRetreat:function(retreatId,userId){
+			var request1 = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/bookClientIntoWorkshop.php",
+			data: {
+				workshopID: retreatId,
+				userID: userId
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request1.success(function (data) {
+			//console.log(JSON.stringify(data));
+					var returnMsg ="";
+					if (data.AddClientsToEnrollmentsResult.Status=="Success"){
+						returnMsg = "Success!";
+						userScheduleService.getUserSchedule(userId);
+					}else{
+						returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
+					}
+					 var alertPopup = $ionicPopup.alert({
+						 title: 'Book Retreat/TT',
+						 template: returnMsg
+					   });
+					   alertPopup.then(function(res) {});
+			});
+			//not working
+			request1.error(function (data) {})
+		}
+	}
+})
+
 
 
 app.factory('eventsService',function($http,$ionicPopup,userScheduleService){
@@ -541,7 +650,6 @@ app.factory('sessionService',function($http){
 
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
-				//alert(JSON.stringify(data));
 				sessionDatabase = data;
 			})
 			
@@ -567,7 +675,7 @@ app.factory('sessionService',function($http){
 
 
 //services
-app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userScheduleService,historyService,purchaseHistoryService,userDetailsService,waitlistService,classesService,workshopsService,eventsService,challengesService,sessionService) {
+app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userScheduleService,historyService,purchaseHistoryService,userDetailsService,waitlistService,classesService,workshopsService,eventsService,retreatsService,challengesService,sessionService,sessionStaffService) {
 	var users = [];
 	var userDatabase = "";
 	
@@ -589,6 +697,7 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
 			request.success(function (data) {
 				userDatabase = data;
 				if(userDatabase.ValidateLoginResult.ErrorCode === 200){	
+					
 					$localstorage.set('name', user.username);
 					$localstorage.set('password', user.password);
 					userID = userDatabase.ValidateLoginResult.Client.ID;
@@ -601,8 +710,10 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
 					classesService.getClassesDatabase();
 					workshopsService.getWorkshopsDatabase();
 					eventsService.getEventsDatabase();
+					retreatsService.getRetreatsDatabase();
 					challengesService.getChallengesDatabase();
 					sessionService.getSession();
+					sessionStaffService.getSessionStaff();
 					
 					$state.go("yoga-app.home");
 				}else{
@@ -630,8 +741,6 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
 })
 
 
-
-
 .run(function($localstorage,userService){
    if($localstorage.get('name')==null){
     console.log("namenull");
@@ -644,21 +753,17 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
   }
 });
 
-//firebase
-app.factory('healthTipDb', function($firebase) {
-    var healthtipsLink = new Firebase("https://healthtipstinkertest.firebaseio.com/");
-	var dataArr = $firebase(healthtipsLink).$asArray();
-    return {
-        getHealthTipsData: function() {
-			return dataArr;
-        },
-		getTip:function(tipId){
-			//healthtipsLink.child('-JekEefgbGTQq_JdneAC').on('value', function(snapshot) { alert(snapshot.val().details); })
-			return 1;
-		}
-    }
-})
+//filter for stars
+app.filter('range', function() {
+  return function(val, range) {
+    range = parseInt(range);
+    for (var i=0; i<range; i++)
+      val.push(i);
+    return val;
+  };
+});
 
+//firebase DATABASE
 app.factory('feedbackDb', function($firebase) {
     var feedbackLink = new Firebase("https://feedbacktinkertest.firebaseio.com/");
 	var dataArr = $firebase(feedbackLink).$asArray();
@@ -669,6 +774,26 @@ app.factory('feedbackDb', function($firebase) {
     }
 })
 
+app.factory('hallOfFameDb', function($firebase) {
+    var fameLink = new Firebase("https://halloffametinkertest.firebaseio.com/");
+	var dataArr = $firebase(fameLink).$asArray();
+    return {
+        getHallOfFameData: function() {
+			return dataArr;
+        }
+    }
+})
+
+app.factory('faqDb', function($firebase) {
+    var faqLink = new Firebase("https://faqtinkertest.firebaseio.com/");
+	var faqDataArr = $firebase(faqLink).$asArray();
+	
+    return {
+        getFaqData: function() {
+			return faqDataArr;
+        }
+    }
+})
 
 app.factory('userDetailsService', function($http) {
 	return {
@@ -1060,6 +1185,7 @@ var timeslots = [];
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
 				apptDatabase = data.ScheduleItems.ScheduleItem;
+				console.log(JSON.stringify(apptDatabase));
 				//alert(JSON.stringify(apptDatabase.ScheduleItems.ScheduleItem));
 				//alert(JSON.stringify(apptDatabase));
 				
@@ -1090,25 +1216,29 @@ var timeslots = [];
 				
 				var endDate = new Date(availSlots[a].EndDateTime.slice(0,19).toString());
 				var hr2 = endDate.getHours();
-				endDate.setHours(hr2-8);
+				endDate.setHours(hr2-9);
 				//alert("new start: "+startDate);
 				//alert("new end: "+endDate);
 				
 				//the new dates are malaysian times, converted from the api string by sun system.
 					
-					while(startDate.getTime()<endDate.getTime()){
+					while(startDate.getTime()<=endDate.getTime()){
 						//alert(startDate.getTime());
 						//alert(endDate.getTime());
 						timeslots[k]=chosenDate+" "+startDate.toString().slice(16,24);
 						//alert("save"+startDate);
 						//alert("1: "+startDate);
+						var newValue = "";
+						if(startDate.getMinutes()==15 || startDate.getMinutes()==45){
+							newValue = startDate.getMinutes()+15;
+						}else{
+							newValue = startDate.getMinutes()+30;
+						}
 						
-						var newValue = startDate.getMinutes()+30;
 						startDate.setMinutes(newValue);
 						//alert("2: "+startDate);
 						k++;
 					}
-					
 			}	
 			})
 			//not working
@@ -1128,6 +1258,7 @@ var timeslots = [];
 					j++;
 				}
 			}
+			//console.log(availSlots);
 			
 			var timeSlots=[];
 			var k=0;
@@ -1139,17 +1270,24 @@ var timeslots = [];
 				
 				var endDate = new Date(availSlots[a].EndDateTime.slice(0,19).toString());
 				var hr2 = endDate.getHours();
-				endDate.setHours(hr2-8);
+				endDate.setHours(hr2-9);
 				
-					while(startDate.getTime()<endDate.getTime()){
+					while(startDate.getTime()<=endDate.getTime()){
 						timeSlots[k]=chosendate+" "+startDate.toString().slice(16,24);
 						
-						var newValue = startDate.getMinutes()+30;
+						var newValue = "";
+						if(startDate.getMinutes()==15 || startDate.getMinutes()==45){
+							newValue = startDate.getMinutes()+15;
+						}else{
+							newValue = startDate.getMinutes()+30;
+						}
+						
 						startDate.setMinutes(newValue);
 						k++;
 					}
-			return timeSlots;
 			}
+			//console.log(timeSlots);
+			return timeSlots;
 		}
 	}
 })
@@ -1207,13 +1345,10 @@ app.factory('bookApptService',function($http,userScheduleService,$ionicPopup,$st
 
 app.factory('sessionStaffService',function($http){
 	return {
-		getSessionStaff: function(SessionTypeID){
+		getSessionStaff: function(){
 			var request = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/getStaff.php",
-			data: {
-				SessionTypeID: SessionTypeID,
-			},
 			headers: { 
 				'Content-Type': 'application/x-www-form-urlencoded' 
 			}
@@ -1235,12 +1370,13 @@ app.factory('sessionStaffService',function($http){
 })
 
 
-app.controller('loginCtrl', function($scope, $state,userService,userScheduleService,classesService,workshopsService,eventsService,challengesService,sessionService) {
+app.controller('loginCtrl', function($scope, $state,userService,userScheduleService,classesService,workshopsService,eventsService,retreatsService,challengesService,sessionService) {
 	$scope.signIn = function(user) {
 		userService.authentication(user);
 		classesService.getClassesDatabase();
 		workshopsService.getWorkshopsDatabase();
 		eventsService.getEventsDatabase();
+		retreatsService.getRetreatsDatabase();
 		challengesService.getChallengesDatabase();
 		sessionService.getSession();
 	};
@@ -1251,21 +1387,23 @@ app.controller('loginCtrl', function($scope, $state,userService,userScheduleServ
 })
 
 //$ionicSideMenuDelegate is the dependency for menu
-app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate) {
+app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate,classesService,$ionicLoading,$timeout) {
 	//left menu
 	$scope.toggleLeft = function() {
     $ionicSideMenuDelegate.toggleLeft();
 	};
-  
-	// function to submit the form after all validation has occurred			
-	//$scope.submitForm = function(user) {
-		//alert(user.email);
-		
-		// check to make sure the form is completely valid
-		//if ($scope.userForm.$valid) {
-		//	alert('our form is amazing');
-		//}
-//	};
+	
+	$scope.loadContact = function(){
+		window.open('http://www.platinumyoga.com/pages/location-map', '_blank', 'location=yes');
+	};
+	
+	$scope.loadPromotions = function(){
+		window.open('http://www.platinumyoga.com/pages/promotion', '_blank', 'location=yes');
+	};
+	
+	$scope.loadPrivileges = function(){
+		window.open('http://www.platinumyoga.com/pages/platinum-yoga-rewards', '_blank', 'location=yes');
+	};
 	
 	/*$scope.goBack = function() {
 		window.history.back();
@@ -1415,6 +1553,9 @@ app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet,$localstor
 	$scope.logout = function(){
 		$localstorage.set('name', '');
 		$localstorage.set('password', '');
+		$localstorage.set('classesDb', '');
+		$localstorage.set('beforeClassRules','');
+		$localstorage.set('duringClassRules','');
 	};
 	
 	
@@ -1423,21 +1564,21 @@ app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet,$localstor
 	  for (var i=0; i<3; i++) {
 		if(i==0){
 			$scope.groups[i] = {
-			name: 'Book',
+			name: 'BOOK',
 			items: []
 			};
 			/*loop through all the classes*/
 			for (var j=0; j<5; j++) {
 				if(j==0){
-					$scope.groups[i].items.push('Classes');
+					$scope.groups[i].items.push('CLASSES');
 				}else if(j==1){
-					$scope.groups[i].items.push('Workshops');
+					$scope.groups[i].items.push('APPOINTMENTS');
 				}else if(j==2){
-					$scope.groups[i].items.push('Events');
+					$scope.groups[i].items.push('WORKSHOPS');
 				}else if(j==3){
-					$scope.groups[i].items.push('Appointments');
+					$scope.groups[i].items.push('SPECIAL EVENTS');
 				}else if(j==4){
-					$scope.groups[i].items.push('Challenges');
+					$scope.groups[i].items.push('RETREATS/TT');
 				}
 				
 			}
@@ -1467,10 +1608,10 @@ app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet,$localstor
 		  titleText: 'BOOKINGS',
 		  buttons: [
 			{ text: 'Classes' },
-			{ text: 'Workshops' },
-			{ text: 'Events' },
 			{ text: 'Appointments' },
-			{ text: 'Challenges' }
+			{ text: 'Workshops' },
+			{ text: 'Special Events' },
+			{ text: 'Retreats/TT' }
 		  ],
 		  cancelText: 'Cancel',
 		  cancel: function() {
@@ -1482,16 +1623,16 @@ app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet,$localstor
 					$state.go('yoga-app.classes');
 					break;
 				case 1:
-					$state.go('yoga-app.workshops');
-					break;
-				case 2:
-					$state.go('yoga-app.events');
-					break;
-				case 3:
 					$state.go('yoga-app.appointments');
 					break;
+				case 2:
+					$state.go('yoga-app.workshops');
+					break;
+				case 3:
+					$state.go('yoga-app.events');
+					break;
 				case 4:
-					$state.go('yoga-app.challenges');
+					$state.go('yoga-app.retreats');
 					break;
 			}
 			return true;
@@ -1510,8 +1651,8 @@ app.controller('barcodeCtrl',function($scope,userService){
 	$scope.userId = userService.getUserID();
 })
 
-app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$timeout,$ionicLoading,$interval,userService,userScheduleService,removeBookingService,waitlistService,removeWaitlistService,historyService,purchaseHistoryService,$ionicModal,feedbackDb,$firebase,removeAppointmentService){
-
+app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$timeout,$ionicLoading,$interval,userService,userScheduleService,removeBookingService,waitlistService,removeWaitlistService,historyService,purchaseHistoryService,$ionicModal,feedbackDb,$firebase,removeAppointmentService,$localstorage){
+	
 	$scope.userId = userService.getUserID();;
 	$scope.username = userService.getUsername();
 	$scope.displayReviews = false;
@@ -1549,27 +1690,50 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		showDelay: 0
 	  });
 	  
-	  // Set a timeout to clear loader, however you would actually call the $ionicLoading.hide(); method whenever everything is ready or loaded.
-	  $timeout(function () {
-	  $ionicLoading.hide();
-		retrieveScheduledClasses();
-	  }, 2900);
-	  
-	  $timeout(function () {
-	  $ionicLoading.hide();
-		retrieveWaitlist();
-	  }, 2900);
-	  
-	  $timeout(function () {
-		$ionicLoading.hide();
-		retrieveUserHistory();
-	  }, 2900);
-	  
-	  $timeout(function () {
-		$ionicLoading.hide();
-		retrievePurchaseHistory();
-	  }, 2900);
-	  
+	  if($localstorage.get('classesDb')==""||$localstorage.get('classesDb')==null){
+			  // Set a timeout to clear loader, however you would actually call the $ionicLoading.hide(); method whenever everything is ready or loaded.
+			  //alert("slow");
+			  $timeout(function () {
+			  $ionicLoading.hide();
+				retrieveScheduledClasses();
+			  }, 7000);
+			  
+			  $timeout(function () {
+			  $ionicLoading.hide();
+				retrieveWaitlist();
+			  }, 7000);
+			  
+			  $timeout(function () {
+				$ionicLoading.hide();
+				retrieveUserHistory();
+			  }, 7000);
+			  
+			  $timeout(function () {
+				$ionicLoading.hide();
+				retrievePurchaseHistory();
+			  }, 7000);
+	  }else{
+		//alert("fast");
+			$timeout(function () {
+			  $ionicLoading.hide();
+				retrieveScheduledClasses();
+			  }, 2900);
+			  
+			  $timeout(function () {
+			  $ionicLoading.hide();
+				retrieveWaitlist();
+			  }, 2900);
+			  
+			  $timeout(function () {
+				$ionicLoading.hide();
+				retrieveUserHistory();
+			  }, 2900);
+			  
+			  $timeout(function () {
+				$ionicLoading.hide();
+				retrievePurchaseHistory();
+			  }, 2900);
+	  }
 	
 	var upcoming = document.getElementById('showUpcoming');
 	var history = document.getElementById('showHistory');
@@ -1620,6 +1784,13 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		$scope.showPurchase = true;
 	};
 	
+	
+	$scope.review = function(){
+		$state.go("yoga-app.home");
+		$scope.showHistory();
+	};	
+	
+	
 	$scope.removeClass = function(classInfo,userId){
 		 // A confirm dialog
 		   var confirmPopup = $ionicPopup.confirm({
@@ -1661,6 +1832,34 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 			 }
 		   })
 	};
+	
+	//pull from healhtips DB (start)
+	var arrayList = new Array();
+	$scope.healthtip = function(){
+		var healthtipsLink = new Firebase("https://healthtipstinkertest.firebaseio.com/");
+		healthtipsLink.once('value', function(allMessagesSnapshot) {
+			allMessagesSnapshot.forEach(function(messageSnapshot) {
+				 // Will be called with a messageSnapshot for each message under message_list.
+					var message = messageSnapshot.child('tips').val();
+					arrayList.push(message);
+			});
+			  
+		   var randomnumber = Math.floor(Math.random() * (arrayList.length));
+			
+			   var alertPopup2 = $ionicPopup.alert({
+				 title: 'Health Tip',
+				 subTitle: 'Thank you for your review!',
+				 template: arrayList[randomnumber]
+			   });
+			   alertPopup2.then(function(res) {});
+			   
+		});
+	};
+	//pull from healhtips DB (end)
+	
+	
+	
+	
 	
     //MODAL START
 	$ionicModal.fromTemplateUrl('review-modal.html', {
@@ -1709,7 +1908,6 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	  for(var b=0;b<$scope.feedbacks.length;b++){
 		if($scope.feedbacks[b].userid==$scope.userId && $scope.feedbacks[b].historyid==$scope.historyId){
 			$scope.userFeeds = $scope.feedbacks[b];
-			$scope.userStars = $scope.feedbacks[b].stars;
 			break;
 		}
 	  }
@@ -1722,12 +1920,9 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	  }
 	  //alert($scope.starsTotal.length);
 	  
-	  
-	  
 	  if($scope.userFeeds!=""){
 		$scope.displayReviews = true;
 	  }
-	  
 	};
 	
 	  
@@ -1741,7 +1936,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		}
 		
 		//alert(review.booking);
-		for(var b=0;b<$scope.feedbacks.length;b++){
+	 for(var b=0;b<$scope.feedbacks.length;b++){
 		if($scope.feedbacks[b].userid==$scope.userId && $scope.feedbacks[b].historyid==$scope.historyId){
 		   result = 1;
 		   break;
@@ -1749,6 +1944,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	  }
 		
 		if(result==0){
+		
 			var save = $scope.feedbacks.$add({
            // booking:review.booking,
 		   historyid:$scope.historyId,
@@ -1761,22 +1957,26 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
            feedback:review.feedback,
 		   stars:review.stars
 			});
+			
 			//review.booking = "";
 			review.feedback = "";
 			review.stars = 0;
+			
 			//alert
-			var alertPopup = $ionicPopup.alert({
+			/*var alertPopup = $ionicPopup.alert({
 			 title: 'Review',
 			 template: "Review has been posted!"
 		   });
 		   alertPopup.then(function(res) {});
+		   alertPopup.close();*/
+		   $scope.healthtip();
 		}
 	  	
 		
 		if(save) {
 		  $scope.closeModal();
 		  review.feedback = "";
-			review.stars = 0;
+		  review.stars = 0;
 		} else {
 			review.feedback = "";
 			review.stars = 0;
@@ -1788,13 +1988,12 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		   $scope.closeModal();
 		}
 		
-    };
-	  
+    };	  
 })
 
-app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesService,userService,feedbackDb,$ionicModal,$timeout) {
+app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesService,userService,feedbackDb,$ionicModal,$timeout,$ionicLoading) {
 	$scope.totalClasses = classesService.getClasses();
-	$scope.selectedclass = classesService.getSelectedClass($stateParams.classID);
+	$scope.selectedclass = classesService.getSelectedClass($stateParams.classID);	
 	$scope.userID = userService.getUserID();
 	//loading the feedback/review DB
 	 $scope.feedbacks = feedbackDb.getFeedbackData();
@@ -1939,12 +2138,61 @@ app.controller('workshopCtrl',function($scope,$stateParams,$ionicPopup,userServi
 	};
 })
 
-app.controller('eventsCtrl',function($scope,$stateParams,$ionicPopup,userService,eventsService,$timeout){
+
+app.controller('retreatCtrl',function($scope,$stateParams,$ionicPopup,userService,retreatsService,$timeout){
+	$scope.retreatsData = retreatsService.getRetreats();
+	
+	$scope.selectedRetreat = retreatsService.getSelectedRetreat($stateParams.retreatID);
+	$scope.selectedRetreatStaff = retreatsService.getRetreatStaff($stateParams.retreatStaffID);
+	$scope.userID = userService.getUserID();
+	
+	
+	//pull to refresh retreats(start)
+	$scope.refreshRetreats = function() {
+		$timeout( function() {
+		  //simulate async response
+		  retreatsService.getRetreatsDatabase();
+		  $scope.retreatsData = retreatsService.getRetreats();
+		  //Stop the ion-refresher from spinning
+		  $scope.$broadcast('scroll.refreshComplete');
+		}, 2000);
+	};
+	//pull to refresh end retreats(end)
+	
+	
+	$scope.bookRetreatNow = function(retreatId,userId){
+		var confirmBookingPopup = $ionicPopup.confirm({
+			 title: 'Book Retreat/TT',
+			 template: 'Are you sure you want to book this retreat/TT?',
+			 okText: 'Confirm'
+		   });
+		   confirmBookingPopup.then(function(res) {
+			 if(res){
+				//click on confirm
+				retreatsService.bookRetreat(retreatId,userId);
+			 }else{
+				//press cancel
+				//alert("nope");
+			 }
+		   });
+	};
+})
+
+
+
+app.controller('eventsCtrl',function($scope,$stateParams,$ionicPopup,userService,eventsService,$timeout,$state){
+
+	//load this method on initialisation
+	$scope.loadSpecialEvents = function(){
+			window.open('http://www.platinumyoga.com/pages/special-events', '_blank', 'location=yes');
+			$state.go("yoga-app.home");
+	};
+
+	/*
 	$scope.eventsData = eventsService.getEvents();
 	$scope.selectedEvent = eventsService.getSelectedEvent($stateParams.eventID);
 	$scope.selectedEventStaff = eventsService.getEventStaff($stateParams.eventStaffID);
 	$scope.userID = userService.getUserID();
-	
 	
 	//pull to refresh events(start)
 	$scope.refreshEvents = function() {
@@ -1973,7 +2221,7 @@ app.controller('eventsCtrl',function($scope,$stateParams,$ionicPopup,userService
 						//alert("nope");
 					 }
 				   });
-	};
+	};*/
 })
 
 app.controller('challengesCtrl',function($scope,$stateParams,$ionicPopup,userService,challengesService,$timeout){
@@ -2013,83 +2261,68 @@ app.controller('challengesCtrl',function($scope,$stateParams,$ionicPopup,userSer
 	};
 })
 
-app.controller('faqCtrl',function($scope){
+app.controller('faqCtrl',function($scope,faqDb,$ionicLoading,$timeout,$state,$localstorage){
+	if($localstorage.get('beforeClassRules')!=null ){
+		$scope.beforeClass = JSON.parse($localstorage.get('beforeClassRules'));
+	}
 	
-	/*ACCORDION START*/
-	  $scope.groups = [];
-	  for (var i=0; i<2; i++) {
-		if(i==0){
-			$scope.groups[i] = {
-			name: 'During Class',
-			items: []
-			};
-			
-			for (var j=0; j<10; j++) {
-				if(j==0){
-					$scope.groups[i].items.push('Come well hydrated and eat lightly 2-3 hours prior to your practice.');
-				}else if(j==1){
-					$scope.groups[i].items.push('Please arrive at least 15 minutes early to find parking, sign in and familiarize yourself with our facilities. Classes begin promptly & are subject to room capacity.');
-				}else if(j==2){
-					$scope.groups[i].items.push('Please remove your shoes in the designated area when you enter the center. Classes are practiced barefoot and in lightweight clothing.');
-				}else if(j==3){
-					$scope.groups[i].items.push('Be sure to advise your teacher before class if you are new (first 10 classes), or if you have an injury/medical condition or are pregnant.');
-				}else if(j==4){
-					$scope.groups[i].items.push('Please keep your voices low in the center as classes may be in session.');
-				}else if(j==5){
-					$scope.groups[i].items.push('Please leave valuables and personal belongings at home. Avoid wearing jewelry in classes, especially the ones which make noise or makes your practice uncomfortable.');
-				}else if(j==6){
-					$scope.groups[i].items.push('Ensure cell phones are turned off while in the center.');
-				}else if(j==7){
-					$scope.groups[i].items.push('On your first visit you will be required to fill out a new student registration form. Please be sure to sign a waiver and indicate any physical injuries or special health conditions.');
-				}else if(j==8){
-					$scope.groups[i].items.push('Please be mindful that others may be meditating in the yoga room prior to class and refrain from talking.');
-				}else if(j==9){
-					$scope.groups[i].items.push('Ask questions and clear your doubts regarding the choice of classes. we are always here to help you in best possible ways.');
-				}
+	if($localstorage.get('duringClassRules')!=null ){
+		$scope.duringClass = JSON.parse($localstorage.get('duringClassRules'));
+	 }
+	  
+	$scope.loadRegulations = function(){
+		$scope.faqDataArr = faqDb.getFaqData();
+		var bef=0;
+		var dur=0;
+		var beforeArr = [];
+		var durArr = [];
+	
+		for(var i=0;i<$scope.faqDataArr.length;i++){
+			if($scope.faqDataArr[i].classType==="Before"){
+				beforeArr[bef]=(bef+1)+". "+$scope.faqDataArr[i].faq;
+				bef++;
+			}else{
+				durArr[dur]=(dur+1)+". "+$scope.faqDataArr[i].faq;
+				dur++;
 			}
 		}
 		
-		if(i==1){
-			$scope.groups[i] = {
-			name: 'Before Class',
-			items: []
-			};
-			
-			for (var j=0; j<7; j++) {
-				if(j==0){
-					$scope.groups[i].items.push('Once the instructor begins class, refrain from talking to others in the yoga room.');
-				}else if(j==1){
-					$scope.groups[i].items.push('Remember to pick up and neatly put away props used during the class.');
-				}else if(j==2){
-					$scope.groups[i].items.push('To maximize benefits from your practice, stay for a full Savasana, the final relaxation pose.');
-				}else if(j==3){
-					$scope.groups[i].items.push('For hygienic purpose use your yoga mat and a towel if possible, especially in a Hot yoga class where you will sweat. Though we provide mats and all other yoga props needed for the practice.');
-				}else if(j==4){
-					$scope.groups[i].items.push('Go at your own pace. Be gentle and respectful towards your body, never moving to the point of extreme pain.');
-				}else if(j==5){
-					$scope.groups[i].items.push('Drink plenty of water before and after each class, especially if you are practicing hot yoga.');
-				}else if(j==6){
-					$scope.groups[i].items.push('If you must leave early, tell the instructor in advance, place your mat near the door and leave quietly before everyone gets into savasana, the final relaxation pose.');
-				}
-			}
-		}
-	  }
+		$scope.beforeClass = beforeArr;
+		$scope.duringClass = durArr;
+		
+		$localstorage.set('beforeClassRules',JSON.stringify($scope.beforeClass));
+		$localstorage.set('duringClassRules',JSON.stringify($scope.duringClass));
+	};
+	
+	if($localstorage.get('beforeClassRules')==null || $localstorage.get('duringClassRules')==null){
+		   $ionicLoading.show({
+			content: 'Loading',
+			animation: 'fade-in',
+			showBackdrop: true,
+			maxWidth: 200,
+			showDelay: 0
+		  });
+		  
+		  // Set a timeout to clear loader, however you would actually call the $ionicLoading.hide() method whenever everything is ready or loaded.
+		  $timeout(function () {
+		  $ionicLoading.hide();
+		  $scope.loadRegulations();
+		  }, 4000);
+	  }  
+
+	
 	  
-	  /*
-	   * if given group is the selected group, deselect it
-	   * else, select the given group
-	   */
-	  $scope.toggleGroup = function(group) {
-		if ($scope.isGroupShown(group)) {
-		  $scope.shownGroup = null;
-		} else {
-		  $scope.shownGroup = group;
-		}
-	  };
-	  $scope.isGroupShown = function(group) {
-		return $scope.shownGroup === group;
-	  };
-	/*ACCORDION END*/
+	//$state.go($state.current, {}, {reload: true});
+	$scope.displayBeforeClass = true;
+	$scope.showBeforeClass = function(){
+		$scope.displayBeforeClass = true;
+		$scope.displayDuringClass = false;	 
+	};
+	
+	$scope.showDuringClass = function(){
+		$scope.displayBeforeClass = false;
+		$scope.displayDuringClass = true;
+	};
 	
 })
 
@@ -2173,7 +2406,7 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 	$scope.displayDate = true;
 	
 	$scope.selectedInstructor = function(){
-		sessionStaffService.getSessionStaff($scope.sessionID);
+		//sessionStaffService.getSessionStaff($scope.sessionID);
 		$scope.instructors = sessionStaffService.getSessionStaffResponse();
 	};
 	
@@ -2296,7 +2529,25 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 	};
 })
 
-app.controller('halloffameCtrl',function($scope){
+app.controller('halloffameCtrl',function($scope,hallOfFameDb,$timeout,$ionicLoading){
+	$scope.halloffameList = hallOfFameDb.getHallOfFameData();
+	
+	  // Setup the loader
+	  if($scope.halloffameList.length==0){
+		   $ionicLoading.show({
+			content: 'Loading',
+			animation: 'fade-in',
+			showBackdrop: true,
+			maxWidth: 200,
+			showDelay: 0
+		  });
+		  
+		  // Set a timeout to clear loader, however you would actually call the $ionicLoading.hide(); method whenever everything is ready or loaded.
+		  $timeout(function () {
+		  $ionicLoading.hide();
+		  }, 4000);
+	  }
+	
 	
 	$scope.winnersData = {
 		"filter" : 'current',
@@ -2325,24 +2576,10 @@ app.controller('halloffameCtrl',function($scope){
 	};
 })
 
-app.controller('promotionsCtrl',function($scope,healthTipDb,$firebase){
-	//$scope.healthtips = healthTipDb.getHealthTipsData();
+app.controller('promotionsCtrl',function($scope,$firebase){
+
 	
-	var arrayList = new Array();
-	$scope.test = function(){
-		var healthtipsLink = new Firebase("https://healthtipstinkertest.firebaseio.com/");
-		healthtipsLink.once('value', function(allMessagesSnapshot) {
-			allMessagesSnapshot.forEach(function(messageSnapshot) {
-				 // Will be called with a messageSnapshot for each message under message_list.
-					var message = messageSnapshot.child('tips').val();
-					arrayList.push(message);
-			});
-			  
-		   var randomnumber = Math.floor(Math.random() * (arrayList.length));
-		   alert(arrayList[randomnumber]);
-			  
-		});
-	};
+
 })
 
 

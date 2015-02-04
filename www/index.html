@@ -78,7 +78,7 @@
 6. EVENTS PAGE
 7. APPOINTMENTS PAGE
 8. CHALLENGES PAGE
-9. POSE TREE PAGE
+9. YOGAPEDIA PAGE
 10. LUCKY DRAW PAGE
 11. HALL OF FAME PAGE
 Promotions
@@ -164,15 +164,15 @@ About page
 							  <a class="tab-item" href="#/yoga-app/barcode">
 								<i class="icon ion-card" style="padding-top:2px;"></></i>
 							  </a>
-							  <!--pose tree-->
-							  <a class="tab-item" href="#/yoga-app/posetree">
+							  <!--yogapedia-->
+							  <a class="tab-item" href="#/yoga-app/yogapedia">
 								<i class="icon ion-man" style="padding-top:2px;"></></i>
 							  </a>
-							  <!--lucky draw-->
-							  <!--
-							  <a class="tab-item" href="#/yoga-app/luckydraw">
-								<i class="icon ion-cash" style="padding-top:2px;"></></i>
-							  </a>-->
+							  <!--review-->
+							  <div class="tab-item" ng-click="review()" ng-controller="homeCtrl">
+								<i class="icon ion-star" style="padding-top:2px;"></></i>
+							  </div>
+							 
 					</ion-tabs>
 				</ion-footer-bar>
 			
@@ -187,15 +187,15 @@ About page
           <ion-content>
             <ul class="list">
               <!-- Note each link has the 'menu-close' attribute so the menu auto closes when clicking on one of these links -->
-              <a href="#/yoga-app/home" class="item" menu-close>Home</a>
+              <a class="item item-icon-left" href="#/yoga-app/home" menu-close><i class="icon ion-home"></i>HOME</a>
 			  
 			  <!--BOOK LINK in ACCORDION-->
 			  	<ion-list>
 					<div ng-repeat="group in groups">
-					  <ion-item class="item"
+					  <ion-item class="item item-icon-left"
 								ng-click="toggleGroup(group)"
-								ng-class="{active: isGroupShown(group)}">
-						  <i class="icon" ng-class="isGroupShown(group) ?"></i>
+								ng-class="{active: isGroupShown(group)}">	
+						  <i class="icon ion-calendar" ng-class="isGroupShown(group) ?"></i>
 						{{group.name}}
 					  </ion-item>
 					  <ion-item class="item-accordion"
@@ -205,12 +205,26 @@ About page
 					  </ion-item>
 					</div>
 				</ion-list>
+			
+			<a href="" ng-click="loadPromotions()" class="item item-icon-left" menu-close><i class="icon ion-speakerphone"></i>PROMOTIONS</a>
+			
+			<!--HEALTH TIP LINK
+			  <a href="#/yoga-app/promotions" class="item item-icon-left" menu-close><i class="icon ion-speakerphone"></i>PROMOTIONS</a>-->
 			  
-			  <a href="#/yoga-app/halloffame" class="item" menu-close>Hall of Fame</a>
-			  <a href="#/yoga-app/promotions" class="item" menu-close>Promotions</a>
-			  <a href="#/yoga-app/contactus" class="item" menu-close>Contact us</a>
-			  <a href="#/yoga-app/faq" class="item" menu-close>FAQ</a>
-			  <a href="#/login" class="item" ng-click="logout()" menu-close>Log Out</a>
+			  <a href="" ng-click="loadPrivileges()" class="item item-icon-left" menu-close><i class="icon ion-happy"></i>PY PRIVILEGES</a>
+			  
+			  <a href="#/yoga-app/yogapedia" class="item item-icon-left" menu-close><i class="icon ion-man"></i>YOGAPEDIA</a>
+			  
+			  <a class="item item-icon-left" href="#/yoga-app/halloffame" menu-close><i class="icon ion-trophy"></i>HALL OF FAME</a>
+			  
+			  <a href="#/yoga-app/faq" class="item item-icon-left" menu-close>
+			  <i class="icon ion-clipboard"></i>INFO/ETIQUETTE</a>
+			  
+			  <a href="" class="item item-icon-left" ng-click="loadContact()" menu-close><i class="icon ion-map"></i>
+			  CONTACT US</a>
+			  
+			  <a href="#/login" class="item item-icon-left" ng-click="logout()" menu-close>
+			  <i class="icon ion-power"></i>LOG OUT</a>
             </ul>
           </ion-content>
         </ion-side-menu>
@@ -230,23 +244,27 @@ About page
 					</div>
 				</div>
 				
+				<b>
 				<div class="button-bar">
-				  <a class="button button-small" id="showUpcoming" ng-click="showUpcoming()">Upcoming</a>
-				  <a class="button button-small" id="showHistory" ng-click="showHistory()">History</a>
+				  <a class="button button-small" id="showUpcoming" ng-click="showUpcoming()">UPCOMING</a>
+				  <a class="button button-small" id="showHistory" ng-click="showHistory()">HISTORY</a>
 				</div>
+				</b>
 				
 				<!--list displaying booked classes and workshops[this is a single list from the mindbodyonline service]-->
 				<div class="list" ng-show="showUpcomingView">
 				
+					<b>
 					<div class="button-bar">
-					  <a class="button button-small" ng-click="showEnrolled()">Enrolled</a>
-					  <a class="button button-small" ng-click="showWaitingList()">Waiting List</a>
+					  <a class="button button-small" ng-click="showEnrolled()">ENROLLED</a>
+					  <a class="button button-small" ng-click="showWaitingList()">WAITING LIST</a>
 					</div>
+					</b>
 					
 					<div class="item" ng-repeat="class in scheduledClasses">
 						<div class="row">
 							<div class="col col-67">
-							{{(class.StartDateTime).slice(0,10)}}&nbsp;{{(class.StartDateTime).slice(12,19)}}<br/>
+							{{(class.StartDateTime).slice(0,10)}}&nbsp;{{(class.StartDateTime).slice(11,16)}}<br/>
 							<b>Lesson:</b>&nbsp;{{class.Name}}<br/>
 							<b>Staff:</b>&nbsp;{{class.Staff.Name}}</div>
 							<div class="col col-33" style="padding-top:20px;padding-left:40px;">
@@ -258,11 +276,12 @@ About page
 				
 				<!--waitlist-->
 				<div class="list" ng-show="showWaitlist">
-				
+					<b>
 					<div class="button-bar">
-					  <a class="button button-small" ng-click="showEnrolled()">Enrolled</a>
-					  <a class="button button-small" ng-click="showWaitingList()">Waiting List</a>
+					  <a class="button button-small" ng-click="showEnrolled()">ENROLLED</a>
+					  <a class="button button-small" ng-click="showWaitingList()">WAITING LIST</a>
 					</div>
+					</b>
 					
 					
 					<div class="item" ng-repeat="class in waitlist">
@@ -283,10 +302,12 @@ About page
 				<!--list showing the history-->
 				<div class="list" ng-show="showHistoryView">
 					
+					<b>
 					<div class="button-bar">
-					  <a class="button button-small" ng-click="showBookingHistory()">Bookings</a>
-					  <a class="button button-small" ng-click="showPurchaseHistory()">Purchase</a>
+					  <a class="button button-small" ng-click="showBookingHistory()">BOOKINGS</a>
+					  <a class="button button-small" ng-click="showPurchaseHistory()">PURCHASE</a>
 					</div>
+					</b>
 					
 					<div class="item" ng-repeat="history in userHistory">
 						<div class="row">
@@ -307,10 +328,12 @@ About page
 				
 				<!--list displaying purchase histories-->
 				<div class="list" ng-show="showPurchase">
+					<b>
 					<div class="button-bar">
-					  <a class="button button-small" ng-click="showBookingHistory()">Bookings</a>
-					  <a class="button button-small" ng-click="showPurchaseHistory()">Purchase</a>
+					  <a class="button button-small" ng-click="showBookingHistory()">BOOKINGS</a>
+					  <a class="button button-small" ng-click="showPurchaseHistory()">PURCHASE</a>
 					</div>
+					</b>
 					
 					<div class="item" ng-repeat="item in saleItems">
 						{{(item.Sale.SaleDate).slice(0,10)}}<br/>
@@ -370,7 +393,7 @@ About page
 								<div class="row">
 										{{star}}<img src="star-on.png"/></div>
 								</div>-->
-								&nbsp;&nbsp;{{userStars}}<img src="star-on.png"/>
+								<span ng-repeat="n in [] | range:userFeeds.stars"><img src="star-on.png"/></span>
 						</div>
 					</div>
 				</div>
@@ -414,8 +437,8 @@ About page
 							{{(class.StartDateTime).slice(0,10)}}<br/>
 							{{(class.StartDateTime).slice(11,16)}} - {{(class.EndDateTime).slice(11,16)}}<br/>
 							{{class.Staff.Name}}<br/>
-							{{class.ClassDescription.Level.Name}}<br>
-							{{class.MaxCapacity-class.TotalBooked}} available
+							{{class.ClassDescription.Level.Name}}
+							<!--{{class.MaxCapacity-class.TotalBooked}} available-->
 							</a>
 						</div>
 						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
@@ -436,24 +459,25 @@ About page
 				<div class="row">
 				  <div class="col"><b>{{selectedclass.ClassDescription.Name}}</b></div>
 				</div>
-
+				
+				<!--
 				<div class="row">
 				  <div class="col">{{selectedclass.TotalBooked}}/{{selectedclass.MaxCapacity}} Enrolled</div>
-				</div>
+				</div>-->
 
 				<div class="row">
 				  <div class="col">
 						<div class="button-bar">
 						  <a class="button button-small button-energized" href="tel:+6563480809">Call</a>
 						  <div class="button button-small button-energized" ng-click="bookClass({{selectedclass.ID}},{{userID}})">Enroll</div>
-						  <a class="button button-small button-energized" href="#/yoga-app/Classes">All Classes</a>
+						  <a class="button button-small button-energized" href="#/yoga-app/CLASSES">All Classes</a>
 						</div>
 					</div>
 				</div>
 
 				<div class="row">
 				  <div class="col">
-					<a href="#yoga-app/classStaff/{{selectedclass.Staff.ID}}" class="button button-small">{{selectedclass.Staff.Name}}
+					<a href="#yoga-app/classStaff/{{selectedclass.Staff.ID}}" class="button button-small">Instructor:&nbsp;{{selectedclass.Staff.Name}}
 					</a>
 				  </div>
 				  <div class="col">
@@ -478,7 +502,9 @@ About page
 				</div>
 				
 				<div class="row">
-				  <div class="col"><b>Description:</b><br/>{{selectedclass.ClassDescription.Description}}</div>
+				  <div class="col"><b>Description:</b><br/>
+				     {{selectedclass.ClassDescription.Description}}
+				  </div>
 				</div>
 				
 			</div>
@@ -514,12 +540,14 @@ About page
 			  </div>
 		</ion-header-bar>			
 			<ion-content>
-				<div class="row" ng-repeat="feed in classReviews">
-					<div class="col">
-						<b>Username:</b>{{feed.username}}<br/>
-						<b>Rating:</b>{{feed.stars}}
-						<span ng-show="classReviews!=null"><img src="star-on.png"/><br/></span>
-						<b>Review:</b>{{feed.feedback}}<br/>
+			<div class="list">
+					<div class="row" ng-repeat="feed in classReviews |orderBy: '-stars'">
+						<div class="col">
+							<b>Username:</b>{{feed.username}}<br/>
+							<b>Rating:</b>
+							<span ng-show="classReviews!=null" ng-repeat="n in [] | range:feed.stars"><img src="star-on.png"/></span><br/>
+							<b>Review:</b>{{feed.feedback}}<br/>
+						</div>
 					</div>
 				</div>
 			</ion-content>
@@ -534,9 +562,6 @@ About page
       <ion-view title="Staff">
         <ion-content>
 			
-			<div class="row">
-				  <div class="col"><b>{{selectedStaff.Name}}</b></div>
-			</div>
 			
 			<div align="center">
 				<div class="row">
@@ -544,7 +569,12 @@ About page
 				</div>
 				
 				<div class="row">
-				  <div class="col"><b>{{selectedStaff.Bio}}</b></div>
+				  <div class="col"><b>Name:</b>&nbsp;{{selectedStaff.Name}}</div>
+				</div>
+			
+				
+				<div class="row">
+				  <div class="col"><b>Biography:</b><br/>{{selectedStaff.Bio}}</div>
 				</div>
 				
 			</div>
@@ -571,9 +601,9 @@ About page
 								<a href="#/yoga-app/selectedWorkshop/{{workshop.ID}}">
 								<b>{{workshop.ClassDescription.Name}}</b><br/>
 								{{(workshop.StartDate).slice(0,10)}}<br/>
-								{{(workshop.StartTime).slice(12,20)}} - {{(workshop.EndTime).slice(12,20)}}<br/>
+								{{(workshop.StartTime).slice(11,16)}} - {{(workshop.EndTime).slice(11,16)}}<br/>
 								{{workshop.Staff.Name}} <br/>
-								Workshop ID:&nbsp;{{workshop.ID}}
+								<!--Workshop ID:&nbsp;{{workshop.ID}}-->
 								</a>
 							</div>
 							<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
@@ -581,8 +611,7 @@ About page
 							</div>
 					</div>
 				</div>
-			</div>	
-			</div>
+			
         </ion-content>
       </ion-view>
     </script>
@@ -596,24 +625,25 @@ About page
 				<div class="row">
 				  <div class="col"><b>{{selectedWorkshop.ClassDescription.Name}}</b></div>
 				</div>
-
+				
+				<!--
 				<div class="row">
 				  <div class="col">25/30 Enrolled (dummy)</div>
-				</div>
+				</div>-->
 
 				<div class="row">
 				  <div class="col">
 						<div class="button-bar">
 						  <a class="button button-small button-energized" href="tel:+6563480809">Call</a>
-						  <div class="button button-small button-energized" ng-click="">Enroll</div>
-						  <a class="button button-small button-energized" href="#/yoga-app/Workshops">All Workshops</a>
+						  <div class="button button-small button-energized" ng-click="bookSelectedWorkshop(selectedWorkshop,userID)">Enroll</div>
+						  <a class="button button-small button-energized" href="#/yoga-app/WORKSHOPS">All Workshops</a>
 						</div>
 					</div>
 				</div>
 
 				<div class="row">
 				  <div class="col">
-					  <a href="#yoga-app/workshopStaff/{{selectedWorkshop.Staff.ID}}" class="button button-small">{{selectedWorkshop.Staff.Name}}</a>
+					  <a href="#yoga-app/workshopStaff/{{selectedWorkshop.Staff.ID}}" class="button button-small">Instructor:&nbsp;{{selectedWorkshop.Staff.Name}}</a>
 				  </div>
 				</div>
 				
@@ -650,9 +680,13 @@ About page
 				<div class="row">
 				  <div class="col"><img src="{{selectedWorkshopStaff.ImageURL}}" /></div>
 				</div>
+	
+				<div class="row">
+				  <div class="col"><b>Name:</b>&nbsp;{{selectedWorkshopStaff.Name}}</div>
+				</div>
 				
 				<div class="row">
-				  <div class="col"><b>{{selectedWorkshopStaff.Name}}</b></div>
+				  <div class="col"><b>Biography:</b><br/>{{selectedWorkshopStaff.Bio}}</div>
 				</div>
 				
 			</div>
@@ -663,32 +697,9 @@ About page
 		<!--EVENTS PAGE(under workshops but has its own tab)-->
     <script id="templates/events.html" type="text/ng-template">
       <ion-view title="Events">
-			<ion-content has-header="true">
+			<ion-content has-header="true" ng-init="loadSpecialEvents()">
 			
-			<!--pull to refresh events(start)-->
-			<ion-refresher on-refresh="refreshEvents()"></ion-refresher>
-			<!--pull to refresh events(end)-->
 			
-			<div class="list">
-				<div class="bar bar-header item-input-inset">
-					<ion-search placeholder="Search for events" filter="search"></ion-search>
-				</div>
-				
-				<div class="row" ng-repeat="event in eventsData| filter:search.value">
-						<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
-							<a href="#/yoga-app/selectedEvent/{{event.ID}}">
-							<b>{{event.ClassDescription.Name}}</b><br/>
-							{{(event.StartDate).slice(0,10)}}<br/>
-							{{(event.StartTime).slice(12,20)}} - {{(event.EndTime).slice(12,20)}}<br/>
-							{{event.Staff.Name}} <br/>
-							Event ID:&nbsp;{{event.ID}}
-							</a>
-						</div>
-						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
-							<button class="button-right button-stable col" ng-click="bookEvent({{event.ID}},{{userID}})">Book</button>
-						</div>
-				</div>
-			</div>	
         </ion-content>
       </ion-view>
     </script>
@@ -702,17 +713,18 @@ About page
 				<div class="row">
 				  <div class="col"><b>{{selectedEvent.ClassDescription.Name}}</b></div>
 				</div>
-
+				
+				<!--
 				<div class="row">
 				  <div class="col">22/30 Enrolled (dummy)</div>
-				</div>
+				</div>-->
 
 				<div class="row">
 				  <div class="col">
 						<div class="button-bar">
 						  <a class="button button-small button-energized" href="tel:+6563480809">Call</a>
 						  <div class="button button-small button-energized" ng-click="bookEvent({{selectedEvent.ID}},{{userID}})">Enroll</div>
-						  <a class="button button-small button-energized" href="#/yoga-app/Events">All Events</a>
+						  <a class="button button-small button-energized" href="#/yoga-app/EVENTS">All Events</a>
 						</div>
 					</div>
 				</div>
@@ -766,6 +778,109 @@ About page
     </script>
 	
 	
+	<!--RETREATS PAGE-->
+    <script id="templates/retreats.html" type="text/ng-template">
+      <ion-view title="Retreats/TT">
+        <ion-content has-header="true">
+		
+			<!--pull to refresh workshops(start)-->
+			<ion-refresher on-refresh=""></ion-refresher>
+			<!--pull to refresh workshops(end)-->
+		
+			<div class="list">
+				<div class="bar bar-header item-input-inset">
+					<ion-search placeholder="Search for retreats/TT" filter="search"></ion-search>
+				</div>		
+					<div class="row" ng-repeat="retreat in retreatsData | filter:search.value">
+							<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
+								<a href="#/yoga-app/selectedRetreat/{{retreat.ID}}">
+								<b>{{retreat.ClassDescription.Name}}</b><br/>
+								{{(retreat.StartDate).slice(0,10)}}<br/>
+								{{(retreat.StartTime).slice(11,16)}} - {{(retreat.EndTime).slice(11,16)}}<br/>
+								{{retreat.Staff.Name}} <br/>
+								<!--Retreat ID:&nbsp;{{retreat.ID}}-->
+								</a>
+							</div>
+							<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
+								<button class="button-right button-stable col" ng-click="bookRetreatNow({{retreat.ID}},{{userID}})">Book</button>
+							</div>
+					</div>
+				</div>
+			
+        </ion-content>
+      </ion-view>
+    </script>
+	
+	
+	<!--SELECTED RETREAT PAGE-->
+    <script id="templates/selectedRetreat.html" type="text/ng-template">
+      <ion-view title="Retreat/TT">
+        <ion-content has-header="true">
+			<div align="center">
+				<div class="row">
+				  <div class="col"><b>{{selectedRetreat.ClassDescription.Name}}</b></div>
+				</div>
+				
+				<!--
+				<div class="row">
+				  <div class="col">25/30 Enrolled (dummy)</div>
+				</div>-->
+
+				<div class="row">
+				  <div class="col">
+						<div class="button-bar">
+						  <a class="button button-small button-energized" href="tel:+6563480809">Call</a>
+						  <div class="button button-small button-energized" ng-click="bookRetreatNow({{selectedRetreat.ID}},{{userID}})">Enroll</div>
+						  <a class="button button-small button-energized" href="#/yoga-app/RETREATS/TT">All Retreats/TT</a>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+				  <div class="col">
+					  <a href="#yoga-app/retreatStaff/{{selectedRetreat.Staff.ID}}" class="button button-small">Instructor:&nbsp;{{selectedRetreat.Staff.Name}}</a>
+				  </div>
+				</div>
+
+				<div class="row">
+				  <div class="col">{{(selectedRetreat.StartDate).slice(0,10)}}</div>
+				</div>
+				
+				<div class="row">
+				  <div class="col">{{(selectedRetreat.StartTime).slice(12,20)}} - {{(selectedRetreat.StartDate.EndTime).slice(12,20)}}</div>
+				</div>
+				
+				<div class="row">
+				  <div class="col"><b>Description:</b><br/>{{selectedRetreat.ClassDescription.Description}}</div>
+				</div>
+			</div>
+        </ion-content>
+      </ion-view>
+    </script>
+	
+	
+	<!--RETREAT STAFF INFO-->
+    <script id="templates/retreatStaff.html" type="text/ng-template">
+      <ion-view title="Staff">
+        <ion-content has-header="true">
+			<div align="center">
+				<div class="row">
+				  <div class="col"><img src="{{selectedRetreatStaff.ImageURL}}" /></div>
+				</div>
+				
+				<div class="row">
+				  <div class="col"><b>Name:</b>&nbsp;{{selectedRetreatStaff.Name}}</div>
+				</div>
+				
+				<div class="row">
+				  <div class="col"><b>Biography:</b><br/>{{selectedRetreatStaff.Bio}}</div>
+				</div>
+				
+			</div>
+        </ion-content>
+      </ion-view>
+    </script>
+	
 	
 	<!--APPOINTMENTS PAGE-->
     <script id="templates/appointments.html" type="text/ng-template">
@@ -790,12 +905,12 @@ About page
 				<div class="item" ng-repeat="instructor in instructors">
 					<div class="row">
 					  <div class="col col-25">
-						<img src="{{instructor.ImageURL}}" width="30px"/></div>	
+						<img src="{{instructor.ImageURL}}" width="60px"/></div>	
 							<div class="col col-75">
 							  <h2>{{instructor.FirstName}} {{instructor.LastName}}</h2>
 							  <br/>
 							  <!--<a class="button" href="#/yoga-app/selectedSessionStaff/{{instructor.ID}}" ng-click="bookInstructor({{sessionID}},{{instructor.ID}})">Book</a>-->
-							  <div class="button button-small" ng-click="bookInstructor({{sessionID}},{{instructor}})">Book</a>
+							  <div class="button button-small" ng-click="bookInstructor({{sessionID}},{{instructor}})"> Book </a>
 							  </div>
 							</div>
 					</div>
@@ -889,10 +1004,11 @@ About page
 				<div class="row">
 				  <div class="col"><b>{{selectedChallenge.ClassDescription.Name}}</b></div>
 				</div>
-
+				
+				<!--
 				<div class="row">
 				  <div class="col">23/30 Enrolled (dummy)</div>
-				</div>
+				</div>-->
 
 				<div class="row">
 				  <div class="col">
@@ -930,9 +1046,9 @@ About page
 	
 	
 	
-	<!--POSE TREE PAGE-->
-    <script id="templates/posetree.html" type="text/ng-template">
-      <ion-view title="Pose Tree">
+	<!--YOGAPEDIA PAGE-->
+    <script id="templates/yogapedia.html" type="text/ng-template">
+      <ion-view title="Yogapedia">
         <ion-content has-header="true">
 			<p align="center">
 				<img src="img/yoga_v0.jpg" width="90%"/>
@@ -957,15 +1073,30 @@ About page
     <script id="templates/halloffame.html" type="text/ng-template">
       <ion-view title="HALL OF FAME" ng-controller="halloffameCtrl">
 		<ion-content has-header="true">
-			<div class="button-bar">
-					<a class="button button-small button-stable" ng-click="winnersData.filter='current'">Current</a>
-					<a class="button button-small button-stable" ng-click="winnersData.filter='past'">Past</a>
-			</div>
+		
+		
+			<!--<div class="button-bar">
+					<!--<a class="button button-small button-stable" ng-click="winnersData.filter='current'">Current</a>
+					<!--<a class="button button-small button-stable" ng-click="winnersData.filter='past'">Past</a>
+			<!--</div>
+			<!--<div class="list">
+				<!--<a class="item" ng-repeat="winner in winnersData.winners | filter : winnersData.filter">
+					<!--<b>{{winner.title}}</b><br>{{winner.name}}
+				<!--</a>
+			<!--</div>-->
+			
 			<div class="list">
-				<a class="item" ng-repeat="winner in winnersData.winners | filter : winnersData.filter">
-					<b>{{winner.title}}</b><br>{{winner.name}}
-				</a>
+				<div class="item" ng-repeat="winner in halloffameList | orderBy:'-period'">
+					<div class="row">
+						<div class="col">
+							<b>Title:&nbsp;</b>{{winner.title}}<br/>
+							<b>Name:&nbsp;</b>{{winner.name}}<br/>
+							<b>Period:&nbsp;</b>{{winner.period}}<br/>
+						</div>
+					</div>
+				</div>
 			</div>
+			
 		</ion-content>
       </ion-view>
     </script>
@@ -977,9 +1108,7 @@ About page
         <ion-content has-header="true">
 			<p align="center">PROMOTIONS</p>
 				<button class="button button-small" ng-click="test()">Test Health Tip</button>
-				
-				
-				
+
         </ion-content>
       </ion-view>
     </script>
@@ -988,32 +1117,8 @@ About page
 	<!--CONTACT US PAGE-->
 	<script id="templates/contactus.html" type="text/ng-template">
       <ion-view title="Contact Us">
-		<ion-content has-header="true" style="padding-left:25px;">
-		
-			<!--CONTACT INFO-->
-			<div class"row">
-				<div class="col ion-location"><span style="font-size:18px;padding-left:10px;">Contact Us</span></div>
-			</div>
-			<div class"row">
-				<div class="col">
-					1 Marine Parade Central,<br/>
-					Parkway Centre,<br/>
-					Level - 13 - 09 (Above McDonald's)<br/>
-					Singapore 449408<br/>
-					<a href="tel:+6563480809">Call now: 63480809</a><br/>
-					<a href="mailto:enquiry@platinumyoga.com">Email now: enquiry@platinumyoga.com</a>
-				</div>
-			</div>
-			<br/>
-			<!--MAP INFO-->
-			<div class"row">
-				<div class="col ion-map"><span style="font-size:18px;padding-left:10px;">Location</span></div>
-			</div>
-			<div class"row">
-				<div class="col">
-					<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m8!1m3!1d15955.154086172972!2d103.905976!3d1.301807!3m2!1i1024!2i768!4f13.1!4m7!1i0!3e6!4m0!4m3!3m2!1d1.301807!2d103.905976!5e0!3m2!1sen!2sus!4v1419688502288" width="280" height="220" frameborder="0" style="border:0"></iframe>
-				</div>
-			</div>
+		<ion-content has-header="true">
+			<div ng-init="loadContact()"></div>
 		</ion-content>
       </ion-view>
     </script>
@@ -1021,13 +1126,44 @@ About page
 	
 	<!--FAQ PAGE-->
     <script id="templates/faq.html" type="text/ng-template">
-	<ion-view title="FAQ">
+	<ion-view title="Info/Etiquette">
 		<ion-content ng-controller="faqCtrl" has-header="true">
 			<!--top bar-->
+			<b>
 			<div class="button-bar">
-				<a style="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;" class="button button-small button-stable" href="#/yoga-app/faq">FAQ</a>
-				<a class="button button-small button-stable" href="#/yoga-app/about">About</a>	
+				<a style="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;" class="button button-small button-stable" href="#/yoga-app/faq"ng-click="showBeforeClass()" ><b>INFO/ETIQUETTE</b></a>
+				<a class="button button-small button-stable" href="#/yoga-app/about"><b>ABOUT</b></a>	
 			</div>
+			</b>
+			
+			<b>
+			<div class="button-bar">
+				<a class="button button-small button-stable" ng-click="showBeforeClass()"><b>BEFORE CLASS</b></a>
+				<a class="button button-small button-stable" ng-click="showDuringClass()"><b>DURING CLASS</b></a>	
+			</div>
+			</b>
+			
+			<div ng-show="displayBeforeClass">
+				<div class="list">
+					<div class="item wrap" ng-repeat="faqbefore in beforeClass">
+						<div class="row">
+							{{faqbefore}}<br/>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div ng-show="displayDuringClass">
+				<div class="list">
+					<div class="item wrap" ng-repeat="faqduring in duringClass">
+						<div class="row">
+							{{faqduring}}<br/>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<!--
 			<ion-list>
 				<div ng-repeat="group in groups">
 				  <ion-item class="item-stable"
@@ -1043,7 +1179,7 @@ About page
 					{{item}}
 				  </ion-item>
 				</div>
-			</ion-list>
+			</ion-list>-->
 		</ion-content>
 	</ion-view>
     </script>
@@ -1053,10 +1189,11 @@ About page
 	<ion-view title="About">
 		<ion-content ng-controller="aboutCtrl" has-header="true">
 			<!--top bar-->
+			<b>
 			<div class="button-bar">
-				<a class="button button-small button-stable" href="#/yoga-app/faq">FAQ</a>
-				<a class="button button-small button-stable" href="#/yoga-app/about" style="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;">About</a>	
-			</div>
+				<a class="button button-small button-stable" href="#/yoga-app/faq">INFO/ETIQUETTE</a>
+				<a class="button button-small button-stable" href="#/yoga-app/about" style="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;">ABOUT</a>	
+			</div></b>
 			<ion-list>
 				<div ng-repeat="group in groups">
 				  <ion-item class="item-stable"
@@ -1081,8 +1218,9 @@ About page
 	<script id="templates/barcode.html" type="text/ng-template">
       <ion-view title="Barcode">
         <ion-content has-header="true">
-			<img src="http://www.barcodes4.me/barcode/i2of5/{{userId}}.jpg?width=350&height=150&IsTextDrawn=2" style="padding-top:80px;padding-left:30px"/>
-			</div><!--<p align="center"><img src="img/barcode.jpg" width="100%"/></p>-->
+		<p align="left">
+			<img src="http://www.barcodes4.me/barcode/c39/{{userId}}.jpg?width=300&height=150&IsTextDrawn=2" style="padding-top:80px;padding-left:30px"/>
+			</p><!--<p align="center"><img src="img/barcode.jpg" width="100%"/></p>-->
         </ion-content>
       </ion-view>
     </script>
