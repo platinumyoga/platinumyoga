@@ -1737,9 +1737,8 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	
 	var upcoming = document.getElementById('showUpcoming');
 	var history = document.getElementById('showHistory');
-	upcoming.style.cssText ="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;";
+	upcoming.style.cssText ="background-color:#e87722; color:#ffffff;";
 	history.style.cssText ="background-color:#f8f8f8";
-	
 	
 	$scope.showUpcomingView = true;
 	$scope.showUpcoming = function(){
@@ -1747,7 +1746,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		$scope.showHistoryView = false;
 		$scope.showPurchase = false;
 		$scope.showWaitlist = false;
-		upcoming.style.cssText="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;";
+		upcoming.style.cssText="background-color:#f8f8f8;color:#e87722; border-bottom: thick solid #e87722;border-bottom-width:2px;";
 		history.style.cssText ="background-color:#f8f8f8";
 	};	
 	
@@ -1756,7 +1755,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		$scope.showWaitlist = false;
 		$scope.showPurchase = false;
 		$scope.showHistoryView = true;
-		history.style.cssText ="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;";
+		history.style.cssText ="background-color:#f8f8f8;color:#e87722; border-bottom: thick solid #e87722;border-bottom-width:2px;";
 		upcoming.style.cssText ="background-color:#f8f8f8";
 	};
 	
@@ -1782,8 +1781,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	$scope.showPurchaseHistory = function(){
 		$scope.showHistoryView = false;
 		$scope.showPurchase = true;
-	};
-	
+	};	
 	
 	$scope.review = function(){
 		$state.go("yoga-app.home");
