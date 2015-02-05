@@ -50,6 +50,15 @@ app.config(function($stateProvider, $urlRouterProvider) {
         }
       }
     })
+	.state('yoga-app.review', {
+      url: '/review',
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/review.html",
+		  controller: "reviewCtrl"
+        }
+      }
+    })
     .state('yoga-app.classes', {
       url: '/CLASSES',
       views: {
@@ -1651,7 +1660,7 @@ app.controller('barcodeCtrl',function($scope,userService){
 	$scope.userId = userService.getUserID();
 })
 
-app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$timeout,$ionicLoading,$interval,userService,userScheduleService,removeBookingService,waitlistService,removeWaitlistService,historyService,purchaseHistoryService,$ionicModal,feedbackDb,$firebase,removeAppointmentService,$localstorage){
+app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoading,userService,userScheduleService,removeBookingService,waitlistService,removeWaitlistService,historyService,purchaseHistoryService,$ionicModal,feedbackDb,$firebase,removeAppointmentService,$localstorage){
 	
 	$scope.userId = userService.getUserID();;
 	$scope.username = userService.getUsername();
@@ -1717,22 +1726,22 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 			$timeout(function () {
 			  $ionicLoading.hide();
 				retrieveScheduledClasses();
-			  }, 2900);
+			  }, 3000);
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				retrieveWaitlist();
-			  }, 2900);
+			  }, 3000);
 			  
 			  $timeout(function () {
 				$ionicLoading.hide();
 				retrieveUserHistory();
-			  }, 2900);
+			  }, 3000);
 			  
 			  $timeout(function () {
 				$ionicLoading.hide();
 				retrievePurchaseHistory();
-			  }, 2900);
+			  }, 3000);
 	  }
 	
 	var upcoming = document.getElementById('showUpcoming');
@@ -1785,7 +1794,8 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 	
 	$scope.review = function(){
 		$state.go("yoga-app.home");
-		$scope.showHistory();
+		$scope.showUpcomingView = false;
+		$scope.showHistoryView = true;
 	};	
 	
 	
@@ -1909,15 +1919,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 			break;
 		}
 	  }
-	  
-	  $scope.starsTotal=[];
-	  var count = 0;
-	  for(var c=0;c<$scope.userStars;c++){
-		$scope.starsTotal[count]=1;
-		count=count+1;
-	  }
-	  //alert($scope.starsTotal.length);
-	  
+
 	  if($scope.userFeeds!=""){
 		$scope.displayReviews = true;
 	  }
@@ -1988,6 +1990,185 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$ionicViewService,$
 		
     };	  
 })
+
+
+
+app.controller('reviewCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoading,userService,userScheduleService,historyService,$ionicModal,feedbackDb,$firebase,$localstorage){
+	
+	$scope.userId = userService.getUserID();;
+	$scope.username = userService.getUsername();
+	$scope.displayReviews = false;
+
+	var retrieveUserHistory = function(){
+		//retrieve user's history
+		historyService.getUserHistory($scope.userId);
+		$scope.userHistory = historyService.getUserHistoryResponse();
+	};
+	
+
+	// Setup the loader
+	  $ionicLoading.show({
+		content: 'Loading',
+		animation: 'fade-in',
+		showBackdrop: true,
+		maxWidth: 200,
+		showDelay: 0
+	  });
+	  
+	  $timeout(function () {
+		$ionicLoading.hide();
+		retrieveUserHistory();
+	  }, 3000);
+
+	
+	//pull from healhtips DB (start)
+	var arrayList = new Array();
+	$scope.healthtip = function(){
+		var healthtipsLink = new Firebase("https://healthtipstinkertest.firebaseio.com/");
+		healthtipsLink.once('value', function(allMessagesSnapshot) {
+			allMessagesSnapshot.forEach(function(messageSnapshot) {
+				 // Will be called with a messageSnapshot for each message under message_list.
+					var message = messageSnapshot.child('tips').val();
+					arrayList.push(message);
+			});
+			  
+		   var randomnumber = Math.floor(Math.random() * (arrayList.length));
+			
+			   var alertPopup2 = $ionicPopup.alert({
+				 title: 'Health Tip',
+				 subTitle: 'Thank you for your review!',
+				 template: arrayList[randomnumber]
+			   });
+			   alertPopup2.then(function(res) {});
+			   
+		});
+	};
+	//pull from healhtips DB (end)
+	
+	
+    //MODAL START
+	$ionicModal.fromTemplateUrl('review-modal.html', {
+		scope: $scope,
+		animation: 'slide-in-up'
+	  }).then(function(modal) {
+		$scope.modal = modal;
+	  });
+	  $scope.openModal = function() {
+		$scope.modal.show();
+	  };
+	  $scope.closeModal = function() {
+		$scope.modal.hide();
+	  };
+	  //Cleanup the modal when we're done with it!
+	  $scope.$on('$destroy', function() {
+		$scope.modal.remove();
+	  });
+	  // Execute action on hide modal
+	  $scope.$on('modal.hidden', function() {
+		// Execute action
+	  });
+	  // Execute action on remove modal
+	  $scope.$on('modal.removed', function() {
+		// Execute action
+	  });
+	  //MODAL END
+	  
+	  
+	  $scope.writeReview = function(history){
+	  $scope.displayReviews = false;
+		//alert(JSON.stringify(history));
+		$scope.historyId = history.ID;
+		$scope.lessonName = history.Name;
+		$scope.staffName = history.Staff.Name;
+		$scope.classID = history.ClassID;
+		//alert("class ID:"+$scope.classID);
+		$scope.appointmentID = history.AppointmentID;
+		//alert("appt ID:"+$scope.appointmentID);
+		$scope.openModal();
+		
+		//loading the feedback/review DB
+	  $scope.feedbacks = feedbackDb.getFeedbackData();
+	  var a=0;
+	  $scope.userFeeds="";
+	  for(var b=0;b<$scope.feedbacks.length;b++){
+		if($scope.feedbacks[b].userid==$scope.userId && $scope.feedbacks[b].historyid==$scope.historyId){
+			$scope.userFeeds = $scope.feedbacks[b];
+			break;
+		}
+	  }
+
+	  if($scope.userFeeds!=""){
+		$scope.displayReviews = true;
+	  }
+	};
+	
+	  
+	  //saving to feedback database
+	   $scope.addReview = function(review) {
+		//alert(review.stars);
+		var result = 0;
+		
+		if(review.feedback==""){
+			result = 1;
+		}
+		
+		//alert(review.booking);
+	 for(var b=0;b<$scope.feedbacks.length;b++){
+		if($scope.feedbacks[b].userid==$scope.userId && $scope.feedbacks[b].historyid==$scope.historyId){
+		   result = 1;
+		   break;
+		}
+	  }
+		
+		if(result==0){
+		
+			var save = $scope.feedbacks.$add({
+           // booking:review.booking,
+		   historyid:$scope.historyId,
+		   userid:$scope.userId,
+		   username:$scope.username,
+		   classid:$scope.classID,
+		   appointmentid:$scope.appointmentID,
+		   lesson:$scope.lessonName,
+		   staff:$scope.staffName,
+           feedback:review.feedback,
+		   stars:review.stars
+			});
+			
+			//review.booking = "";
+			review.feedback = "";
+			review.stars = 0;
+			
+			//alert
+			/*var alertPopup = $ionicPopup.alert({
+			 title: 'Review',
+			 template: "Review has been posted!"
+		   });
+		   alertPopup.then(function(res) {});
+		   alertPopup.close();*/
+		   $scope.healthtip();
+		}
+	  	
+		
+		if(save) {
+		  $scope.closeModal();
+		  review.feedback = "";
+		  review.stars = 0;
+		} else {
+			review.feedback = "";
+			review.stars = 0;
+		  var alert1 = $ionicPopup.alert({
+			 title: 'Review',
+			 template: "Sorry, you can only review once per class."
+		   });
+		   alert1.then(function(res) {});
+		   $scope.closeModal();
+		}
+    };	  
+})
+
+
+
 
 app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesService,userService,feedbackDb,$ionicModal,$timeout,$ionicLoading) {
 	$scope.totalClasses = classesService.getClasses();
@@ -2183,7 +2364,6 @@ app.controller('eventsCtrl',function($scope,$stateParams,$ionicPopup,userService
 	//load this method on initialisation
 	$scope.loadSpecialEvents = function(){
 			window.open('http://www.platinumyoga.com/pages/special-events', '_blank', 'location=yes');
-			$state.go("yoga-app.home");
 	};
 
 	/*
@@ -2397,7 +2577,7 @@ app.controller('aboutCtrl',function($scope){
 	
 })
 
-app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,sessionService,$stateParams,sessionStaffService,$ionicModal,$ionicPopup,userService,bookApptService){
+app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,sessionService,$stateParams,sessionStaffService,$ionicModal,$ionicPopup,userService,bookApptService,$ionicLoading,$timeout){
 	$scope.sessionTypes = sessionService.getSessionResponse();
 	$scope.sessionID = $stateParams.sessionTypeID;
 	$scope.displayTime = true;
@@ -2446,10 +2626,23 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 				}
 			}
 			
-			$scope.schedules = appointmentService.getApptResponse();
+			if(appointmentService.getApptResponse()==null || appointmentService.getApptResponse()=="") {
+				
+					// Setup the loader
+				  $ionicLoading.show({
+					content: 'Loading',
+					animation: 'fade-in',
+					showBackdrop: true,
+					maxWidth: 200,
+					showDelay: 0
+				  });
+	 
+				  $timeout(function () {
+				  $ionicLoading.hide();
+				$scope.schedules = appointmentService.getApptResponse();
+				  }, 5000);
+			}
 			$scope.openModal();
-			//$scope.displayTime = true;
-			
 	};  
 	   
 	   //MODAL START

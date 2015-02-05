@@ -169,9 +169,9 @@ About page
 								<i class="icon ion-man custom-icon" style="padding-top:2px;"></></i>
 							  </a>
 							  <!--review-->
-							  <div class="tab-item" ng-click="review()" ng-controller="homeCtrl">
+							  <a class="tab-item" href="#yoga-app/review" ng-click="" ng-controller="reviewCtrl">
 								<i class="icon ion-star custom-icon" style="padding-top:2px;"></></i>
-							  </div>
+							  </a>
 							 
 					</ion-tabs>
 				</ion-footer-bar>
@@ -220,7 +220,7 @@ About page
 			  <a href="#/yoga-app/faq" class="item item-icon-left" menu-close>
 			  <i class="icon ion-clipboard"></i>INFO/ETIQUETTE</a>
 			  
-			  <a href="" class="item item-icon-left" ng-click="window.open('http://www.platinumyoga.com/pages/location-map', '_blank', 'location=yes','closebuttoncaption=back')" menu-close><i class="icon ion-map"></i>
+			  <a href="" class="item item-icon-left" ng-click="loadContact()" menu-close><i class="icon ion-map"></i>
 			  CONTACT US</a>
 			  
 			  <a href="#/login" class="item item-icon-left" ng-click="logout()" menu-close>
@@ -348,6 +348,37 @@ About page
     </script>
 	
 	
+	
+	<!--REVIEW PAGE-->
+    <script id="templates/review.html" type="text/ng-template">
+      <ion-view title="REVIEW">
+			<ion-content has-header="true">
+				<!--list showing the history-->
+				HERE
+				<div class="list">
+					<div class="item" ng-repeat="history in userHistory">
+						<div class="row">
+							<div class="col col-67">
+							{{(history.StartDateTime).slice(0,10)}}<br/>
+							<b>Lesson:</b>&nbsp;{{history.Name}}<br/>
+							<b>Staff:</b>&nbsp;{{history.Staff.Name}}<br/>
+							<b>Attendance:&nbsp;</b>
+							<span ng-show={{history.SignedIn}}>Present</span>
+							<span ng-show=!{{history.SignedIn}}>Absent</span>
+							</div>
+							<div class="col col-33">
+								<div class="button button-small" ng-click="writeReview({{history}})">Review</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</ion-content>
+      </ion-view>
+    </script>
+	
+	
+	
 	<!--SHOW REVIEW MODAL-->
 	<script id="review-modal.html" type="text/ng-template">
 	  <ion-modal-view>
@@ -388,11 +419,6 @@ About page
 					<div class="row">
 						<div class="col">
 								{{userFeeds.feedback}}
-								<!--
-								<div class="item" ng-repeat="star in starsTotal">
-								<div class="row">
-										{{star}}<img src="star-on.png"/></div>
-								</div>-->
 								<span ng-repeat="n in [] | range:userFeeds.stars"><img src="star-on.png"/></span>
 						</div>
 					</div>
@@ -784,7 +810,7 @@ About page
         <ion-content has-header="true">
 		
 			<!--pull to refresh workshops(start)-->
-			<ion-refresher on-refresh=""></ion-refresher>
+			<ion-refresher on-refresh="refreshRetreats()"></ion-refresher>
 			<!--pull to refresh workshops(end)-->
 		
 			<div class="list">
