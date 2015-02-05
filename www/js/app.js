@@ -113,7 +113,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
         }
       }
     })
-	.state('yoga-app.retreat', {
+	.state('yoga-app.retreats', {
       url: '/RETREATS/TT',
       views: {
         'menuContent' :{
