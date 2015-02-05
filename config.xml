@@ -17,8 +17,6 @@
   <feature name="StatusBar">
     <param name="ios-package" value="CDVStatusBar" onload="true"/>
   </feature>
- 
-  
   
   <icon src="icons/android/res/drawable-hdpi/appicon.png" />
   
