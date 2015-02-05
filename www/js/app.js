@@ -2364,6 +2364,7 @@ app.controller('eventsCtrl',function($scope,$stateParams,$ionicPopup,userService
 	//load this method on initialisation
 	$scope.loadSpecialEvents = function(){
 			window.open('http://www.platinumyoga.com/pages/special-events', '_blank', 'location=yes');
+			$state.go("yoga-app.classes");
 	};
 
 	/*
