@@ -18,12 +18,12 @@
   <preference name="orientation" value="portrait" />
   
   
-  
-  
   <!--phonegap plugin for inapp browser-->
   <gap:plugin name="org.apache.cordova.inappbrowser" version="0.1.0" />
   <gap:plugin name="org.apache.cordova.splashscreen" version="0.1.0" />
-  <gap:plugin name="com.phonegap.plugins.pushplugin" version="2.1.1" />
+  <gap:plugin name="com.pushwoosh.plugins.pushwoosh" version="3.4.2" />
+  
+  <access origin="*.pushwoosh.com" />
   
   <feature name="StatusBar">
     <param name="ios-package" value="CDVStatusBar" onload="true"/>
