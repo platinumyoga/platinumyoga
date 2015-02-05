@@ -1394,15 +1394,15 @@ app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate,
 	};
 	
 	$scope.loadContact = function(){
-		window.open('http://www.platinumyoga.com/pages/location-map', '_blank', 'location=yes');
+		window.open('http://www.platinumyoga.com/pages/location-map', '_blank', 'location=yes','closebuttoncaption=back');
 	};
 	
 	$scope.loadPromotions = function(){
-		window.open('http://www.platinumyoga.com/pages/promotion', '_blank', 'location=yes');
+		window.open('http://www.platinumyoga.com/pages/promotion', '_blank', 'location=yes','closebuttoncaption=back');
 	};
 	
 	$scope.loadPrivileges = function(){
-		window.open('http://www.platinumyoga.com/pages/platinum-yoga-rewards', '_blank', 'location=yes');
+		window.open('http://www.platinumyoga.com/pages/platinum-yoga-rewards', '_blank', 'location=yes','closebuttoncaption=back');
 	};
 	
 	/*$scope.goBack = function() {
