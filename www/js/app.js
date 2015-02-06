@@ -2441,11 +2441,11 @@ app.controller('challengesCtrl',function($scope,$stateParams,$ionicPopup,userSer
 })
 
 app.controller('faqCtrl',function($scope,faqDb,$ionicLoading,$timeout,$state,$localstorage){
-	if($localstorage.get('beforeClassRules')!=null ){
+	if($localstorage.get('beforeClassRules')!=null && $localstorage.get('beforeClassRules')!==""){
 		$scope.beforeClass = JSON.parse($localstorage.get('beforeClassRules'));
 	}
 	
-	if($localstorage.get('duringClassRules')!=null ){
+	if($localstorage.get('duringClassRules')!=null && $localstorage.get('duringClassRules')!==""){
 		$scope.duringClass = JSON.parse($localstorage.get('duringClassRules'));
 	 }
 	  
