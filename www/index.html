@@ -261,7 +261,7 @@ About page
 					</div>
 					</b>
 					
-					<div class="item" ng-repeat="class in scheduledClasses">
+					<div class="item wrap" ng-repeat="class in scheduledClasses">
 						<div class="row">
 							<div class="col col-67">
 							{{(class.StartDateTime).slice(0,10)}}&nbsp;{{(class.StartDateTime).slice(11,16)}}<br/>
@@ -284,7 +284,7 @@ About page
 					</b>
 					
 					
-					<div class="item" ng-repeat="class in waitlist">
+					<div class="item wrap" ng-repeat="class in waitlist">
 						<div class="row">
 							<div class="col col-67">
 								{{(class.ClassDate).slice(0,10)}}&nbsp;{{(class.ClassSchedule.StartTime).slice(12,19)}}<br/>
@@ -309,7 +309,7 @@ About page
 					</div>
 					</b>
 					
-					<div class="item" ng-repeat="history in userHistory">
+					<div class="item wrap" ng-repeat="history in userHistory">
 						<div class="row">
 							<div class="col col-67">
 							{{(history.StartDateTime).slice(0,10)}}<br/>
@@ -336,7 +336,7 @@ About page
 					</div>
 					</b>
 					
-					<div class="item" ng-repeat="item in saleItems">
+					<div class="item wrap" ng-repeat="item in saleItems">
 						{{(item.Sale.SaleDate).slice(0,10)}}<br/>
 						<b>Item:</b>{{item.Description}}<br/>
 						<b>Price:</b>{{item.Price}}<br/>
@@ -356,7 +356,7 @@ About page
 			<ion-content has-header="true">
 				<!--list showing the history-->
 				<div class="list">
-					<div class="item" ng-repeat="history in userHistory">
+					<div class="item wrap" ng-repeat="history in userHistory">
 						<div class="row">
 							<div class="col col-67">
 							{{(history.StartDateTime).slice(0,10)}}<br/>
@@ -367,7 +367,7 @@ About page
 							<span ng-show=!{{history.SignedIn}}>Absent</span>
 							</div>
 							<div class="col col-33">
-								<div class="button button-small" ng-click="writeReview({{history}})">Review</div>
+								<div class="button button-small" ng-click="writeReview({{history}})" ng-show={{history.SignedIn}}>Review</div>
 							</div>
 						</div>
 					</div>
@@ -456,7 +456,7 @@ About page
 				</div>
 			
 				<div class="list">
-					<div class="item" ng-repeat="class in totalClasses | orderBy:'StartDateTime'| filter:(date) | filter:(selectedOption.value)|contains:search">
+					<div class="item wrap" ng-repeat="class in totalClasses | orderBy:'StartDateTime'| filter:(date) | filter:(selectedOption.value)|contains:search">
 					<div class="row">
 						<div class="col col-75">
 							<a href="#/yoga-app/selectedClass/{{class.ID}}">
@@ -540,23 +540,6 @@ About page
       </ion-view>
     </script>
 	
-	<!--CLASS RATING STARS SCRIPT (for selected class)-->
-	<script type="text/javascript">
-		$(function(){
-		$('#review1').raty(
-			{
-				half: true,
-				target: '#result1',
-				targetKeep: true,
-				score: function()
-				{
-					return $(this).attr('data-score');
-				}
-			});
-		});
-	</script>
-	
-	
 	
 	<!--SHOW REVIEW MODAL-->
 	<script id="classReviews_modal.html" type="text/ng-template">
@@ -624,18 +607,20 @@ About page
 				<div class="bar bar-header item-input-inset">
 					<ion-search placeholder="Search for workshop" filter="search"></ion-search>
 				</div>		
-					<div class="row" ng-repeat="workshop in workShopsData | filter:search.value">
-							<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
-								<a href="#/yoga-app/selectedWorkshop/{{workshop.ID}}">
-								<b>{{workshop.ClassDescription.Name}}</b><br/>
-								{{(workshop.StartDate).slice(0,10)}}<br/>
-								{{(workshop.StartTime).slice(11,16)}} - {{(workshop.EndTime).slice(11,16)}}<br/>
-								{{workshop.Staff.Name}} <br/>
-								<!--Workshop ID:&nbsp;{{workshop.ID}}-->
-								</a>
-							</div>
-							<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
-								<button class="button-right button-stable col" ng-click="bookSelectedWorkshop({{workshop.ID}},{{userID}})">Book</button>
+					<div class="item wrap" ng-repeat="workshop in workShopsData | filter:search.value">
+						<div class="row">
+								<div class="col col-67">
+									<a href="#/yoga-app/selectedWorkshop/{{workshop.ID}}">
+									<b>{{workshop.ClassDescription.Name}}</b><br/>
+									{{(workshop.StartDate).slice(0,10)}}<br/>
+									{{(workshop.StartTime).slice(11,16)}} - {{(workshop.EndTime).slice(11,16)}}<br/>
+									{{workshop.Staff.Name}} <br/>
+									<!--Workshop ID:&nbsp;{{workshop.ID}}-->
+									</a>
+								</div>
+								<div class="col col-center col-33">
+									<button class="button-right button-stable col" ng-click="bookSelectedWorkshop({{workshop.ID}},{{userID}})" ng-show={{workshop.IsAvailable}}>Book</button>
+								</div>
 							</div>
 					</div>
 				</div>
@@ -819,8 +804,9 @@ About page
 				<div class="bar bar-header item-input-inset">
 					<ion-search placeholder="Search for retreats/TT" filter="search"></ion-search>
 				</div>		
-					<div class="row" ng-repeat="retreat in retreatsData | filter:search.value">
-							<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
+					<div class="item wrap" ng-repeat="retreat in retreatsData | filter:search.value">
+						<div class="row">
+							<div class="col col-67">
 								<a href="#/yoga-app/selectedRetreat/{{retreat.ID}}">
 								<b>{{retreat.ClassDescription.Name}}</b><br/>
 								{{(retreat.StartDate).slice(0,10)}}<br/>
@@ -829,8 +815,10 @@ About page
 								<!--Retreat ID:&nbsp;{{retreat.ID}}-->
 								</a>
 							</div>
-							<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
-								<button class="button-right button-stable col" ng-click="bookRetreatNow({{retreat.ID}},{{userID}})">Book</button>
+							<div class="col col-center col-33">
+								<button class="button-right button-stable col" ng-click="bookRetreatNow({{retreat.ID}},{{userID}})" ng-show={{retreat.IsAvailable}}>Book</button>
+							</div>
+							
 							</div>
 					</div>
 				</div>
