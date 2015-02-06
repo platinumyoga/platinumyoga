@@ -967,18 +967,17 @@ About page
 		</div>
 		
 			<!--list showing instructors free timeslots-->
-			<div class="list" ng-show="displayTime">
 			<b>Available Timeslots for {{date}}:</b><br/>
+			<div class="list" ng-show="displayTime">
 				<div class="item" ng-repeat="schedule in schedules">
 						<a style="color:green" ng-click="showPopup(schedule)">
-							{{schedule.slice(11, 18)}}0
+							{{schedule.slice(11, 19)}}
 						</a>
 				</div>
 			</div>
 		</ion-content>
 	  </ion-modal-view>
 	</script>
-	
 	
 	
 	<!--CHALLENGES PAGE(under workshops but has its own tab)-->

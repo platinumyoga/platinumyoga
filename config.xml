@@ -21,7 +21,7 @@
   <!--phonegap plugin for inapp browser-->
   <gap:plugin name="org.apache.cordova.inappbrowser" version="0.1.0" />
   <gap:plugin name="org.apache.cordova.splashscreen" version="0.1.0" />
-  <gap:plugin name="com.pushwoosh.plugins.pushwoosh" version="3.4.2" />
+  <gap:plugin name="com.phonegap.plugins.pushplugin" version="2.4.0" />
   
   <access origin="*.pushwoosh.com" />
   

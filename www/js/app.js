@@ -451,7 +451,7 @@ app.factory('retreatsService',function($http,$ionicPopup,userScheduleService){
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
 				retreatsDatabase = data;
-				console.log(JSON.stringify(retreatsDatabase));
+				//console.log(JSON.stringify(retreatsDatabase));
 			})
 		},
 		getRetreats:function(){
@@ -752,7 +752,7 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
 
 .run(function($localstorage,userService){
    if($localstorage.get('name')==null){
-    console.log("namenull");
+    //console.log("namenull");
   }else{
 	  var userInfo = {};	
 	  userInfo.username = $localstorage.get('name');
@@ -1045,7 +1045,7 @@ app.factory('removeAppointmentService',function($http,userScheduleService,$ionic
 
 			/* Check whether the HTTP Request is successful or not. */
 			request2.success(function (data) {
-				console.log(data);
+				//console.log(data);
 					  
 				if(data.AddOrUpdateAppointmentsResult.ErrorCode===200){
 					 userScheduleService.getUserSchedule(userId);
@@ -1175,10 +1175,11 @@ app.factory('purchaseHistoryService', function($http) {
 })
 
 
-app.factory('appointmentService',function($http){
+app.factory('appointmentService',function($http,$ionicLoading,$timeout){
 var timeslots = [];
+var check = "";
 	return {
-		getAppointments: function(sessionTypeID,instructorID,chosenDate){
+		getAppointments: function(sessionTypeID,instructorID){
 			var request = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/getAppointments.php",
@@ -1193,12 +1194,16 @@ var timeslots = [];
 
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
-				apptDatabase = data.ScheduleItems.ScheduleItem;
-				console.log(JSON.stringify(apptDatabase));
+			
+			apptDatabase = data.ScheduleItems.ScheduleItem;
+			alert(JSON.stringify(apptDatabase));
+			//alert("main");
+			//console.log("main data");
+			//console.log(apptDatabase);
+			
+				//console.log(JSON.stringify(apptDatabase));
 				//alert(JSON.stringify(apptDatabase.ScheduleItems.ScheduleItem));
 				//alert(JSON.stringify(apptDatabase));
-				
-				
 				
 			var availSlots = [];
 			var j=0;
@@ -1211,8 +1216,7 @@ var timeslots = [];
 					j++;
 				}
 			}
-			
-			
+
 			var k=0;
 			
 			for(var a=0;a<availSlots.length;a++){
@@ -1255,9 +1259,55 @@ var timeslots = [];
             })
 		},
 		getApptResponse:function(){
+		
+				if(timeslots.length == 0){
+				alert("initiate loading");
+				// Setup the loader
+				  $ionicLoading.show({
+					content: 'Loading',
+					animation: 'fade-in',
+					showBackdrop: true,
+					maxWidth: 200,
+					showDelay: 0
+				  });
+
+				  // Set a timeout to clear loader, however you would actually call the $ionicLoading.hide(); method whenever everything is ready or loaded.
+				  //alert("slow");
+				  $timeout(function () {
+				  $ionicLoading.hide();
+					retrieveScheduledClasses();
+				  }, 14500);
+			}
+		
 			return timeslots;
 		},
 		getApptResponse1:function(chosendate){
+		
+
+			alert("sub start");
+			//alert(apptDatabase);
+		if(typeof apptDatabase == 'undefined'){
+				alert("initiate loading");
+				// Setup the loader
+				  $ionicLoading.show({
+					content: 'Loading',
+					animation: 'fade-in',
+					showBackdrop: true,
+					maxWidth: 200,
+					showDelay: 0
+				  });
+
+				  // Set a timeout to clear loader, however you would actually call the $ionicLoading.hide(); method whenever everything is ready or loaded.
+				  //alert("slow");
+				  $timeout(function () {
+				  $ionicLoading.hide();
+					retrieveScheduledClasses();
+				  }, 14500);
+			}
+			
+			
+		
+		
 			var availSlots = [];
 			var j=0;
 			
@@ -1297,7 +1347,7 @@ var timeslots = [];
 			}
 			//console.log(timeSlots);
 			return timeSlots;
-		}
+		}	
 	}
 })
 
@@ -2581,23 +2631,13 @@ app.controller('aboutCtrl',function($scope){
 app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,sessionService,$stateParams,sessionStaffService,$ionicModal,$ionicPopup,userService,bookApptService,$ionicLoading,$timeout){
 	$scope.sessionTypes = sessionService.getSessionResponse();
 	$scope.sessionID = $stateParams.sessionTypeID;
-	$scope.displayTime = true;
-	$scope.displayDate = true;
+	//$scope.displayDate = true;
+	$scope.displayTime = false;
 	
 	$scope.selectedInstructor = function(){
 		//sessionStaffService.getSessionStaff($scope.sessionID);
 		$scope.instructors = sessionStaffService.getSessionStaffResponse();
 	};
-	
-	$scope.showDate = function(){
-		$scope.displayTime = false;
-		$scope.displayDate = true;
-	};
-	
-	$scope.showTime = function(){
-		$scope.displayTime = true;
-		$scope.displayDate = false;
-	};   
 	
 	//calendar start
 		  var today = new Date();
@@ -2614,39 +2654,9 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 		  $scope.maxDate = '2015-12-04';
 		  $scope.disabledDates = ['2014-11-19'];
 		   //calender end
-	
-	
-	$scope.bookInstructor = function(sessionID,instructor){
-		$scope.instructorVar = instructor;
-		$scope.sessionName = sessionService.getSessionName(sessionID);
-		//call this earlier to attain the timeslots faster
-		appointmentService.getAppointments($scope.sessionID,$scope.instructorVar.ID,$scope.date);
-			for(var i=0;i<$scope.instructors.length;i++){
-				if($scope.instructors[i].ID==instructor.ID){
-					$scope.instructorName = $scope.instructors[i].Name;
-				}
-			}
-			
-			if(appointmentService.getApptResponse()==null || appointmentService.getApptResponse()=="") {
-				
-					// Setup the loader
-				  $ionicLoading.show({
-					content: 'Loading',
-					animation: 'fade-in',
-					showBackdrop: true,
-					maxWidth: 200,
-					showDelay: 0
-				  });
-	 
-				  $timeout(function () {
-				  $ionicLoading.hide();
-				$scope.schedules = appointmentService.getApptResponse();
-				  }, 5000);
-			}
-			$scope.openModal();
-	};  
-	   
-	   //MODAL START
+		   
+		   
+    //MODAL START
 	$ionicModal.fromTemplateUrl('my-modal.html', {
 		scope: $scope,
 		animation: 'slide-in-up'
@@ -2674,7 +2684,20 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 	  //MODAL END
 	
 	
-	
+	$scope.bookInstructor = function(sessionID,instructor){
+		$scope.instructorVar = instructor;
+		$scope.sessionName = sessionService.getSessionName(sessionID);
+		//call this earlier to attain the timeslots faster
+		appointmentService.getAppointments($scope.sessionID,$scope.instructorVar.ID,$scope.date);
+			for(var i=0;i<$scope.instructors.length;i++){
+				if($scope.instructors[i].ID==instructor.ID){
+					$scope.instructorName = $scope.instructors[i].Name;
+				}
+			}
+
+			$scope.schedules = appointmentService.getApptResponse();
+			$scope.openModal();
+	};	
 	
 	//when a date is selected
 	$scope.selectedDate=function(date){
