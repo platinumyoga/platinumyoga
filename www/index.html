@@ -320,8 +320,8 @@ About page
 							<span ng-show=!{{history.SignedIn}}>Absent</span>
 							</div>
 							
-							<div class="col col-33" ng-show={{history.SignedIn}}>
-								<div class="button button-small" ng-click="writeReview({{history}})">Review</div>
+							<div class="col col-33">
+								<div class="button button-small" ng-click="writeReview({{history}})" ng-show={{history.SignedIn}}>Review</div>
 							</div>
 						</div>
 					</div>
@@ -468,8 +468,8 @@ About page
 							<!--{{class.MaxCapacity-class.TotalBooked}} available-->
 							</a>
 						</div>
-						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;" ng-show={{class.IsAvailable}}>
-							<button class="button-right button-stable col" ng-click="bookClass({{class.ID}},{{userID}})">Book</button>
+						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
+							<button class="button-right button-stable col" ng-click="bookClass({{class.ID}},{{userID}})" ng-show={{class.IsAvailable}}>Book</button>
 						</div>
 					</div>
 				</div>
