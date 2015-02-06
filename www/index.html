@@ -457,8 +457,9 @@ About page
 				</div>
 			
 				<div class="list">
-					<div class="row" ng-repeat="class in totalClasses | orderBy:'StartDateTime'| filter:(date) | filter:(selectedOption.value)|contains:search">
-						<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
+					<div class="item" ng-repeat="class in totalClasses | orderBy:'StartDateTime'| filter:(date) | filter:(selectedOption.value)|contains:search">
+					<div class="row">
+						<div class="col col-75">
 							<a href="#/yoga-app/selectedClass/{{class.ID}}">
 							<b>{{class.ClassDescription.Name}}</b><br/>			
 							{{(class.StartDateTime).slice(0,10)}}<br/>
@@ -468,9 +469,9 @@ About page
 							<!--{{class.MaxCapacity-class.TotalBooked}} available-->
 							</a>
 						</div>
-						<div class="item col col-center col-33" style="padding-top:45px;padding-bottom:43px;border-left-style: none;">
-							<button class="button-right button-stable col" ng-click="bookClass({{class.ID}},{{userID}})" ng-show={{class.IsAvailable}}>Book</button>
-							<button class="button-right button-stable col" ng-click="" ng-show=!{{class.IsAvailable}}>Not Avail</button>
+						<div class="col col-center col-25">
+							<button class="button-right button-stable" ng-click="bookClass({{class.ID}},{{userID}})" ng-show={{class.IsAvailable}}>Book</button>
+						</div>
 						</div>
 					</div>
 				</div>
@@ -933,12 +934,13 @@ About page
 				<div class="item" ng-repeat="instructor in instructors">
 					<div class="row">
 					  <div class="col col-25">
-						<img src="{{instructor.ImageURL}}" width="60px"/></div>	
-							<div class="col col-75">
+						<img src="{{instructor.ImageURL}}" width="65px" height="65px"/>
+						</div>	
+							<div class="col col-50">
 							  <h2>{{instructor.FirstName}} {{instructor.LastName}}</h2>
-							  <br/>
-							  <!--<a class="button" href="#/yoga-app/selectedSessionStaff/{{instructor.ID}}" ng-click="bookInstructor({{sessionID}},{{instructor.ID}})">Book</a>-->
-							  <div class="button button-small" ng-click="bookInstructor({{sessionID}},{{instructor}})"> Book </a>
+							  </div>
+							  <div class="col col-center col-25">
+							  <button class="button-right button-stable" ng-click="bookInstructor({{sessionID}},{{instructor}})"> Book </button>
 							  </div>
 							</div>
 					</div>
