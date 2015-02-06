@@ -1196,22 +1196,12 @@ var check = "";
 			request.success(function (data) {
 			
 			apptDatabase = data.ScheduleItems.ScheduleItem;
-			alert(JSON.stringify(apptDatabase));
-			//alert("main");
-			//console.log("main data");
-			//console.log(apptDatabase);
-			
-				//console.log(JSON.stringify(apptDatabase));
-				//alert(JSON.stringify(apptDatabase.ScheduleItems.ScheduleItem));
-				//alert(JSON.stringify(apptDatabase));
-				
+		
 			var availSlots = [];
 			var j=0;
 			
 			for(var i=0;i<apptDatabase.length;i++){
 				if(apptDatabase[i].StartDateTime.slice(0,10)==chosenDate){
-					//alert("Start date:"+apptDatabase[i].StartDateTime);
-					//alert("End date:"+apptDatabase[i].EndDateTime);
 					availSlots[j]=apptDatabase[i];
 					j++;
 				}
@@ -1220,9 +1210,7 @@ var check = "";
 			var k=0;
 			
 			for(var a=0;a<availSlots.length;a++){
-				//alert(availSlots[a].StartDateTime.slice(0,19).toString());
-				//alert(availSlots[a].EndDateTime.slice(0,19).toString());
-				
+
 				var startDate = new Date(availSlots[a].StartDateTime.slice(0,19).toString());
 				var hr1 = startDate.getHours();
 				startDate.setHours(hr1-8);
@@ -1230,17 +1218,14 @@ var check = "";
 				var endDate = new Date(availSlots[a].EndDateTime.slice(0,19).toString());
 				var hr2 = endDate.getHours();
 				endDate.setHours(hr2-9);
-				//alert("new start: "+startDate);
-				//alert("new end: "+endDate);
+
 				
 				//the new dates are malaysian times, converted from the api string by sun system.
 					
 					while(startDate.getTime()<=endDate.getTime()){
-						//alert(startDate.getTime());
-						//alert(endDate.getTime());
+
 						timeslots[k]=chosenDate+" "+startDate.toString().slice(16,24);
-						//alert("save"+startDate);
-						//alert("1: "+startDate);
+
 						var newValue = "";
 						if(startDate.getMinutes()==15 || startDate.getMinutes()==45){
 							newValue = startDate.getMinutes()+15;
@@ -1261,7 +1246,6 @@ var check = "";
 		getApptResponse:function(){
 		
 				if(timeslots.length == 0){
-				alert("initiate loading");
 				// Setup the loader
 				  $ionicLoading.show({
 					content: 'Loading',
@@ -1282,12 +1266,9 @@ var check = "";
 			return timeslots;
 		},
 		getApptResponse1:function(chosendate){
-		
 
-			alert("sub start");
 			//alert(apptDatabase);
 		if(typeof apptDatabase == 'undefined'){
-				alert("initiate loading");
 				// Setup the loader
 				  $ionicLoading.show({
 					content: 'Loading',
@@ -1304,9 +1285,7 @@ var check = "";
 					retrieveScheduledClasses();
 				  }, 14500);
 			}
-			
-			
-		
+
 		
 			var availSlots = [];
 			var j=0;
