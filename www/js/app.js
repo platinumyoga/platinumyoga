@@ -2271,7 +2271,7 @@ app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesSe
 	
 	$scope.selectedStaff = classesService.getClassStaff($stateParams.classStaffID);
 	
-	$scope.options = [{ name: "Beginner", value: "Beginner"}, { name: "Intermediate", value: "Intermediate"}, { name: "Advanced", value: "Advanced"}, {name: "All", value: ""}];
+	$scope.options = [{ name: "Beginner", value: "Beginner"}, { name: "Advanced", value: "Advanced"},{ name: "Multi-level", value: "Multi-level"},{name: "All", value: ""}];
 	$scope.selectedOption = $scope.options[0].value;	
 	
 	
