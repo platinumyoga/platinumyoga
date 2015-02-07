@@ -2831,10 +2831,11 @@ a.subdued {
     background-color: #e87722;
     color: #000000;
 	letter-spacing: 1.25px;
-	font-weight: 900;}
+	font-weight: bold;}
     .bar.bar-energized .title {
       color: #000000;
-	  letter-spacing: 1.25px;}
+	  letter-spacing: 1.25px;
+	  font-weight: bold;}
     .bar.bar-energized.bar-footer {
       background-image: linear-gradient(180deg, #ffb976, #ffb976 50%, transparent 50%); }
   .bar.bar-royal {

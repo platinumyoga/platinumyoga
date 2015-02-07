@@ -1782,9 +1782,10 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 	$scope.showUpcoming = function(){
 		$scope.showUpcomingView = true;
 		$scope.showHistoryView = false;
+		$scope.showEnrolled = true;
 		$scope.showPurchase = false;
 		$scope.showWaitlist = false;
-		upcoming.style.cssText="background-color:#f8f8f8;color:#e87722; border-bottom: thick solid #e87722;border-bottom-width:2px;";
+		upcoming.style.cssText="background-color:#e87722; color:#ffffff;";
 		history.style.cssText ="background-color:#f8f8f8";
 	};	
 	
@@ -1793,7 +1794,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 		$scope.showWaitlist = false;
 		$scope.showPurchase = false;
 		$scope.showHistoryView = true;
-		history.style.cssText ="background-color:#f8f8f8;color:#e87722; border-bottom: thick solid #e87722;border-bottom-width:2px;";
+		history.style.cssText ="background-color:#e87722; color:#ffffff;";
 		upcoming.style.cssText ="background-color:#f8f8f8";
 	};
 	
@@ -1802,6 +1803,8 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 		$scope.showWaitlist = true;
 		$scope.showPurchase = false;
 		$scope.showHistoryView = false;
+		upcoming.style.cssText="background-color:#e87722; color:#ffffff;";
+		history.style.cssText ="background-color:#f8f8f8";
 	};
 	
 	$scope.showEnrolled = function(){
