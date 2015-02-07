@@ -1425,7 +1425,7 @@ app.controller('loginCtrl', function($scope, $state,userService,userScheduleServ
 })
 
 //$ionicSideMenuDelegate is the dependency for menu
-app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate,classesService,$ionicLoading,$timeout) {
+app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate,classesService,$ionicLoading,$timeout,faqDb,$localstorage) {
 	//left menu
 	$scope.toggleLeft = function() {
     $ionicSideMenuDelegate.toggleLeft();
@@ -1441,6 +1441,31 @@ app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate,
 	
 	$scope.loadPrivileges = function(){
 		window.open('http://www.platinumyoga.com/pages/platinum-yoga-rewards', '_blank', 'location=yes','closebuttoncaption=back');
+	};
+	
+	
+	$scope.loadRegulations = function(){
+		$scope.faqDataArr = faqDb.getFaqData();
+		var bef=0;
+		var dur=0;
+		var beforeArr = [];
+		var durArr = [];
+	
+		for(var i=0;i<$scope.faqDataArr.length;i++){
+			if($scope.faqDataArr[i].classType==="Before"){
+				beforeArr[bef]=(bef+1)+". "+$scope.faqDataArr[i].faq;
+				bef++;
+			}else{
+				durArr[dur]=(dur+1)+". "+$scope.faqDataArr[i].faq;
+				dur++;
+			}
+		}
+		
+		$scope.beforeClass = beforeArr;
+		$scope.duringClass = durArr;
+		
+		$localstorage.set('beforeClassRules',JSON.stringify($scope.beforeClass));
+		$localstorage.set('duringClassRules',JSON.stringify($scope.duringClass));
 	};
 	
 	/*$scope.goBack = function() {
@@ -1734,22 +1759,22 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				retrieveScheduledClasses();
-			  }, 7000);
+			  }, 7500);
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				retrieveWaitlist();
-			  }, 7000);
+			  }, 7500);
 			  
 			  $timeout(function () {
 				$ionicLoading.hide();
 				retrieveUserHistory();
-			  }, 7000);
+			  }, 7500);
 			  
 			  $timeout(function () {
 				$ionicLoading.hide();
 				retrievePurchaseHistory();
-			  }, 7000);
+			  }, 7500);
 	  }else{
 		//alert("fast");
 			$timeout(function () {
@@ -2473,37 +2498,8 @@ app.controller('challengesCtrl',function($scope,$stateParams,$ionicPopup,userSer
 })
 
 app.controller('faqCtrl',function($scope,faqDb,$ionicLoading,$timeout,$state,$localstorage){
-	if($localstorage.get('beforeClassRules')!=null && $localstorage.get('beforeClassRules')!==""){
-		$scope.beforeClass = JSON.parse($localstorage.get('beforeClassRules'));
-	}
-	
-	if($localstorage.get('duringClassRules')!=null && $localstorage.get('duringClassRules')!==""){
-		$scope.duringClass = JSON.parse($localstorage.get('duringClassRules'));
-	 }
-	  
-	$scope.loadRegulations = function(){
-		$scope.faqDataArr = faqDb.getFaqData();
-		var bef=0;
-		var dur=0;
-		var beforeArr = [];
-		var durArr = [];
-	
-		for(var i=0;i<$scope.faqDataArr.length;i++){
-			if($scope.faqDataArr[i].classType==="Before"){
-				beforeArr[bef]=(bef+1)+". "+$scope.faqDataArr[i].faq;
-				bef++;
-			}else{
-				durArr[dur]=(dur+1)+". "+$scope.faqDataArr[i].faq;
-				dur++;
-			}
-		}
-		
-		$scope.beforeClass = beforeArr;
-		$scope.duringClass = durArr;
-		
-		$localstorage.set('beforeClassRules',JSON.stringify($scope.beforeClass));
-		$localstorage.set('duringClassRules',JSON.stringify($scope.duringClass));
-	};
+
+
 	
 	if($localstorage.get('beforeClassRules')==null || $localstorage.get('duringClassRules')==null){
 		   $ionicLoading.show({
@@ -2518,8 +2514,17 @@ app.controller('faqCtrl',function($scope,faqDb,$ionicLoading,$timeout,$state,$lo
 		  $timeout(function () {
 		  $ionicLoading.hide();
 		  $scope.loadRegulations();
-		  }, 7000);
+		  }, 9000);
 	  }  
+	  
+	  if($localstorage.get('beforeClassRules')!=null && $localstorage.get('beforeClassRules')!==""){
+		$scope.beforeClass = JSON.parse($localstorage.get('beforeClassRules'));
+	}
+	
+	if($localstorage.get('duringClassRules')!=null && $localstorage.get('duringClassRules')!==""){
+		$scope.duringClass = JSON.parse($localstorage.get('duringClassRules'));
+	 }
+	  
 
 	
 	  
