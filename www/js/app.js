@@ -2518,7 +2518,7 @@ app.controller('faqCtrl',function($scope,faqDb,$ionicLoading,$timeout,$state,$lo
 		  $timeout(function () {
 		  $ionicLoading.hide();
 		  $scope.loadRegulations();
-		  }, 4000);
+		  }, 5500);
 	  }  
 
 	
