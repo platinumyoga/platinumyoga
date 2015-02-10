@@ -343,6 +343,7 @@ var availClasses = [];
 
 			/* Check whether the HTTP Request is successful or not. */
 			request1.success(function (data) {
+			console.log(JSON.stringify(data));
 					var returnMsg = "";
 					if (data.AddClientsToClassesResult.ErrorCode===200){
 						if(JSON.stringify(data).indexOf("Added to Waitlist") > -1){
@@ -353,7 +354,20 @@ var availClasses = [];
 						userScheduleService.getUserSchedule(userId);
 						waitlistService.getWaitlist(userId);
 					}else{
-						returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToClassesResult.Classes.Class.Clients.Client.Messages.string);
+						if(JSON.stringify(data.AddClientsToClassesResult.Classes.Class.Clients.Client.Messages.string).indexOf("payments") > -1){
+							returnMsg = "You have no Platinum Yoga membership. Please call or visit Platinum Yoga to sign up for membership.";
+						}else if(JSON.stringify(data.AddClientsToClassesResult.Classes.Class.Clients.Client.Messages.string).indexOf("already booked this class") > -1){
+							returnMsg = "You have already booked this class.";
+							
+						}else if(JSON.stringify(data.AddClientsToClassesResult.Classes.Class.Clients.Client.Messages.string).indexOf("Client is already booked at this time") > -1){
+							returnMsg = "You have a booking at this time.";
+						}else if(JSON.stringify(data.AddClientsToClassesResult.Classes.Class.Clients.Client.Messages.string).indexOf("full") > -1){
+							returnMsg = "This class is full.";
+						}else{
+							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToClassesResult.Classes.Class.Clients.Client.Messages.string);
+						}
+						
+						
 					}
 					 var alertPopup = $ionicPopup.alert({
 						 title: 'Book Class',
@@ -422,7 +436,16 @@ app.factory('workshopsService',function($http,$ionicPopup,userScheduleService){
 						returnMsg = "Success!";
 						userScheduleService.getUserSchedule(userId);
 					}else{
-						returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
+						if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("capacity has been reached")>-1){
+							returnMsg = "This workshop is full";
+						}else if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("has no available payments")>-1){
+							returnMsg = "You have no Platinum Yoga membership. Please call or visit Platinum Yoga to sign up for membership.";
+						}else if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("Client is already booked at this time")>-1){
+							returnMsg = "You have a booking at this time.";
+						}else{
+							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
+						}	
+						
 					}
 					 var alertPopup = $ionicPopup.alert({
 						 title: 'Book Workshop',
@@ -492,7 +515,16 @@ app.factory('retreatsService',function($http,$ionicPopup,userScheduleService){
 						returnMsg = "Success!";
 						userScheduleService.getUserSchedule(userId);
 					}else{
-						returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
+					
+						if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("capacity has been reached")>-1){
+							returnMsg = "This workshop is full";
+						}else if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("has no available payments")>-1){
+							returnMsg = "You have no Platinum Yoga membership. Please call or visit Platinum Yoga to sign up for membership.";
+						}else if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("Client is already booked at this time")>-1){
+							returnMsg = "You have a booking at this time.";
+						}else{
+							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
+						}	
 					}
 					 var alertPopup = $ionicPopup.alert({
 						 title: 'Book Retreat/TT',
