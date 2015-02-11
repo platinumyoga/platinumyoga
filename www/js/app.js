@@ -22,6 +22,7 @@ var app = angular.module('ionicApp', ['ionic','ionic.utils','firebase','ui.route
 //CONFIGURATION+ROUTE
 //CONFIGURATION+ROUTE
 app.config(function($stateProvider, $urlRouterProvider) {
+
 	$urlRouterProvider.otherwise('/login')
 	
   $stateProvider
@@ -343,7 +344,7 @@ var availClasses = [];
 
 			/* Check whether the HTTP Request is successful or not. */
 			request1.success(function (data) {
-			console.log(JSON.stringify(data));
+			//console.log(JSON.stringify(data));
 					var returnMsg = "";
 					if (data.AddClientsToClassesResult.ErrorCode===200){
 						if(JSON.stringify(data).indexOf("Added to Waitlist") > -1){
@@ -363,6 +364,8 @@ var availClasses = [];
 							returnMsg = "You have a booking at this time.";
 						}else if(JSON.stringify(data.AddClientsToClassesResult.Classes.Class.Clients.Client.Messages.string).indexOf("full") > -1){
 							returnMsg = "This class is full.";
+						}else if(JSON.stringify(data.AddClientsToClassesResult.Classes.Class.Clients.Client.Messages.string).indexOf("outside scheduling window") > -1){
+							returnMsg = "This class is not for booking.";
 						}else{
 							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToClassesResult.Classes.Class.Clients.Client.Messages.string);
 						}
@@ -438,10 +441,14 @@ app.factory('workshopsService',function($http,$ionicPopup,userScheduleService){
 					}else{
 						if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("capacity has been reached")>-1){
 							returnMsg = "This workshop is full";
+						}else if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("full")>-1){
+							returnMsg = "This workshop is full.";
 						}else if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("has no available payments")>-1){
 							returnMsg = "You have no Platinum Yoga membership. Please call or visit Platinum Yoga to sign up for membership.";
 						}else if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("Client is already booked at this time")>-1){
 							returnMsg = "You have a booking at this time.";
+						}else if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("already started")>-1){
+							returnMsg = "This workshop is not for booking.";
 						}else{
 							returnMsg = "Unsuccessful! " + JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string);
 						}	
@@ -517,9 +524,13 @@ app.factory('retreatsService',function($http,$ionicPopup,userScheduleService){
 					}else{
 					
 						if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("capacity has been reached")>-1){
-							returnMsg = "This workshop is full";
+							returnMsg = "This retreat/TT is full";
+						}else if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("full")>-1){
+							returnMsg = "This retreat/TT is full.";
 						}else if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("has no available payments")>-1){
 							returnMsg = "You have no Platinum Yoga membership. Please call or visit Platinum Yoga to sign up for membership.";
+						}else if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("already started")>-1){
+							returnMsg = "This retreat/TT is not for booking";
 						}else if(JSON.stringify(data.AddClientsToEnrollmentsResult.Enrollments.ClassSchedule.Clients.Client.Messages.string).indexOf("Client is already booked at this time")>-1){
 							returnMsg = "You have a booking at this time.";
 						}else{
@@ -741,6 +752,7 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
 					
 					$localstorage.set('name', user.username);
 					$localstorage.set('password', user.password);
+					//console.log(JSON.stringify(userDatabase.ValidateLoginResult));
 					userID = userDatabase.ValidateLoginResult.Client.ID;
 					userScheduleService.getUserSchedule(userID);
 					waitlistService.getWaitlist(userID);
@@ -878,6 +890,18 @@ app.factory('userDetailsService', function($http) {
 		},
 		getUserGender:function(){
 			return userDetailsData.GetClientsResult.Clients.Client.Gender;
+		},
+		getUserEmerName:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.EmergencyContactInfoName;
+		},
+		getUserEmerRelation:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.EmergencyContactInfoRelationship;
+		},
+		getUserEmerPhone:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.EmergencyContactInfoPhone;
+		},
+		getUserEmerEmail:function(){
+			return userDetailsData.GetClientsResult.Clients.Client.EmergencyContactInfoEmail;
 		}
 	}
 })
@@ -896,7 +920,11 @@ app.factory('updateUserDetailsService', function($http,$ionicPopup) {
 				mobilePhone: user.mobile,
 				birthDate: user.birthDate,
 				gender: user.gender,
-				postalCode: user.postalCode
+				postalCode: user.postalCode,
+				emerName: user.emerName,
+				emerRelation: user.emerRelation,
+				emerPhone: user.emerPhone,
+				emerEmail: user.emerEmail
 			},
 			headers: { 
 				'Content-Type': 'application/x-www-form-urlencoded' 
@@ -906,6 +934,7 @@ app.factory('updateUserDetailsService', function($http,$ionicPopup) {
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
 				updateData = data;
+				//console.log(JSON.stringify(data));
 				/*alert(user.id);
 				alert(user.address);
 				alert(user.mobile);
@@ -1457,7 +1486,7 @@ app.controller('loginCtrl', function($scope, $state,userService,userScheduleServ
 })
 
 //$ionicSideMenuDelegate is the dependency for menu
-app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate,classesService,$ionicLoading,$timeout,faqDb,$localstorage) {
+app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate,classesService,$ionicLoading,$timeout,faqDb,$localstorage,hallOfFameDb) {
 	//left menu
 	$scope.toggleLeft = function() {
     $ionicSideMenuDelegate.toggleLeft();
@@ -1475,8 +1504,15 @@ app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate,
 		window.open('http://www.platinumyoga.com/pages/platinum-yoga-rewards', '_blank', 'location=yes','closebuttoncaption=back');
 	};
 	
+	//loading the hall of fame list from firebase (no saving to localstorage)
+	$scope.loadHallOfFameList = function(){
+		$scope.halloffameList = hallOfFameDb.getHallOfFameData();
+		$localstorage.set('hallofFameList',JSON.stringify($scope.halloffameList));
+	}
 	
-	$scope.loadRegulations = function(){
+	
+	//loading the info/etiquette (FAQ) firebase (saving to localstorage but gets updated when when method called in homeCtrl)
+ 	$scope.loadRegulations = function(){
 		$scope.faqDataArr = faqDb.getFaqData();
 		var bef=0;
 		var dur=0;
@@ -1518,6 +1554,10 @@ app.controller('settingCtrl', function($scope,$ionicPopup,userService,userDetail
 		$scope.user.mobile = userDetailsService.getUserMobile();
 		$scope.user.birthDate = userDetailsService.getUserBirth();
 		$scope.user.gender = userDetailsService.getUserGender();
+		$scope.user.emerName = userDetailsService.getUserEmerName();
+		$scope.user.emerRelation = userDetailsService.getUserEmerRelation();
+		$scope.user.emerPhone = userDetailsService.getUserEmerPhone();
+		$scope.user.emerEmail = userDetailsService.getUserEmerEmail();
 	};
 
 	
@@ -1637,6 +1677,122 @@ app.controller('settingCtrl', function($scope,$ionicPopup,userService,userDetail
 	};
 	
 	
+	$scope.editEmergencyName = function() {
+	  $scope.editData = {};
+	  // An elaborate, custom popup
+	  var myPopup3 = $ionicPopup.show({
+		template: '<input type="text" ng-model="editData.emerName">',
+		title: 'Enter new emergency contact name',
+		scope: $scope,
+		buttons: [
+		  { text: 'Cancel' },
+		  {
+			text: '<b>Save</b>',
+			type: 'button-energized',
+			onTap: function(e) {
+			  if (!$scope.editData.emerName) {
+				//don't allow the user to close unless he enters wifi password
+				e.preventDefault();
+			  } else {
+				$scope.user.emerName = $scope.editData.emerName;
+				updateUserDetailsService.updateUserDetails($scope.user);
+				userDetailsService.getUserDetails($scope.user.id);
+			  }
+			}
+		  }
+		]
+	  });
+	};
+	
+	
+	
+	$scope.editEmergencyRelationship = function() {
+	  $scope.editData = {};
+	  // An elaborate, custom popup
+	  var myPopup3 = $ionicPopup.show({
+		template: '<input type="text" ng-model="editData.emerRelation">',
+		title: 'Enter new emergency contact relationship',
+		scope: $scope,
+		buttons: [
+		  { text: 'Cancel' },
+		  {
+			text: '<b>Save</b>',
+			type: 'button-energized',
+			onTap: function(e) {
+			  if (!$scope.editData.emerRelation) {
+				//don't allow the user to close unless he enters wifi password
+				e.preventDefault();
+			  } else {
+				$scope.user.emerRelation = $scope.editData.emerRelation;
+				updateUserDetailsService.updateUserDetails($scope.user);
+				userDetailsService.getUserDetails($scope.user.id);
+			  }
+			}
+		  }
+		]
+	  });
+	};
+	
+	
+	
+	$scope.editEmergencyPhone = function() {
+	  $scope.editData = {};
+	  // An elaborate, custom popup
+	  var myPopup3 = $ionicPopup.show({
+		template: '<input type="text" ng-model="editData.emerPhone">',
+		title: 'Enter new emergency contact phone number',
+		scope: $scope,
+		buttons: [
+		  { text: 'Cancel' },
+		  {
+			text: '<b>Save</b>',
+			type: 'button-energized',
+			onTap: function(e) {
+			  if (!$scope.editData.emerPhone) {
+				//don't allow the user to close unless he enters wifi password
+				e.preventDefault();
+			  } else {
+				$scope.user.emerPhone = $scope.editData.emerPhone;
+				updateUserDetailsService.updateUserDetails($scope.user);
+				userDetailsService.getUserDetails($scope.user.id);
+			  }
+			}
+		  }
+		]
+	  });
+	};
+	
+	
+	$scope.editEmergencyEmail = function() {
+	  $scope.editData = {};
+	  // An elaborate, custom popup
+	  var myPopup3 = $ionicPopup.show({
+		template: '<input type="text" ng-model="editData.emerEmail">',
+		title: 'Enter new emergency contact email address',
+		scope: $scope,
+		buttons: [
+		  { text: 'Cancel' },
+		  {
+			text: '<b>Save</b>',
+			type: 'button-energized',
+			onTap: function(e) {
+			  if (!$scope.editData.emerEmail) {
+				//don't allow the user to close unless he enters wifi password
+				e.preventDefault();
+			  } else {
+				$scope.user.emerEmail = $scope.editData.emerEmail;
+				updateUserDetailsService.updateUserDetails($scope.user);
+				userDetailsService.getUserDetails($scope.user.id);
+			  }
+			}
+		  }
+		]
+	  });
+	};
+	
+	
+	
+	
 	$scope.goBack = function() {
 		window.history.back();
 	};
@@ -1651,6 +1807,7 @@ app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet,$localstor
 		$localstorage.set('classesDb', '');
 		$localstorage.set('beforeClassRules','');
 		$localstorage.set('duringClassRules','');
+		$localstorage.set('hallofFameList','');
 	};
 	
 	
@@ -1807,27 +1964,57 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 				$ionicLoading.hide();
 				retrievePurchaseHistory();
 			  }, 7500);
+			  
+			  			  
+			  $timeout(function () {
+			  $ionicLoading.hide();
+				//loading of info/etiquette here
+				$scope.loadRegulations();
+			  }, 7500);
+			  
+			  
+			  $timeout(function () {
+			  $ionicLoading.hide();
+				//loading of hall of fame list here
+				$scope.loadHallOfFameList();
+			  }, 7500);
+			  
+			  
+			  
 	  }else{
 		//alert("fast");
 			$timeout(function () {
 			  $ionicLoading.hide();
 				retrieveScheduledClasses();
-			  }, 3000);
+			  }, 4500);
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
-				retrieveWaitlist();
-			  }, 3000);
-			  
+				$scope.retrieveWaitlist();
+			  }, 4500);
+			
 			  $timeout(function () {
 				$ionicLoading.hide();
 				retrieveUserHistory();
-			  }, 3000);
+			  }, 4500);
 			  
 			  $timeout(function () {
 				$ionicLoading.hide();
 				retrievePurchaseHistory();
-			  }, 3000);
+			  }, 4500);
+			  
+			  $timeout(function () {
+			  $ionicLoading.hide();
+			  //loading of info/etiquette here
+				$scope.loadRegulations();
+			  }, 4500);
+			  
+			  
+			  $timeout(function () {
+			  $ionicLoading.hide();
+				//loading of hall of fame list here
+				$scope.loadHallOfFameList();
+			  }, 4500);
 	  }
 	
 	var upcoming = document.getElementById('showUpcoming');
@@ -2262,6 +2449,17 @@ app.controller('reviewCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLo
 app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesService,userService,feedbackDb,$ionicModal,$timeout,$ionicLoading) {
 	$scope.totalClasses = classesService.getClasses();
 	$scope.selectedclass = classesService.getSelectedClass($stateParams.classID);	
+	
+
+	
+	if($scope.selectedclass!=null){
+			var str = $scope.selectedclass.ClassDescription.Description;
+				str = str.replace(/<div>/g,"");
+				str = str.replace(/<\/div>/g,"");
+				str = str.replace(/&nbsp;/g,"");
+			$scope.updatedClassDescription = str;
+	}
+	
 	$scope.userID = userService.getUserID();
 	//loading the feedback/review DB
 	 $scope.feedbacks = feedbackDb.getFeedbackData();
@@ -2302,6 +2500,20 @@ app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesSe
 	};
 	
 	$scope.selectedStaff = classesService.getClassStaff($stateParams.classStaffID);
+	
+	if($scope.selectedStaff!=null){
+			var str1 = $scope.selectedStaff.Bio;
+			 str1 = str1.replace(/&lsquo;/g,"");
+			 str1 = str1.replace(/&rsquo;/g,"");
+			 str1 = str1.replace(/<br\/>/g,"");
+			 str1 = str1.replace(/<\/p>/g,"");
+			 str1 = str1.replace(/<p>/g,"");
+			 str1 = str1.replace(/<div>/g,"");
+			 str1 = str1.replace(/<\/div>/g,"");
+			 str1 = str1.replace(/&nbsp;/g,"");
+			 $scope.updatedClassStaffDesc = str1;
+	}
+	
 	
 	$scope.options = [{ name: "Beginner", value: "Beginner"}, { name: "Advanced", value: "Advanced"},{ name: "Multi-level", value: "Multi-level"},{name: "All", value: ""}];
 	$scope.selectedOption = $scope.options[0].value;	
@@ -2370,8 +2582,37 @@ app.filter('contains', function () {
 app.controller('workshopCtrl',function($scope,$stateParams,$ionicPopup,userService,workshopsService,$timeout){
 	$scope.workShopsData = workshopsService.getWorkshops();
 	$scope.selectedWorkshop = workshopsService.getSelectedWorkshop($stateParams.workshopID);
-	$scope.selectedWorkshopStaff = workshopsService.getWorkshopStaff($stateParams.workshopStaffID);
+	console.log($scope.selectedWorkshop);
 	$scope.userID = userService.getUserID();
+	
+	
+	if($scope.selectedWorkshop!=null){
+		var str1 = $scope.selectedWorkshop.ClassDescription.Description;
+		str1 = str1.replace(/<div>/g,"");
+		str1 = str1.replace(/<\/div>/g,"");
+		str1 = str1.replace(/&nbsp;/g,"");
+		str1 = str1.replace(/<br\/>/g,"");
+		str1 = str1.replace(/<p>/g,"");
+		str1 = str1.replace(/<\/p>/g,"");
+		$scope.updatedWorkshopDescription = str1;
+	}
+	
+	$scope.selectedWorkshopStaff = workshopsService.getWorkshopStaff($stateParams.workshopStaffID);
+	
+
+
+	if($scope.selectedWorkshopStaff!=null){
+		var str2 = $scope.selectedWorkshopStaff.Bio;
+		 str2 = str2.replace(/&lsquo;/g,"");
+		 str2 = str2.replace(/&rsquo;/g,"");
+		 str2 = str2.replace(/<br\/>/g,"");
+		 str2 = str2.replace(/<\/p>/g,"");
+		 str2 = str2.replace(/<p>/g,"");
+		 str2 = str2.replace(/<div>/g,"");
+		 str2 = str2.replace(/<\/div>/g,"");
+		 str2 = str2.replace(/&nbsp;/g,"");
+		 $scope.updatedWkspStaffDesc = str2;
+	}
 	
 	
 	//pull to refresh workshops(start)
@@ -2411,8 +2652,35 @@ app.controller('retreatCtrl',function($scope,$stateParams,$ionicPopup,userServic
 	$scope.retreatsData = retreatsService.getRetreats();
 	
 	$scope.selectedRetreat = retreatsService.getSelectedRetreat($stateParams.retreatID);
-	$scope.selectedRetreatStaff = retreatsService.getRetreatStaff($stateParams.retreatStaffID);
+	
 	$scope.userID = userService.getUserID();
+	
+	
+	if($scope.selectedRetreat!=null){
+			var str = $scope.selectedRetreat.ClassDescription.Description;
+			str = str.replace(/<div>/g,"");
+			str = str.replace(/<\/div>/g,"");
+			str = str.replace(/&nbsp;/g,"");
+			str = str.replace(/&bull;/g,"");
+			str = str.replace(/<br\/>/g,"");
+			$scope.updatedRetreatDescription = str;
+	}
+	
+	$scope.selectedRetreatStaff = retreatsService.getRetreatStaff($stateParams.retreatStaffID);
+	
+	if($scope.selectedRetreatStaff!=null){
+			var str2 = $scope.selectedRetreatStaff.Bio;
+			 str2 = str2.replace(/&lsquo;/g,"");
+			 str2 = str2.replace(/&rsquo;/g,"");
+			 str2 = str2.replace(/<br\/>/g,"");
+			 str2 = str2.replace(/<\/p>/g,"");
+			 str2 = str2.replace(/<p>/g,"");
+			 str2 = str2.replace(/<div>/g,"");
+			 str2 = str2.replace(/<\/div>/g,"");
+			 str2 = str2.replace(/&nbsp;/g,"");
+			 $scope.updatedRetreatStaffDesc = str2;
+	}
+	
 	
 	
 	//pull to refresh retreats(start)
@@ -2545,7 +2813,6 @@ app.controller('faqCtrl',function($scope,faqDb,$ionicLoading,$timeout,$state,$lo
 		  // Set a timeout to clear loader, however you would actually call the $ionicLoading.hide() method whenever everything is ready or loaded.
 		  $timeout(function () {
 		  $ionicLoading.hide();
-		  $scope.loadRegulations();
 		  }, 9000);
 	  }  
 	  
@@ -2763,11 +3030,11 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 	};
 })
 
-app.controller('halloffameCtrl',function($scope,hallOfFameDb,$timeout,$ionicLoading){
-	$scope.halloffameList = hallOfFameDb.getHallOfFameData();
+app.controller('halloffameCtrl',function($scope,hallOfFameDb,$timeout,$ionicLoading,$localstorage){
+	
 	
 	  // Setup the loader
-	  if($scope.halloffameList.length==0){
+	  if($localstorage.get('hallofFameList')==null){
 		   $ionicLoading.show({
 			content: 'Loading',
 			animation: 'fade-in',
@@ -2781,33 +3048,6 @@ app.controller('halloffameCtrl',function($scope,hallOfFameDb,$timeout,$ionicLoad
 		  $ionicLoading.hide();
 		  }, 4000);
 	  }
-	
-	
-	$scope.winnersData = {
-		"filter" : 'current',
-		"winners": [
-		  {
-			type : "current",
-			title : "Best Attendance",
-			name: "Mr Khan"
-		  },
-		  {
-			type : "current",
-			title : "Youngest at Heart",
-			name: "Mrs Kee"
-		  },
-		  {
-			type : "past",
-			title : "Best Attendance",
-			name: "Mr Singh"
-		  },
-		  {
-			type : "past",
-			title : "Youngest at Heart",
-			name: "Mrs Cheryl"
-		  }
-		]
-	};
 })
 
 app.controller('promotionsCtrl',function($scope,$firebase){

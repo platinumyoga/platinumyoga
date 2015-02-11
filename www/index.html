@@ -531,7 +531,7 @@ About page
 				
 				<div class="row">
 				  <div class="col"><b>Description:</b><br/>
-				     {{selectedclass.ClassDescription.Description}}
+				     {{updatedClassDescription}}
 				  </div>
 				</div>
 				
@@ -585,7 +585,7 @@ About page
 			
 				
 				<div class="row">
-				  <div class="col"><b>Biography:</b><br/>{{selectedStaff.Bio}}</div>
+				  <div class="col"><b>Biography:</b><br/>{{updatedClassStaffDesc}}</div>
 				</div>
 				
 			</div>
@@ -673,11 +673,11 @@ About page
 				</div>
 				
 				<div class="row">
-				  <div class="col">{{(selectedWorkshop.StartTime).slice(12,20)}} - {{(selectedWorkshop.StartDate.EndTime).slice(12,20)}}</div>
+				  <div class="col">{{(selectedWorkshop.StartTime).slice(11,16)}} - {{(selectedWorkshop.EndTime).slice(11,16)}}</div>
 				</div>
 				
 				<div class="row">
-				  <div class="col"><b>Description:</b><br/>{{selectedWorkshop.ClassDescription.Description}}</div>
+				  <div class="col"><b>Description:</b><br/>{{updatedWorkshopDescription}}</div>
 				</div>
 			</div>
         </ion-content>
@@ -699,7 +699,7 @@ About page
 				</div>
 				
 				<div class="row">
-				  <div class="col"><b>Biography:</b><br/>{{selectedWorkshopStaff.Bio}}</div>
+				  <div class="col"><b>Biography:</b><br/>{{updatedWkspStaffDesc}}</div>
 				</div>
 				
 			</div>
@@ -863,11 +863,11 @@ About page
 				</div>
 				
 				<div class="row">
-				  <div class="col">{{(selectedRetreat.StartTime).slice(12,20)}} - {{(selectedRetreat.StartDate.EndTime).slice(12,20)}}</div>
+				  <div class="col">{{(selectedRetreat.StartTime).slice(11,16)}} - {{(selectedRetreat.EndTime).slice(11,16)}}</div>
 				</div>
 				
 				<div class="row">
-				  <div class="col"><b>Description:</b><br/>{{selectedRetreat.ClassDescription.Description}}</div>
+				  <div class="col"><b>Description:</b><br/>{{updatedRetreatDescription}}</div>
 				</div>
 			</div>
         </ion-content>
@@ -889,7 +889,7 @@ About page
 				</div>
 				
 				<div class="row">
-				  <div class="col"><b>Biography:</b><br/>{{selectedRetreatStaff.Bio}}</div>
+				  <div class="col"><b>Biography:</b><br/>{{updatedRetreatStaffDesc}}</div>
 				</div>
 				
 			</div>
@@ -1104,7 +1104,11 @@ About page
 			<div class="list">
 				<div class="item" ng-repeat="winner in halloffameList | orderBy:'-period'">
 					<div class="row">
-						<div class="col">
+					
+						<div class="col col-25">
+							<img ng-src="data:{{winner.famepicturebase64.filetype}};base64,{{winner.famepicturebase64.base64}}" alt=" "  height="50" width="50">
+						</div>
+						<div class="col col-75">
 							<b>Title:&nbsp;</b>{{winner.title}}<br/>
 							<b>Name:&nbsp;</b>{{winner.name}}<br/>
 							<b>Period:&nbsp;</b>{{winner.period}}<br/>
@@ -1275,6 +1279,34 @@ About page
 								Edit
 							</button>
 						  </div>
+						  <!--Emergency Contact Info name-->	
+						  <!--<div class="item item-button-right">
+							Emergency Contact Name:&nbsp;{{user.emerName}}
+							<button class="button button-energized" ng-click="editEmergencyName()">
+								Edit
+							</button>
+						  </div>-->
+						  <!--Emergency Contact Info relationship-->	
+						 <!-- <div class="item item-button-right">
+							Emergency Contact Relationship:&nbsp;{{user.emerRelation}}
+							<button class="button button-energized" ng-click="editEmergencyRelationship()">
+								Edit
+							</button>
+						  </div>-->
+						  <!--Emergency Contact Info phone-->	
+						  <!--<div class="item item-button-right">
+							Emergency Contact Phone:&nbsp;{{user.emerPhone}}
+							<button class="button button-energized" ng-click="editEmergencyPhone()">
+								Edit
+							</button>
+						  </div>-->
+						  <!--Emergency Contact Info email-->	
+						 <!-- <div class="item item-button-right">
+							Emergency Contact Email:&nbsp;{{user.emerEmail}}
+							<button class="button button-energized" ng-click="editEmergencyEmail()">
+								Edit
+							</button>
+						  </div>-->
 					</div>
 					<button class="button" ng-click="goBack()">Go Back</button>
         </ion-content>
