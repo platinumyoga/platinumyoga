@@ -116,13 +116,47 @@ About page
               Sign-In
             </button>
             <p class="text-center">
-				<a style="color:blue; text-decoration: underline;"href="http://www.platinumyoga.com/">Register</a><br/>
+				<a style="color:black; text-decoration: none;"href="http://www.platinumyoga.com/">Register</a><br/>
               <!--<a href="#/forgot-password">Forgot password</a>-->
             </p>
+			<div align="center">
+				<div ng-click="openModal()">Reset Password</div><br/>
+              <!--<a href="#/forgot-password">Forgot password</a>-->
+            </div>
           </div>
         </ion-content>
       </ion-view>
     </script>
+	
+	
+	
+	
+	<!--PASSWORD RESET MODAL-->
+	<script id="password-modal.html" type="text/ng-template">
+	  <ion-modal-view>
+		<ion-header-bar class="bar-energized">
+			<h1 class="title">Password Reset</h1>
+			  <div class="buttons">
+					<a class="button button-icon ion-close" ng-click="closeModal()"></a>
+			  </div>
+		</ion-header-bar>
+			<ion-content>
+				<div class="list">
+				  <label class="item item-input">
+					<input type="text" placeholder="Email" ng-model='reset.email'>
+				  </label>
+				  <label class="item item-input">
+					<input type="text" placeholder="First Name" ng-model='reset.firstName' >
+				  </label>
+				  <label class="item item-input">
+					<input type="text" placeholder="Last Name" ng-model='reset.lastName' >
+				  </label>
+					  <button class="button button-block button-energized" ng-click="passwordReset(reset)">Submit</button>
+				</div>
+			</ion-content>
+	  </ion-modal-view>
+	</script>
+	
 	 
 	<!--MAIN PARENT PAGE CONTAINER (with only top bar and side menus, contents are injected)-->
     <script id="templates/yoga-app.html" type="text/ng-template">

@@ -302,14 +302,6 @@ var availClasses = [];
 				$localstorage.set('classesDb', JSON.stringify(data.Classes.Class));
 				classesDatabase = JSON.parse($localstorage.get('classesDb'));
 
-				//alert(JSON.stringify(classesDatabase));
-				/*var j = 0;
-				for(var i=0;i<classesDatabase.length;i++){
-					if(classesDatabase[i].IsAvailable){
-						availClasses[j]=classesDatabase[i];
-						j=j+1;
-					}
-				}*/
 			})
 		},
 		getClasses:function(){
@@ -806,6 +798,49 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
   }
 });
 
+
+
+app.factory('resetService', function($http,$ionicPopup) {
+	return {
+		resetInfo: function(reset){
+			var request = $http({
+			method: "post",
+			url: "http://platinumyoga-rerawan.rhcloud.com/sendUserNewPassword.php",
+			data: {
+				email: reset.email,
+				firstname: reset.firstName,
+				lastname: reset.lastName
+			},
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded' 
+			}
+			});
+
+			/* Check whether the HTTP Request is successful or not. */
+			request.success(function (data) {
+				if(data.SendUserNewPasswordResult.ErrorCode === 200){	
+					var alertPopup = $ionicPopup.alert({
+					 title: 'Success',
+					 template: 'Password reset email sent!'
+				   });
+				   alertPopup.then(function(res) {});
+
+				}else{
+					var alertPopup = $ionicPopup.alert({
+					 title: 'Error',
+					 template: 'Could not find based on information given.'
+				   });
+				   alertPopup.then(function(res) {});
+				}	
+			})
+			
+			request.error(function (data) {
+            })
+		}
+	}
+})
+
+
 //filter for stars
 app.filter('range', function() {
   return function(val, range) {
@@ -934,15 +969,7 @@ app.factory('updateUserDetailsService', function($http,$ionicPopup) {
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
 				updateData = data;
-				//console.log(JSON.stringify(data));
-				/*alert(user.id);
-				alert(user.address);
-				alert(user.mobile);
-				alert(user.birthDate);
-				alert(user.gender);
-				alert(user.postalCode);
-				alert(JSON.stringify(updateData));*/
-				
+			
 				if(updateData.AddOrUpdateClientsResult.ErrorCode === 200){
 					var alertPopup = $ionicPopup.alert({
 					 title: 'Setting',
@@ -1469,7 +1496,7 @@ app.factory('sessionStaffService',function($http){
 })
 
 
-app.controller('loginCtrl', function($scope, $state,userService,userScheduleService,classesService,workshopsService,eventsService,retreatsService,challengesService,sessionService) {
+app.controller('loginCtrl', function($scope, $state,userService,userScheduleService,classesService,workshopsService,eventsService,retreatsService,challengesService,sessionService,$ionicModal,resetService) {
 	$scope.signIn = function(user) {
 		userService.authentication(user);
 		classesService.getClassesDatabase();
@@ -1483,6 +1510,41 @@ app.controller('loginCtrl', function($scope, $state,userService,userScheduleServ
 	$scope.next = function(){
 		$state.go('yoga-app.home');
 	};
+	
+	$scope.passwordReset = function(reset){
+		resetService.resetInfo(reset);
+	};
+	
+	
+	//MODAL START
+	$ionicModal.fromTemplateUrl('password-modal.html', {
+		scope: $scope,
+		animation: 'slide-in-up'
+	  }).then(function(modal) {
+		$scope.modal = modal;
+	  });
+	  $scope.openModal = function() {
+		$scope.modal.show();
+	  };
+	  $scope.closeModal = function() {
+		$scope.modal.hide();
+	  };
+	  //Cleanup the modal when we're done with it!
+	  $scope.$on('$destroy', function() {
+		$scope.modal.remove();
+	  });
+	  // Execute action on hide modal
+	  $scope.$on('modal.hidden', function() {
+		// Execute action
+	  });
+	  // Execute action on remove modal
+	  $scope.$on('modal.removed', function() {
+		// Execute action
+	  });
+	  //MODAL END
+	
+	
+	
 })
 
 //$ionicSideMenuDelegate is the dependency for menu
@@ -2140,9 +2202,6 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 		});
 	};
 	//pull from healhtips DB (end)
-	
-	
-	
 	
 	
     //MODAL START
