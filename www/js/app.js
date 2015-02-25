@@ -3116,7 +3116,7 @@ app.controller('promotionsCtrl',function($scope,$firebase){
 })
 
 
-app.controller('DateCtrl', function($scope,appointmentService) {
+app.controller('DateCtrl', function($scope,$ionicPopup, $timeout,appointmentService) {
 		  var today = new Date();
 		  var dd = today.getDate();
 		  var mm = today.getMonth()+1; //January is 0!
@@ -3131,6 +3131,29 @@ app.controller('DateCtrl', function($scope,appointmentService) {
 		   $scope.test=function(){
 				alert($scope.date);
 			  };
+			  
+		$scope.showDate = function() {
+		   $scope.data = {}
+
+		   var myPopup = $ionicPopup.show({
+			 template: '<div pickadate id="classDate" ng-model="date" min-date="minDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" date="selectedDate" no-extra-rows></div>',
+			 title: 'Select a date',
+			 scope: $scope,
+			 buttons: [
+			   { text: 'Cancel'},
+			   {
+				 text: '<b>Confirm</b>',
+				 type: 'button-positive',
+				 onTap: function(e) {
+					 //$scope.date = selectedDate;
+				 }
+			   },
+			 ]
+		   });
+		   myPopup.then(function(res) {
+			 console.log('Tapped!', res);
+		   });
+		  };
 
 })
 

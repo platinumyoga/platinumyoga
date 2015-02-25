@@ -473,9 +473,12 @@ About page
 			<!--pull to refresh(end)-->
 			
 			<div class="container" ng-controller="DateCtrl">
-			  <div pickadate id="classDate" ng-model="date" min-date="minDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" date="dateDefault" no-extra-rows></div>
-
-			<div class="item">
+				<div pickadate id="classDate" ng-model="date" min-date="minDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" date="selectedDate" no-extra-rows></div>
+			<button align="center" class="button button-energized" ng-click="showDate()">
+			{{date || dateDefault}}
+			</button>
+			<br>
+			<div class="item" align="center">
 				<select data-ng-options="o.name for o in options" data-ng-model="selectedOption"></select>
 			</div>
 			
