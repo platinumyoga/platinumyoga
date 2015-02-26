@@ -2017,36 +2017,36 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				retrieveScheduledClasses();
-			  }, 7500);
+			  }, 6000);
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				retrieveWaitlist();
-			  }, 7500);
+			  }, 6000);
 			  
 			  $timeout(function () {
 				$ionicLoading.hide();
 				retrieveUserHistory();
-			  }, 7500);
+			  }, 6000);
 			  
 			  $timeout(function () {
 				$ionicLoading.hide();
 				retrievePurchaseHistory();
-			  }, 7500);
+			  }, 6000);
 			  
 			  			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				//loading of info/etiquette here
 				$scope.loadRegulations();
-			  }, 7500);
+			  }, 6000);
 			  
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				//loading of hall of fame list here
 				$scope.loadHallOfFameList();
-			  }, 7500);
+			  }, 6000);
 			  
 			  
 			  
@@ -2055,35 +2055,35 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 			$timeout(function () {
 			  $ionicLoading.hide();
 				retrieveScheduledClasses();
-			  }, 4500);
+			  }, 4000);
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				$scope.retrieveWaitlist();
-			  }, 4500);
+			  }, 4000);
 			
 			  $timeout(function () {
 				$ionicLoading.hide();
 				retrieveUserHistory();
-			  }, 4500);
+			  }, 4000);
 			  
 			  $timeout(function () {
 				$ionicLoading.hide();
 				retrievePurchaseHistory();
-			  }, 4500);
+			  }, 4000);
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 			  //loading of info/etiquette here
 				$scope.loadRegulations();
-			  }, 4500);
+			  }, 4000);
 			  
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				//loading of hall of fame list here
 				$scope.loadHallOfFameList();
-			  }, 4500);
+			  }, 4000);
 	  }
 	
 	var upcoming = document.getElementById('showUpcoming');
@@ -2359,7 +2359,7 @@ app.controller('reviewCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLo
 	  $timeout(function () {
 		$ionicLoading.hide();
 		retrieveUserHistory();
-	  }, 3000);
+	  }, 6000);
 
 	
 	//pull from healhtips DB (start)
