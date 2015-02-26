@@ -1226,7 +1226,11 @@ app.factory('historyService', function($http) {
             })
 		},
 		getUserHistoryResponse:function(){
-			return historyDatabase.GetClientVisitsResult.Visits.Visit;
+			if(JSON.stringify(historyDatabase.GetClientVisitsResult.Visits.Visit).indexOf("[")>-1){
+				 return historyDatabase.GetClientVisitsResult.Visits.Visit;
+			}else{
+				return JSON.parse("["+JSON.stringify(historyDatabase.GetClientVisitsResult.Visits.Visit)+"]");
+			}	
 		}
 	}
 })
@@ -1256,8 +1260,11 @@ app.factory('purchaseHistoryService', function($http) {
             })
 		},
 		getPurchaseResponse:function(){
-		//alert(purchaseHistoryDatabase.GetClientPurchasesResult.Purchases.SaleItem[0].Description);
-			return purchaseHistoryDatabase.GetClientPurchasesResult.Purchases.SaleItem;
+		if(JSON.stringify(purchaseHistoryDatabase.GetClientPurchasesResult.Purchases.SaleItem).indexOf("[")>-1){
+				 return purchaseHistoryDatabase.GetClientPurchasesResult.Purchases.SaleItem;
+			}else{
+				return JSON.parse("["+JSON.stringify(purchaseHistoryDatabase.GetClientPurchasesResult.Purchases.SaleItem)+"]");
+			}
 		}
 	}
 })
@@ -2088,7 +2095,6 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 	$scope.showUpcoming = function(){
 		$scope.showUpcomingView = true;
 		$scope.showHistoryView = false;
-		$scope.showEnrolled = true;
 		$scope.showPurchase = false;
 		$scope.showWaitlist = false;
 		upcoming.style.cssText="background-color:#e87722; color:#ffffff;";
@@ -3136,7 +3142,7 @@ app.controller('DateCtrl', function($scope,$ionicPopup, $timeout,appointmentServ
 		   $scope.data = {}
 
 		   var myPopup = $ionicPopup.show({
-			 template: '<div pickadate id="classDate" ng-model="date" min-date="minDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" date="selectedDate" no-extra-rows></div>',
+			 template: '<div pickadate id="classDate" ng-model="date" min-date="minDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" date="selectedDate" no-extra-rows>',
 			 title: 'Select a date',
 			 scope: $scope,
 			 buttons: [
@@ -3146,11 +3152,15 @@ app.controller('DateCtrl', function($scope,$ionicPopup, $timeout,appointmentServ
 				 type: 'button-positive',
 				 onTap: function(e) {
 					 //$scope.date = selectedDate;
+					 
+					 
+					 //alert($scope.selectedDate);
 				 }
 			   },
 			 ]
 		   });
 		   myPopup.then(function(res) {
+			 alert(1);
 			 console.log('Tapped!', res);
 		   });
 		  };
