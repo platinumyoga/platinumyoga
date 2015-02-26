@@ -1025,12 +1025,11 @@ app.factory('userScheduleService', function($http,$state) {
             })
 		},
 		getUserScheduleOutput:function(){
-			
+			//console.log(JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit));
 			if(JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit).charAt(0)!="["){
 				return JSON.parse("["+JSON.stringify(userScheduleDatabase.GetClientScheduleResult.Visits.Visit)+"]"); 
 			}else{
-				return userScheduleDatabase.GetClientScheduleResult.Visits.Visit; 
-				
+				return userScheduleDatabase.GetClientScheduleResult.Visits.Visit;
 			}
 		}
 	}
@@ -1226,7 +1225,7 @@ app.factory('historyService', function($http) {
             })
 		},
 		getUserHistoryResponse:function(){
-			if(JSON.stringify(historyDatabase.GetClientVisitsResult.Visits.Visit).indexOf("[")>-1){
+			if(JSON.stringify(historyDatabase.GetClientVisitsResult.Visits.Visit).charAt(0)=="["){
 				 return historyDatabase.GetClientVisitsResult.Visits.Visit;
 			}else{
 				return JSON.parse("["+JSON.stringify(historyDatabase.GetClientVisitsResult.Visits.Visit)+"]");
@@ -1260,7 +1259,7 @@ app.factory('purchaseHistoryService', function($http) {
             })
 		},
 		getPurchaseResponse:function(){
-		if(JSON.stringify(purchaseHistoryDatabase.GetClientPurchasesResult.Purchases.SaleItem).indexOf("[")>-1){
+		if(JSON.stringify(purchaseHistoryDatabase.GetClientPurchasesResult.Purchases.SaleItem).charAt(0)=="["){
 				 return purchaseHistoryDatabase.GetClientPurchasesResult.Purchases.SaleItem;
 			}else{
 				return JSON.parse("["+JSON.stringify(purchaseHistoryDatabase.GetClientPurchasesResult.Purchases.SaleItem)+"]");
@@ -1448,7 +1447,6 @@ app.factory('bookApptService',function($http,userScheduleService,$ionicPopup,$st
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
 				//alert(JSON.stringify(data));
-				//console.log(JSON.stringify(data));
 				//alert(data.AddOrUpdateAppointmentsResult.ErrorCode);
 				if(data.AddOrUpdateAppointmentsResult.ErrorCode==200){
 					userScheduleService.getUserSchedule(userID);
@@ -2087,9 +2085,14 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 	  }
 	
 	var upcoming = document.getElementById('showUpcoming');
+	var waiting = document.getElementById('showWaitingList');
 	var history = document.getElementById('showHistory');
+	var purchase = document.getElementById('showPurchaseHistory');
+	
 	upcoming.style.cssText ="background-color:#e87722; color:#ffffff;";
+	waiting.style.cssText ="background-color:#f8f8f8";
 	history.style.cssText ="background-color:#f8f8f8";
+	purchase.style.cssText ="background-color:#f8f8f8";
 	
 	$scope.showUpcomingView = true;
 	$scope.showUpcoming = function(){
@@ -2099,6 +2102,9 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 		$scope.showWaitlist = false;
 		upcoming.style.cssText="background-color:#e87722; color:#ffffff;";
 		history.style.cssText ="background-color:#f8f8f8";
+		waiting.style.cssText ="background-color:#f8f8f8";
+		history.style.cssText ="background-color:#f8f8f8";
+		purchase.style.cssText ="background-color:#f8f8f8";
 	};	
 	
 	$scope.showHistory = function(){
@@ -2115,8 +2121,12 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 		$scope.showWaitlist = true;
 		$scope.showPurchase = false;
 		$scope.showHistoryView = false;
-		upcoming.style.cssText="background-color:#e87722; color:#ffffff;";
+
+		waiting.style.cssText="background-color:#e87722; color:#ffffff;";
+		upcoming.style.cssText ="background-color:#f8f8f8";
 		history.style.cssText ="background-color:#f8f8f8";
+		purchase.style.cssText ="background-color:#f8f8f8";
+		
 	};
 	
 	$scope.showEnrolled = function(){
@@ -2134,6 +2144,13 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 	$scope.showPurchaseHistory = function(){
 		$scope.showHistoryView = false;
 		$scope.showPurchase = true;
+		$scope.showUpcomingView = false;
+		$scope.showWaitlist = false;
+		
+		purchase.style.cssText="background-color:#e87722; color:#ffffff;";
+		upcoming.style.cssText ="background-color:#f8f8f8";
+		history.style.cssText ="background-color:#f8f8f8";
+		waiting.style.cssText ="background-color:#f8f8f8";
 	};	
 	
 	$scope.review = function(){
@@ -2153,9 +2170,9 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 		   confirmPopup.then(function(res) {
 			 if(res) {
 				if(classInfo.ClassID==0){
-					removeAppointmentService.removeScheduledAppt(classInfo,userId);
+					removeAppointmentService.removeScheduledAppt(classInfo,$scope.userId);
 				}else{
-					removeBookingService.removeScheduledClass(classInfo,userId);
+					removeBookingService.removeScheduledClass(classInfo,$scope.userId);
 				}
 				
 				$state.go($state.current, {}, {reload: true});
@@ -2515,7 +2532,22 @@ app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesSe
 	$scope.totalClasses = classesService.getClasses();
 	$scope.selectedclass = classesService.getSelectedClass($stateParams.classID);	
 	
-
+	//date
+	var today = new Date();
+	var dd = today.getDate();
+	var mm = today.getMonth()+1;//jan is 0
+	var yyyy = today.getFullYear();
+	
+	if(mm<10){
+		mm="0"+mm;
+	}
+	
+	if(dd<10){
+		dd="0"+dd;
+	}
+	$scope.datex = yyyy+"-"+mm+"-"+dd;
+	$scope.ricky="asd";
+	
 	
 	if($scope.selectedclass!=null){
 			var str = $scope.selectedclass.ClassDescription.Description;
@@ -2544,7 +2576,6 @@ app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesSe
 	//pull to refresh end classes(end)
 	 
 	 
-	 
 	$scope.bookClass = function(selectedClassID,userID){
 		$scope.selectedClassId = selectedClassID;
 		//classesService.bookClass(selectedClassID,userID);
@@ -2556,7 +2587,7 @@ app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesSe
 				   confirmBookingPopup.then(function(res) {
 					 if(res){
 						//click on confirm
-						classesService.bookClass(selectedClassID,userID);
+						classesService.bookClass(selectedClassID,$scope.userID);
 					 }else{
 						//press cancel
 						//alert("nope");
@@ -2703,7 +2734,7 @@ app.controller('workshopCtrl',function($scope,$stateParams,$ionicPopup,userServi
 		   confirmBookingPopup.then(function(res) {
 			 if(res){
 				//click on confirm
-				workshopsService.bookWorkshop(workshopId,userId);
+				workshopsService.bookWorkshop(workshopId,$scope.userID);
 			 }else{
 				//press cancel
 				//alert("nope");
@@ -2770,7 +2801,7 @@ app.controller('retreatCtrl',function($scope,$stateParams,$ionicPopup,userServic
 		   confirmBookingPopup.then(function(res) {
 			 if(res){
 				//click on confirm
-				retreatsService.bookRetreat(retreatId,userId);
+				retreatsService.bookRetreat(retreatId,$scope.userID);
 			 }else{
 				//press cancel
 				//alert("nope");
@@ -3073,7 +3104,6 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 				 type: 'button-assertive',
 				 onTap: function(e) {
 					//method trigger here
-						
 
 				   if ($scope.data.notes!=null) {
 						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule,$scope.data.notes);
@@ -3160,7 +3190,6 @@ app.controller('DateCtrl', function($scope,$ionicPopup, $timeout,appointmentServ
 			 ]
 		   });
 		   myPopup.then(function(res) {
-			 alert(1);
 			 console.log('Tapped!', res);
 		   });
 		  };
