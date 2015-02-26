@@ -2103,7 +2103,6 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 		upcoming.style.cssText="background-color:#e87722; color:#ffffff;";
 		history.style.cssText ="background-color:#f8f8f8";
 		waiting.style.cssText ="background-color:#f8f8f8";
-		history.style.cssText ="background-color:#f8f8f8";
 		purchase.style.cssText ="background-color:#f8f8f8";
 	};	
 	
@@ -2114,6 +2113,8 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 		$scope.showHistoryView = true;
 		history.style.cssText ="background-color:#e87722; color:#ffffff;";
 		upcoming.style.cssText ="background-color:#f8f8f8";
+		waiting.style.cssText ="background-color:#f8f8f8";
+		purchase.style.cssText ="background-color:#f8f8f8";
 	};
 	
 	$scope.showWaitingList = function(){
