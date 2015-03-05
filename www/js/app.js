@@ -283,7 +283,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 
 
-app.factory('classesService', function($http,$ionicPopup,userScheduleService,waitlistService,$localstorage) {
+app.factory('classesService', function($http,$ionicPopup,userScheduleService,waitlistService,$localstorage,$state) {
 var availClasses = [];
 	return {
 		getClassesDatabase: function(){
@@ -301,10 +301,10 @@ var availClasses = [];
 
 				$localstorage.set('classesDb', JSON.stringify(data.Classes.Class));
 				classesDatabase = JSON.parse($localstorage.get('classesDb'));
-
 			})
 		},
 		getClasses:function(){
+			console.log(JSON.stringify(classesDatabase));
 			return classesDatabase;
 		},
 		getSelectedClass:function(classID){	
@@ -1571,6 +1571,11 @@ app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate,
 		window.open('http://www.platinumyoga.com/pages/platinum-yoga-rewards', '_blank', 'location=yes','closebuttoncaption=back');
 	};
 	
+	$scope.loadRegister = function(){
+		window.open('http://www.platinumyoga.com/', '_blank', 'location=yes','closebuttoncaption=back');
+	};
+	
+	
 	//loading the hall of fame list from firebase (no saving to localstorage)
 	$scope.loadHallOfFameList = function(){
 		$scope.halloffameList = hallOfFameDb.getHallOfFameData();
@@ -1970,8 +1975,7 @@ app.controller('barcodeCtrl',function($scope,userService){
 	$scope.userId = userService.getUserID();
 })
 
-app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoading,userService,userScheduleService,removeBookingService,waitlistService,removeWaitlistService,historyService,purchaseHistoryService,$ionicModal,feedbackDb,$firebase,removeAppointmentService,$localstorage){
-	
+app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoading,userService,userScheduleService,removeBookingService,waitlistService,removeWaitlistService,historyService,purchaseHistoryService,$ionicModal,feedbackDb,$firebase,removeAppointmentService,$localstorage,classesService,$stateParams){
 	$scope.userId = userService.getUserID();;
 	$scope.username = userService.getUsername();
 	$scope.displayReviews = false;
@@ -1988,18 +1992,12 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 		$scope.waitlist = waitlistService.getWaitlistOutput();
 	};
 	
-	var retrieveUserHistory = function(){
-		//retrieve user's history
-		historyService.getUserHistory($scope.userId);
-		$scope.userHistory = historyService.getUserHistoryResponse();
+	//calling the classes 
+	var retrieveClasses = function(){
+		$scope.totalClasses = classesService.getClasses();
+		$scope.selectedclass = classesService.getSelectedClass($stateParams.classID);	
 	};
 	
-	var retrievePurchaseHistory = function(){
-		//retrieve user's purchase history
-		purchaseHistoryService.getPurchaseHistory($scope.userId);
-		$scope.saleItems = purchaseHistoryService.getPurchaseResponse();
-	};
-
 	// Setup the loader
 	  $ionicLoading.show({
 		content: 'Loading',
@@ -2011,45 +2009,39 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 	  
 	  if($localstorage.get('classesDb')==""||$localstorage.get('classesDb')==null){
 			  // Set a timeout to clear loader, however you would actually call the $ionicLoading.hide(); method whenever everything is ready or loaded.
-			  //alert("slow");
+			  $timeout(function () {
+			  $ionicLoading.hide();
+				retrieveClasses();
+			  }, 5000);
+			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				retrieveScheduledClasses();
-			  }, 6000);
+			  }, 5000);
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				retrieveWaitlist();
-			  }, 6000);
-			  
-			  $timeout(function () {
-				$ionicLoading.hide();
-				retrieveUserHistory();
-			  }, 6000);
-			  
-			  $timeout(function () {
-				$ionicLoading.hide();
-				retrievePurchaseHistory();
-			  }, 6000);
-			  
-			  			  
+			  }, 5000);
+			  	  			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				//loading of info/etiquette here
 				$scope.loadRegulations();
-			  }, 6000);
-			  
+			  }, 5000);
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				//loading of hall of fame list here
 				$scope.loadHallOfFameList();
-			  }, 6000);
-			  
-			  
-			  
+			  }, 5000);		  
 	  }else{
 		//alert("fast");
+			$timeout(function () {
+			  $ionicLoading.hide();
+				retrieveClasses();
+			  }, 4000);
+			  
 			$timeout(function () {
 			  $ionicLoading.hide();
 				retrieveScheduledClasses();
@@ -2057,17 +2049,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
-				$scope.retrieveWaitlist();
-			  }, 4000);
-			
-			  $timeout(function () {
-				$ionicLoading.hide();
-				retrieveUserHistory();
-			  }, 4000);
-			  
-			  $timeout(function () {
-				$ionicLoading.hide();
-				retrievePurchaseHistory();
+				retrieveWaitlist();
 			  }, 4000);
 			  
 			  $timeout(function () {
@@ -2075,8 +2057,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 			  //loading of info/etiquette here
 				$scope.loadRegulations();
 			  }, 4000);
-			  
-			  
+			    
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				//loading of hall of fame list here
@@ -2086,80 +2067,48 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 	
 	var upcoming = document.getElementById('showUpcoming');
 	var waiting = document.getElementById('showWaitingList');
-	var history = document.getElementById('showHistory');
-	var purchase = document.getElementById('showPurchaseHistory');
+	var allClasses = document.getElementById('showClasses');
 	
-	upcoming.style.cssText ="background-color:#e87722; color:#ffffff;";
-	waiting.style.cssText ="background-color:#f8f8f8";
-	history.style.cssText ="background-color:#f8f8f8";
-	purchase.style.cssText ="background-color:#f8f8f8";
+	upcoming.style.cssText = "background-color:#f8f8f8";
+	waiting.style.cssText = "background-color:#f8f8f8";
+	allClasses.style.cssText = "background-color:#e87722; color:#ffffff;";
 	
-	$scope.showUpcomingView = true;
+	$scope.displayClasses = true;
+	
 	$scope.showUpcoming = function(){
 		$scope.showUpcomingView = true;
-		$scope.showHistoryView = false;
-		$scope.showPurchase = false;
 		$scope.showWaitlist = false;
-		upcoming.style.cssText="background-color:#e87722; color:#ffffff;";
-		history.style.cssText ="background-color:#f8f8f8";
+		$scope.displayClasses = false;
+		upcoming.style.cssText = "background-color:#e87722; color:#ffffff;";
 		waiting.style.cssText ="background-color:#f8f8f8";
-		purchase.style.cssText ="background-color:#f8f8f8";
-	};	
-	
-	$scope.showHistory = function(){
-		$scope.showUpcomingView = false;
-		$scope.showWaitlist = false;
-		$scope.showPurchase = false;
-		$scope.showHistoryView = true;
-		history.style.cssText ="background-color:#e87722; color:#ffffff;";
-		upcoming.style.cssText ="background-color:#f8f8f8";
-		waiting.style.cssText ="background-color:#f8f8f8";
-		purchase.style.cssText ="background-color:#f8f8f8";
+		allClasses.style.cssText = "background-color:#f8f8f8";
 	};
 	
 	$scope.showWaitingList = function(){
 		$scope.showUpcomingView = false;
 		$scope.showWaitlist = true;
-		$scope.showPurchase = false;
-		$scope.showHistoryView = false;
-
-		waiting.style.cssText="background-color:#e87722; color:#ffffff;";
-		upcoming.style.cssText ="background-color:#f8f8f8";
-		history.style.cssText ="background-color:#f8f8f8";
-		purchase.style.cssText ="background-color:#f8f8f8";
+		$scope.displayClasses = false;
 		
+		upcoming.style.cssText="background-color:#f8f8f8;";
+		waiting.style.cssText="background-color:#e87722; color:#ffffff;";
+		allClasses.style.cssText = "background-color:#f8f8f8";
 	};
 	
-	$scope.showEnrolled = function(){
-		$scope.showUpcomingView = true;
-		$scope.showWaitlist = false;
-		$scope.showPurchase = false;
-		$scope.showHistoryView = false;
-	};
-	
-	$scope.showBookingHistory = function(){
-		$scope.showHistoryView = true;
-		$scope.showPurchase = false;
-	};
-	
-	$scope.showPurchaseHistory = function(){
-		$scope.showHistoryView = false;
-		$scope.showPurchase = true;
+	$scope.showClasses = function(){
+		$scope.displayClasses = true;
 		$scope.showUpcomingView = false;
 		$scope.showWaitlist = false;
 		
-		purchase.style.cssText="background-color:#e87722; color:#ffffff;";
-		upcoming.style.cssText ="background-color:#f8f8f8";
-		history.style.cssText ="background-color:#f8f8f8";
-		waiting.style.cssText ="background-color:#f8f8f8";
-	};	
+		upcoming.style.cssText="background-color:#f8f8f8;";
+		waiting.style.cssText="background-color:#f8f8f8;";
+		allClasses.style.cssText = "background-color:#e87722; color:#ffffff;";
+	};
 	
 	$scope.review = function(){
 		$state.go("yoga-app.home");
 		$scope.showUpcomingView = false;
 		$scope.showHistoryView = true;
 	};	
-	
 	
 	$scope.removeClass = function(classInfo,userId){
 		 // A confirm dialog
@@ -2179,7 +2128,6 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 				$state.go($state.current, {}, {reload: true});
 			 } else {
 				//press cancel
-				//alert("nope");
 			 }
 		   });
 		   
@@ -2198,45 +2146,79 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 				$state.go($state.current, {}, {reload: true});
 			 } else {
 				//press cancel
-				//alert("nope");
 			 }
 		   })
 	};
 	
-	//pull from healhtips DB (start)
-	var arrayList = new Array();
-	$scope.healthtip = function(){
-		var healthtipsLink = new Firebase("https://healthtipstinkertest.firebaseio.com/");
-		healthtipsLink.once('value', function(allMessagesSnapshot) {
-			allMessagesSnapshot.forEach(function(messageSnapshot) {
-				 // Will be called with a messageSnapshot for each message under message_list.
-					var message = messageSnapshot.child('tips').val();
-					arrayList.push(message);
-			});
-			  
-		   var randomnumber = Math.floor(Math.random() * (arrayList.length));
-			
-			   var alertPopup2 = $ionicPopup.alert({
-				 title: 'Health Tip',
-				 subTitle: 'Thank you for your review!',
-				 template: arrayList[randomnumber]
-			   });
-			   alertPopup2.then(function(res) {});
-			   
-		});
+	//classes logic (start)	
+	if($scope.selectedclass!=null){
+		var str = $scope.selectedclass.ClassDescription.Description;
+			str = str.replace(/<div>/g,"");
+			str = str.replace(/<\/div>/g,"");
+			str = str.replace(/&nbsp;/g,"");
+		$scope.updatedClassDescription = str;
+	}
+	
+	$scope.userID = userService.getUserID();
+	//loading the feedback/review DB
+	 $scope.feedbacks = feedbackDb.getFeedbackData();
+	 
+	 $scope.bookClassInHome = function(selectedClassID,userID){
+		$scope.selectedClassId = selectedClassID;
+		//classesService.bookClass(selectedClassID,userID);
+		var confirmBookingPopup = $ionicPopup.confirm({
+					 title: 'Book Class',
+					 template: 'Are you sure you want to book this class?',
+					 okText: 'Confirm'
+				   });
+				   confirmBookingPopup.then(function(res) {
+					 if(res){
+						//click on confirm
+						classesService.bookClass(selectedClassID,$scope.userID);
+						$state.go($state.current, {}, {reload: true});
+					 }else{
+						//press cancel
+						//alert("nope");
+					 }
+				   });
 	};
-	//pull from healhtips DB (end)
+	
+	//$scope.selectedStaff = classesService.getClassStaff($stateParams.classStaffID);
+	
+	if($scope.selectedStaff!=null){
+			var str1 = $scope.selectedStaff.Bio;
+			 str1 = str1.replace(/&lsquo;/g,"");
+			 str1 = str1.replace(/&rsquo;/g,"");
+			 str1 = str1.replace(/<br\/>/g,"");
+			 str1 = str1.replace(/<\/p>/g,"");
+			 str1 = str1.replace(/<p>/g,"");
+			 str1 = str1.replace(/<div>/g,"");
+			 str1 = str1.replace(/<\/div>/g,"");
+			 str1 = str1.replace(/&nbsp;/g,"");
+			 $scope.updatedClassStaffDesc = str1;
+	}
 	
 	
-    //MODAL START
-	$ionicModal.fromTemplateUrl('review-modal.html', {
+	//MODAL START
+	$ionicModal.fromTemplateUrl('classReviews_modal.html', {
 		scope: $scope,
 		animation: 'slide-in-up'
 	  }).then(function(modal) {
 		$scope.modal = modal;
 	  });
+	  
 	  $scope.openModal = function() {
-		$scope.modal.show();
+		
+		var userFeedbacks = [];
+		var a=0;
+		  for(var b=0;b<$scope.feedbacks.length;b++){
+			if($scope.feedbacks[b].staff==$scope.selectedclass.Staff.Name && $scope.feedbacks[b].lesson==$scope.selectedclass.ClassDescription.Name){
+				userFeedbacks[a] = $scope.feedbacks[b];
+				a++;
+			}
+		  }
+		$scope.classReviews = userFeedbacks;  
+		$scope.modal.show();	
 	  };
 	  $scope.closeModal = function() {
 		$scope.modal.hide();
@@ -2254,105 +2236,12 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 		// Execute action
 	  });
 	  //MODAL END
-	  
-	  
-	  $scope.writeReview = function(history){
-	  $scope.displayReviews = false;
-		//alert(JSON.stringify(history));
-		$scope.historyId = history.ID;
-		$scope.lessonName = history.Name;
-		$scope.staffName = history.Staff.Name;
-		$scope.classID = history.ClassID;
-		//alert("class ID:"+$scope.classID);
-		$scope.appointmentID = history.AppointmentID;
-		//alert("appt ID:"+$scope.appointmentID);
-		$scope.openModal();
-		
-		//loading the feedback/review DB
-	  $scope.feedbacks = feedbackDb.getFeedbackData();
-	  var a=0;
-	  $scope.userFeeds="";
-	  for(var b=0;b<$scope.feedbacks.length;b++){
-		if($scope.feedbacks[b].userid==$scope.userId && $scope.feedbacks[b].historyid==$scope.historyId){
-			$scope.userFeeds = $scope.feedbacks[b];
-			break;
-		}
-	  }
-
-	  if($scope.userFeeds!=""){
-		$scope.displayReviews = true;
-	  }
-	};
-	
-	  
-	  //saving to feedback database
-	   $scope.addReview = function(review) {
-		//alert(review.stars);
-		var result = 0;
-		
-		if(review.feedback==""){
-			result = 1;
-		}
-		
-		//alert(review.booking);
-	 for(var b=0;b<$scope.feedbacks.length;b++){
-		if($scope.feedbacks[b].userid==$scope.userId && $scope.feedbacks[b].historyid==$scope.historyId){
-		   result = 1;
-		   break;
-		}
-	  }
-		
-		if(result==0){
-		
-			var save = $scope.feedbacks.$add({
-           // booking:review.booking,
-		   historyid:$scope.historyId,
-		   userid:$scope.userId,
-		   username:$scope.username,
-		   classid:$scope.classID,
-		   appointmentid:$scope.appointmentID,
-		   lesson:$scope.lessonName,
-		   staff:$scope.staffName,
-           feedback:review.feedback,
-		   stars:review.stars
-			});
-			
-			//review.booking = "";
-			review.feedback = "";
-			review.stars = 0;
-			
-			//alert
-			/*var alertPopup = $ionicPopup.alert({
-			 title: 'Review',
-			 template: "Review has been posted!"
-		   });
-		   alertPopup.then(function(res) {});
-		   alertPopup.close();*/
-		   $scope.healthtip();
-		}
-	  	
-		
-		if(save) {
-		  $scope.closeModal();
-		  review.feedback = "";
-		  review.stars = 0;
-		} else {
-			review.feedback = "";
-			review.stars = 0;
-		  var alert1 = $ionicPopup.alert({
-			 title: 'Review',
-			 template: "Sorry, you can only review once per class."
-		   });
-		   alert1.then(function(res) {});
-		   $scope.closeModal();
-		}
-		
-    };	  
+	//classes logic (end)
 })
 
 
 
-app.controller('reviewCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoading,userService,userScheduleService,historyService,$ionicModal,feedbackDb,$firebase,$localstorage){
+app.controller('reviewCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoading,userService,userScheduleService,historyService,$ionicModal,feedbackDb,$firebase,$localstorage,purchaseHistoryService){
 	
 	$scope.userId = userService.getUserID();;
 	$scope.username = userService.getUsername();
@@ -2363,7 +2252,12 @@ app.controller('reviewCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLo
 		historyService.getUserHistory($scope.userId);
 		$scope.userHistory = historyService.getUserHistoryResponse();
 	};
-	
+		
+	var retrievePurchaseHistory = function(){
+		//retrieve user's purchase history
+		purchaseHistoryService.getPurchaseHistory($scope.userId);
+		$scope.saleItems = purchaseHistoryService.getPurchaseResponse();
+	};
 
 	// Setup the loader
 	  $ionicLoading.show({
@@ -2377,10 +2271,38 @@ app.controller('reviewCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLo
 	  $timeout(function () {
 		$ionicLoading.hide();
 		retrieveUserHistory();
-	  }, 6000);
+	  }, 5000);
+	  
+	  $timeout(function () {
+		$ionicLoading.hide();
+		retrievePurchaseHistory();
+	  }, 5000);
 
+	  
+	  
+	var history = document.getElementById('showHistory');
+	var purchase = document.getElementById('showPurchaseHistory');
 	
-	//pull from healhtips DB (start)
+	history.style.cssText ="background-color:#e87722; color:#ffffff;";
+	purchase.style.cssText ="background-color:#f8f8f8";
+	
+	$scope.showHistoryView = true;
+	
+	$scope.showHistory = function(){
+		$scope.showPurchase = false;
+		$scope.showHistoryView = true;
+		history.style.cssText ="background-color:#e87722; color:#ffffff;";
+		purchase.style.cssText ="background-color:#f8f8f8";
+	};
+	
+	$scope.showPurchaseHistory = function(){
+		$scope.showHistoryView = false;
+		$scope.showPurchase = true;
+		purchase.style.cssText="background-color:#e87722; color:#ffffff;";
+		history.style.cssText ="background-color:#f8f8f8";
+	};
+	
+	//pull from healthtips DB (start)
 	var arrayList = new Array();
 	$scope.healthtip = function(){
 		var healthtipsLink = new Firebase("https://healthtipstinkertest.firebaseio.com/");

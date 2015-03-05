@@ -115,10 +115,10 @@ About page
             <button class="button button-block button-energized" ng-click="signIn(user)">
               Sign-In
             </button>
-            <p class="text-center">
-				<a style="color:black; text-decoration: none;"href="http://www.platinumyoga.com/">Register</a><br/>
-              <!--<a href="#/forgot-password">Forgot password</a>-->
-            </p>
+            <div align="center">
+				<div ng-click="loadRegister()">Register</a><br/>
+				</div>
+            </div>
 			<div align="center">
 				<div ng-click="openModal()">Reset Password</div><br/>
               <!--<a href="#/forgot-password">Forgot password</a>-->
@@ -280,16 +280,37 @@ About page
 				
 				<b>
 				<div class="button-bar">
-				  <a class="button button-small" id="showUpcoming" ng-click="showUpcoming()">BOOKED</a>
+				  <a class="button button-small" id="showClasses" ng-click="showClasses()">CLASSES</a>
+				</div>
+				<div class="button-bar">
+				  <a class="button button-small" id="showUpcoming" ng-click="showUpcoming()">MY SCHEDULE</a>
 				  <a class="button button-small" id="showWaitingList" ng-click="showWaitingList()">WAITING LIST</a>
 				</div>
 				</b>
-				<b>
-				<div class="button-bar">
-				  <a class="button button-small" id="showHistory" ng-click="showHistory()">PAST BOOKINGS</a>
-				  <a class="button button-small" id="showPurchaseHistory" ng-click="showPurchaseHistory()">PURCHASES</a>
+				
+				
+				<!--displays one week's worth of classes for booking-->
+				<div class="list" ng-show="displayClasses">
+					<div class="item wrap" ng-repeat="classListItem in totalClasses | orderBy:'StartDateTime'">
+					<div class="row">
+						<div class="col col-75">
+							<a href="#/yoga-app/selectedClass/{{classListItem.ID}}">
+							<b>{{classListItem.ClassDescription.Name}}</b><br/>			
+							{{(classListItem.StartDateTime).slice(8,10)}}-{{(classListItem.StartDateTime).slice(5,7)}}-{{(classListItem.StartDateTime).slice(0,4)}}<br/>
+							{{(classListItem.StartDateTime).slice(11,16)}} - {{(classListItem.EndDateTime).slice(11,16)}}<br/>
+							{{classListItem.Staff.Name}}<br/>
+							{{classListItem.ClassDescription.Level.Name}}
+							<!--{{classListItem.MaxCapacity-classListItem.TotalBooked}} available-->
+							</a>
+						</div>
+						<div class="col col-center col-25">
+							<button class="button-right button-stable" ng-click="bookClassInHome({{classListItem.ID}},{{userID}})" ng-show={{classListItem.IsAvailable}}>Book</button>
+						</div>
+						</div>
+					</div>
 				</div>
-				</b>
+				
+				
 				
 				<!--list displaying booked classes and workshops[this is a single list from the mindbodyonline service]-->
 				<div class="list" ng-show="showUpcomingView">			
@@ -322,38 +343,6 @@ About page
 						</div>
 					</div>
 				</div>
-				
-				
-				<!--list showing the history-->
-				<div class="list" ng-show="showHistoryView">
-					<div class="item wrap" ng-repeat="history in userHistory | orderBy:'-StartDateTime'">
-						<div class="row">
-							<div class="col col-67">
-							{{(history.StartDateTime).slice(8,10)}}-{{(history.StartDateTime).slice(5,7)}}-{{(history.StartDateTime).slice(0,4)}}<br/>
-							<b>Lesson:</b>&nbsp;{{history.Name}}<br/>
-							<b>Staff:</b>&nbsp;{{history.Staff.Name}}<br/>
-							<b>Attendance:&nbsp;</b>
-							<span ng-show={{history.SignedIn}}>Present</span>
-							<span ng-show=!{{history.SignedIn}}>Absent</span>
-							</div>
-							
-							<div class="col col-33">
-								<div class="button button-small" ng-click="writeReview({{history}})" ng-show={{history.SignedIn}}>Review</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				
-				<!--list displaying purchase histories-->
-				<div class="list" ng-show="showPurchase">				
-					<div class="item wrap" ng-repeat="item in saleItems | orderBy:'-Sale.SaleDate'">
-						{{(item.Sale.SaleDate).slice(8,10)}}-{{(item.Sale.SaleDate).slice(5,7)}}-{{(item.Sale.SaleDate).slice(0,4)}}<br/>
-						<b>Item:</b>{{item.Description}}<br/>
-						<b>Price:</b>S${{item.Price.slice(0,-2)}}<br/>
-						<b>Quantity:</b>{{item.Quantity}}
-					</div>
-				</div>
-				
 			</ion-content>
       </ion-view>
     </script>
@@ -362,10 +351,20 @@ About page
 	
 	<!--REVIEW PAGE-->
     <script id="templates/review.html" type="text/ng-template">
-      <ion-view title="REVIEW">
+      <ion-view title="History">
 			<ion-content has-header="true">
 				<!--list showing the history-->
-				<div class="list">
+				
+				<b>
+					<div class="button-bar">
+					  <a class="button button-small" id="showHistory" ng-click="showHistory()">PAST BOOKINGS</a>
+					  <a class="button button-small" id="showPurchaseHistory" ng-click="showPurchaseHistory()">PURCHASES</a>
+					</div>
+				</b>
+				
+				
+				<!--histories showing past bookings-->
+				<div class="list" ng-show="showHistoryView">
 					<div class="item wrap" ng-repeat="history in userHistory | orderBy:'-StartDateTime'">
 						<div class="row">
 							<div class="col col-67">
@@ -380,6 +379,17 @@ About page
 								<div class="button button-small" ng-click="writeReview({{history}})" ng-show={{history.SignedIn}}>Review</div>
 							</div>
 						</div>
+					</div>
+				</div>
+				
+				
+				<!--list displaying purchase histories-->
+				<div class="list" ng-show="showPurchase">				
+					<div class="item wrap" ng-repeat="item in saleItems | orderBy:'-Sale.SaleDate'">
+						{{(item.Sale.SaleDate).slice(8,10)}}-{{(item.Sale.SaleDate).slice(5,7)}}-{{(item.Sale.SaleDate).slice(0,4)}}<br/>
+						<b>Item:</b>{{item.Description}}<br/>
+						<b>Price:</b>S${{item.Price.slice(0,-2)}}<br/>
+						<b>Quantity:</b>{{item.Quantity}}
 					</div>
 				</div>
 
@@ -1335,7 +1345,7 @@ About page
 							</button>
 						  </div>-->
 					</div>
-					<button class="button" ng-click="goBack()">Go Back</button>
+					<button class="button button-block button-stable" ng-click="goBack()">Done</button>
         </ion-content>
       </ion-view>
     </script>
