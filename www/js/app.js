@@ -2013,29 +2013,29 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				retrieveClasses();
-			  }, 5000);
+			  }, 6000);
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				retrieveScheduledClasses();
-			  }, 5000);
+			  }, 6000);
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				retrieveWaitlist();
-			  }, 5000);
+			  }, 6000);
 			  	  			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				//loading of info/etiquette here
 				$scope.loadRegulations();
-			  }, 5000);
+			  }, 6000);
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				//loading of hall of fame list here
 				$scope.loadHallOfFameList();
-			  }, 5000);		  
+			  }, 6000);		  
 	  }else{
 		//alert("fast");
 			$timeout(function () {
@@ -2267,7 +2267,7 @@ app.controller('reviewCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLo
 	  $timeout(function () {
 		$ionicLoading.hide();
 		retrieveUserHistory();
-	  }, 5000);
+	  }, 6000);
 	  
 	  $timeout(function () {
 		$ionicLoading.hide();
