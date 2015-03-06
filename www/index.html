@@ -115,7 +115,7 @@ About page
             <button class="button button-block button-energized" ng-click="signIn(user)">
               Sign-In
             </button>
-            <div align="center">
+			<div align="center">
 				<div ng-click="loadRegister()">Register</a><br/>
 				</div>
             </div>
@@ -288,7 +288,6 @@ About page
 				</div>
 				</b>
 				
-				
 				<!--displays one week's worth of classes for booking-->
 				<div class="list" ng-show="displayClasses">
 					<div class="item wrap" ng-repeat="classListItem in totalClasses | orderBy:'StartDateTime'">
@@ -309,7 +308,6 @@ About page
 						</div>
 					</div>
 				</div>
-				
 				
 				
 				<!--list displaying booked classes and workshops[this is a single list from the mindbodyonline service]-->
@@ -343,12 +341,14 @@ About page
 						</div>
 					</div>
 				</div>
+				
 			</ion-content>
       </ion-view>
     </script>
 	
 	
 	
+
 	<!--REVIEW PAGE-->
     <script id="templates/review.html" type="text/ng-template">
       <ion-view title="History">
@@ -357,7 +357,7 @@ About page
 				
 				<b>
 					<div class="button-bar">
-					  <a class="button button-small" id="showHistory" ng-click="showHistory()">PAST BOOKINGS</a>
+					  <a class="button button-small" id="showHistoryButton" ng-click="showHistory()">PAST BOOKINGS</a>
 					  <a class="button button-small" id="showPurchaseHistory" ng-click="showPurchaseHistory()">PURCHASES</a>
 					</div>
 				</b>
