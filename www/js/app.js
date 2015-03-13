@@ -2282,6 +2282,8 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 	//classes logic (end)
 	
 	
+	
+	
 })
 
 
