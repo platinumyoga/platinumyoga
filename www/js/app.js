@@ -2281,9 +2281,10 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 	  //MODAL END
 	//classes logic (end)
 	
-	
-	
-	
+	$scope.share = function(classInfo){
+		var msg = "Join me for "+JSON.stringify(classInfo.Name)+" at Platinum Yoga!"
+		window.plugins.socialsharing.share(msg, null, null,'http://http://www.platinumyoga.com/');
+	};
 })
 
 
