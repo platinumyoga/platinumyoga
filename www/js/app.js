@@ -728,7 +728,7 @@ app.factory('sessionService',function($http){
 
 
 //services
-app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userScheduleService,historyService,purchaseHistoryService,userDetailsService,waitlistService,classesService,workshopsService,eventsService,retreatsService,challengesService,sessionService,sessionStaffService) {
+app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userScheduleService,historyService,purchaseHistoryService,userDetailsService,waitlistService,classesService,workshopsService,eventsService,retreatsService,challengesService,sessionService,sessionStaffService,$ionicLoading,$timeout) {
 	var users = [];
 	var userDatabase = "";
 	
@@ -750,6 +750,8 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
 			request.success(function (data) {
 				userDatabase = data;
 				if(userDatabase.ValidateLoginResult.ErrorCode === 200){	
+
+					
 					
 					$localstorage.set('name', user.username);
 					$localstorage.set('password', user.password);
@@ -768,6 +770,8 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
 					challengesService.getChallengesDatabase();
 					sessionService.getSession();
 					sessionStaffService.getSessionStaff();
+					
+			
 					
 					$state.go("yoga-app.home");
 				}else{
