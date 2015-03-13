@@ -1103,12 +1103,70 @@ About page
     <script id="templates/yogapedia.html" type="text/ng-template">
       <ion-view title="Yogapedia">
         <ion-content has-header="true">
-			<p align="center">
-				<img src="img/yoga_v0.jpg" width="90%"/>
-			</p>
+			<!--<p align="center">-->
+				<!--<img src="img/yoga_v0.jpg" width="90%"/>-->
+			<!--</p>-->
+			<div class="item" align="center">
+				<span class="input-label">Select Pose Category:</span>
+				<select data-ng-options="o.name for o in poseOptions" data-ng-model="poseOption"></select>
+			</div>
+			
+			<div class="bar bar-header item-input-inset ng-hide">
+					<ion-search filter="(poseOption.value)"></ion-search>
+			</div>
+			
+			
+			<div class="list">
+				<div class="item wrap" ng-repeat="yogapediapose in yogapediaList | filter:(poseOption.value)">
+					<div class="row">
+						<div class="col col-25">
+							<img ng-src="data:{{yogapediapose.posepicturebase64.filetype}};base64,{{yogapediapose.posepicturebase64.base64}}" alt=""  height="50" width="50">
+						</div>
+						<div class="col col-75">
+							<b>Pose:&nbsp;</b>{{yogapediapose.pose}}<br/>
+							<b>Category:&nbsp;</b>{{yogapediapose.classType}}<br/>
+							<button class="button button-small" ng-click="poseInfo(yogapediapose)">&nbsp;&nbsp;Info&nbsp;&nbsp;</button>
+						</div>
+					</div>
+				</div>
+			</div>
         </ion-content>
       </ion-view>
-    </script>
+    </script>	
+		
+	<!--YOGAPEDIA MODAL-->
+	<script id="yogapedia-modal.html" type="text/ng-template">
+	  <ion-modal-view>
+		<ion-header-bar class="bar-energized">
+			<h1 class="title">Yogapedia Pose</h1>
+			  <div class="buttons">
+					<a class="button button-icon ion-close" ng-click="closeModal()"></a>
+			  </div>
+		</ion-header-bar>
+			<ion-content>	
+			    <img ng-src="data:{{selectedPose.posepicturebase64.filetype}};base64,{{selectedPose.posepicturebase64.base64}}" alt=""  height="100" width="100">
+				<br/>
+				<b>Pose Name:&nbsp;</b>{{selectedPose.pose}}<br/>
+				<b>Category:&nbsp;</b>{{selectedPose.classType}}<br/>
+				<button class="button button-block button-energized" ng-click="completedPose(selectedPose)">Completed</button>
+				
+				<!--<div class="list">
+				  <label class="item item-input">
+					<input type="text" placeholder="Email" ng-model='reset.email'>
+				  </label>
+				  <label class="item item-input">
+					<input type="text" placeholder="First Name" ng-model='reset.firstName' >
+				  </label>
+				  <label class="item item-input">
+					<input type="text" placeholder="Last Name" ng-model='reset.lastName' >
+				  </label>
+					  <button class="button button-block button-energized" ng-click="passwordReset(reset)">Submit</button>
+				</div>-->
+			</ion-content>
+	  </ion-modal-view>
+	</script>
+
+
 	
 	<!--LUCKY DRAW PAGE-->
 	<!--

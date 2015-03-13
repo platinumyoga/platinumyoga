@@ -209,6 +209,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
       views: {
         'menuContent' :{
           templateUrl: "templates/yogapedia.html",
+		  controller: "yogapediaCtrl"
         }
       }
     })
@@ -283,7 +284,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 
 
 
-app.factory('classesService', function($http,$ionicPopup,userScheduleService,waitlistService,$localstorage) {
+app.factory('classesService', function($http,$ionicPopup,userScheduleService,waitlistService,$localstorage,bookingDb) {
 var availClasses = [];
 	return {
 		getClassesDatabase: function(){
@@ -369,6 +370,14 @@ var availClasses = [];
 						 template: returnMsg
 					   });
 					   alertPopup.then(function(res) {});
+					   
+					   //counting how many successful bookings each user has, store into database
+					   var bookingDB = bookingDb.getBookingData();
+							
+							var save = bookingDB.$add({
+							   userid:userId
+							});		   
+					   
 			})
 			//not working
 			request1.error(function (data) {
@@ -882,6 +891,27 @@ app.factory('faqDb', function($firebase) {
         }
     }
 })
+
+app.factory('bookingDb', function($firebase) {
+    var bookingLink = new Firebase("https://tinkerfyptest.firebaseio.com/");
+	var bookDataArr = $firebase(bookingLink).$asArray();
+    return {
+        getBookingData: function() {
+			return bookDataArr;
+        }
+    }
+})
+
+app.factory('yogapediaDb', function($firebase) {
+    var yogapediaLink = new Firebase("https://yogapediatinkertest.firebaseio.com/");
+	var yogapediaArr = $firebase(yogapediaLink).$asArray();
+    return {
+        getYogapediaData: function() {
+			return yogapediaArr;
+        }
+    }
+})
+//firebase retrieval ends
 
 app.factory('userDetailsService', function($http) {
 	return {
@@ -1520,7 +1550,6 @@ app.controller('loginCtrl', function($scope, $state,userService,userScheduleServ
 		resetService.resetInfo(reset);
 	};
 	
-	
 	//MODAL START
 	$ionicModal.fromTemplateUrl('password-modal.html', {
 		scope: $scope,
@@ -1547,13 +1576,10 @@ app.controller('loginCtrl', function($scope, $state,userService,userScheduleServ
 		// Execute action
 	  });
 	  //MODAL END
-	
-	
-	
 })
 
 //$ionicSideMenuDelegate is the dependency for menu
-app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate,classesService,$ionicLoading,$timeout,faqDb,$localstorage,hallOfFameDb) {
+app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate,classesService,$ionicLoading,$timeout,faqDb,$localstorage,hallOfFameDb,yogapediaDb) {
 	
 	//left menu
 	$scope.toggleLeft = function() {
@@ -1576,12 +1602,16 @@ app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate,
 		window.open('http://www.platinumyoga.com/', '_blank', 'location=yes','closebuttoncaption=back');
 	};
 	
-	
 	//loading the hall of fame list from firebase (no saving to localstorage)
 	$scope.loadHallOfFameList = function(){
 		$scope.halloffameList = hallOfFameDb.getHallOfFameData();
 		$localstorage.set('hallofFameList',JSON.stringify($scope.halloffameList));
-	}
+	};
+	
+	$scope.loadYogapediaList = function(){
+		$scope.yogapediaList = yogapediaDb.getYogapediaData();
+		//$localstorage.set('hallofFameList',JSON.stringify($scope.yogapediaList));
+	};
 	
 	
 	//loading the info/etiquette (FAQ) firebase (saving to localstorage but gets updated when when method called in homeCtrl)
@@ -2035,7 +2065,15 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 			  $ionicLoading.hide();
 				//loading of hall of fame list here
 				$scope.loadHallOfFameList();
-			  }, 6000);		  
+			  }, 6000);		
+			  
+			  $timeout(function () {
+			  $ionicLoading.hide();
+				//loading of hall of fame list here
+				$scope.loadYogapediaList();
+			  }, 6000);
+
+			  
 	  }else{
 		//alert("fast");
 			$timeout(function () {
@@ -2064,6 +2102,12 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 				//loading of hall of fame list here
 				$scope.loadHallOfFameList();
 			  }, 4000);
+			  
+			  $timeout(function () {
+			  $ionicLoading.hide();
+				$scope.loadYogapediaList();
+			  }, 4000);
+			  
 	  }
 	
 	var upcoming = document.getElementById('showUpcoming');
@@ -2264,15 +2308,27 @@ app.controller('reviewCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLo
 		showDelay: 0
 	  });
 	  
-	  $timeout(function () {
-		$ionicLoading.hide();
-		retrieveUserHistory();
-	  }, 6000);
-	  
-	  $timeout(function () {
-		$ionicLoading.hide();
-		retrievePurchaseHistory();
-	  }, 5000);
+	   if($localstorage.get('classesDb')==""||$localstorage.get('classesDb')==null){
+			  $timeout(function () {
+				$ionicLoading.hide();
+				retrieveUserHistory();
+			  }, 6000);
+			  
+			  $timeout(function () {
+				$ionicLoading.hide();
+				retrievePurchaseHistory();
+			  }, 6000);
+	   }else{
+			$timeout(function () {
+				$ionicLoading.hide();
+				retrieveUserHistory();
+			  }, 4000);
+			  
+			  $timeout(function () {
+				$ionicLoading.hide();
+				retrievePurchaseHistory();
+			  }, 4000);
+	   }
 	  
 		  
 	//var historyBtn = document.getElementById('showHistoryButton');
@@ -3065,10 +3121,50 @@ app.controller('halloffameCtrl',function($scope,hallOfFameDb,$timeout,$ionicLoad
 	  }
 })
 
-app.controller('promotionsCtrl',function($scope,$firebase){
 
+app.controller('yogapediaCtrl',function($scope,$ionicModal){
+	$scope.poseOptions = [{ name: "Standing", value: "Standing"}, { name: "Seated", value: "Seated"},{ name: "Inversions", value: "Inversions"},{name: "Backbends", value: "Backbends"},{name: "Arm Balances", value: "Arm Balances"}];
+	$scope.poseOption = $scope.poseOptions[1].value;
 	
+	$scope.poseInfo = function(pose){
+		$scope.selectedPose = pose;
+		 $scope.openModal();
+	};
+	
+	$scope.completedPose = function(chosenPose){
+	 $scope.completedPoseName = chosenPose.pose;
+		$localstorage.set(JSON.stringify($scope.completedPoseName),JSON.stringify($scope.completedPoseName));
+	};
+	
+	//MODAL START
+	$ionicModal.fromTemplateUrl('yogapedia-modal.html', {
+		scope: $scope,
+		animation: 'slide-in-up'
+	  }).then(function(modal) {
+		$scope.modal = modal;
+	  });
+	  $scope.openModal = function() {
+		$scope.modal.show();
+	  };
+	  $scope.closeModal = function() {
+		$scope.modal.hide();
+	  };
+	  //Cleanup the modal when we're done with it!
+	  $scope.$on('$destroy', function() {
+		$scope.modal.remove();
+	  });
+	  // Execute action on hide modal
+	  $scope.$on('modal.hidden', function() {
+		// Execute action
+	  });
+	  // Execute action on remove modal
+	  $scope.$on('modal.removed', function() {
+		// Execute action
+	  });
+	  //MODAL END
+})
 
+app.controller('promotionsCtrl',function($scope,$firebase){
 })
 
 
