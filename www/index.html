@@ -115,10 +115,10 @@ About page
             <button class="button button-block button-energized" ng-click="signIn(user)">
               Sign-In
             </button>
-			<div align="center">
+			<!--<div align="center">
 				<div ng-click="loadRegister()">Register</a><br/>
 				</div>
-            </div>
+            </div>-->
 			<div align="center">
 				<div ng-click="openModal()">Reset Password</div><br/>
               <!--<a href="#/forgot-password">Forgot password</a>-->
@@ -1249,15 +1249,15 @@ About page
 			<!--top bar-->
 			<b>
 			<div class="button-bar">
-				<a style="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;" class="button button-small button-stable" href="#/yoga-app/faq"ng-click="showBeforeClass()" ><b>INFO/ETIQUETTE</b></a>
+				<!--<a style="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;" class="button button-small button-stable" href="#/yoga-app/faq" ng-click="showBeforeClass()" ><b>INFO/ETIQUETTE</b></a>-->
 				<a class="button button-small button-stable" href="#/yoga-app/about"><b>ABOUT</b></a>	
 			</div>
 			</b>
 			
 			<b>
 			<div class="button-bar">
-				<a class="button button-small button-stable" ng-click="showBeforeClass()"><b>BEFORE CLASS</b></a>
-				<a class="button button-small button-stable" ng-click="showDuringClass()"><b>DURING CLASS</b></a>	
+				<a class="button button-small button-stable" href="#/yoga-app/faq" ng-click="showBeforeClass()"><b>BEFORE CLASS</b></a>
+				<a class="button button-small button-stable" href="#/yoga-app/faq" ng-click="showDuringClass()"><b>DURING CLASS</b></a>
 			</div>
 			</b>
 			
@@ -1309,9 +1309,18 @@ About page
 			<!--top bar-->
 			<b>
 			<div class="button-bar">
-				<a class="button button-small button-stable" href="#/yoga-app/faq">INFO/ETIQUETTE</a>
-				<a class="button button-small button-stable" href="#/yoga-app/about" style="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;">ABOUT</a>	
+				<a class="button button-small button-stable" href="#/yoga-app/about" style="background-color:#e67e22;color:#f8f8f8; border-bottom: thick solid #e67e22;border-bottom-width:2px;">ABOUT</a>	
 			</div></b>
+			
+		<b>
+			<div class="button-bar">
+				<a class="button button-small button-stable" href="#/yoga-app/faq" ng-click="showBeforeClass()"><b>BEFORE CLASS</b></a>
+				<a class="button button-small button-stable" href="#/yoga-app/faq" ng-click="showDuringClass()"><b>DURING CLASS</b></a>	
+			</div>
+			</b>
+			
+			
+			
 			<ion-list>
 				<div ng-repeat="group in groups">
 				  <ion-item class="item-stable"

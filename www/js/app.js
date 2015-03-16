@@ -732,6 +732,17 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
 	var users = [];
 	var userDatabase = "";
 	
+     // Setup the loader
+	/*$ionicLoading.show({
+		content: 'Loading',
+		animation: 'fade-in',
+		showBackdrop: true,
+		maxWidth: 200,
+		showDelay: 0
+	  });*/
+
+	  
+	
 	return {
 		authentication: function(user){
 			var request = $http({
@@ -750,9 +761,8 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
 			request.success(function (data) {
 				userDatabase = data;
 				if(userDatabase.ValidateLoginResult.ErrorCode === 200){	
+					
 
-					
-					
 					$localstorage.set('name', user.username);
 					$localstorage.set('password', user.password);
 					//console.log(JSON.stringify(userDatabase.ValidateLoginResult));
@@ -770,8 +780,8 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
 					challengesService.getChallengesDatabase();
 					sessionService.getSession();
 					sessionStaffService.getSessionStaff();
-					
-			
+	  //$ionicLoading.hide();
+ 
 					
 					$state.go("yoga-app.home");
 				}else{
@@ -800,9 +810,9 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
 
 
 .run(function($localstorage,userService){
-   if($localstorage.get('name')==null){
+   if($localstorage.get('name')!="" && $localstorage.get('name')!=null){
     //console.log("namenull");
-  }else{
+
 	  var userInfo = {};	
 	  userInfo.username = $localstorage.get('name');
 	  userInfo.password = $localstorage.get('password');
@@ -1599,11 +1609,11 @@ app.controller('MainCtrl', function($scope,$state,$http, $ionicSideMenuDelegate,
 	};
 	
 	$scope.loadPrivileges = function(){
-		window.open('http://www.platinumyoga.com/pages/platinum-yoga-rewards', '_blank', 'location=yes','closebuttoncaption=back');
+		window.open('http://www.platinumyoga.com/pages/py-rewards', '_blank', 'location=yes','closebuttoncaption=back');
 	};
 	
 	$scope.loadRegister = function(){
-		window.open('http://www.platinumyoga.com/', '_blank', 'location=yes','closebuttoncaption=back');
+		window.open('https://clients.mindbodyonline.com/classic/home?studioid=20688', '_blank', 'location=yes','closebuttoncaption=back');
 	};
 	
 	//loading the hall of fame list from firebase (no saving to localstorage)
@@ -2083,34 +2093,34 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 			$timeout(function () {
 			  $ionicLoading.hide();
 				retrieveClasses();
-			  }, 4000);
+			  }, 5500);
 			  
 			$timeout(function () {
 			  $ionicLoading.hide();
 				retrieveScheduledClasses();
-			  }, 4000);
+			  }, 5500);
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				retrieveWaitlist();
-			  }, 4000);
+			  }, 5500);
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 			  //loading of info/etiquette here
 				$scope.loadRegulations();
-			  }, 4000);
+			  }, 5500);
 			    
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				//loading of hall of fame list here
 				$scope.loadHallOfFameList();
-			  }, 4000);
+			  }, 5500);
 			  
 			  $timeout(function () {
 			  $ionicLoading.hide();
 				$scope.loadYogapediaList();
-			  }, 4000);
+			  }, 5500);
 			  
 	  }
 	
@@ -2329,12 +2339,12 @@ app.controller('reviewCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLo
 			$timeout(function () {
 				$ionicLoading.hide();
 				retrieveUserHistory();
-			  }, 4000);
+			  }, 5500);
 			  
 			  $timeout(function () {
 				$ionicLoading.hide();
 				retrievePurchaseHistory();
-			  }, 4000);
+			  }, 5500);
 	   }
 	  
 		  
