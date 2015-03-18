@@ -1317,7 +1317,7 @@ app.factory('appointmentService',function($http,$ionicLoading,$timeout){
 var timeslots = [];
 var check = "";
 	return {
-		getAppointments: function(sessionTypeID,instructorID){
+		getAppointments: function(sessionTypeID,instructorID,chosenDate){
 			var request = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/getAppointments.php",
@@ -1397,10 +1397,10 @@ var check = "";
 				  //alert("slow");
 				  $timeout(function () {
 				  $ionicLoading.hide();
-					retrieveScheduledClasses();
+					//retrieveScheduledClasses();
 				  }, 14500);
 			}
-		
+		//alert(timeslots[1]);
 			return timeslots;
 		},
 		getApptResponse1:function(chosendate){
@@ -1420,7 +1420,7 @@ var check = "";
 				  //alert("slow");
 				  $timeout(function () {
 				  $ionicLoading.hide();
-					retrieveScheduledClasses();
+					//retrieveScheduledClasses();
 				  }, 14500);
 			}
 
@@ -1472,6 +1472,7 @@ var check = "";
 app.factory('bookApptService',function($http,userScheduleService,$ionicPopup,$state){
 	return {
 		bookAppointment: function(isMale,instructorID,sessionID,userID,startDateTime,notesStr){
+		alert("start");
 			var request = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/bookClientIntoAppointment.php",
@@ -1490,6 +1491,7 @@ app.factory('bookApptService',function($http,userScheduleService,$ionicPopup,$st
 
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
+			//alert(data);
 				//alert(JSON.stringify(data));
 				//alert(data.AddOrUpdateAppointmentsResult.ErrorCode);
 				if(data.AddOrUpdateAppointmentsResult.ErrorCode==200){
@@ -1501,11 +1503,11 @@ app.factory('bookApptService',function($http,userScheduleService,$ionicPopup,$st
 				   alertPopup.then(function(res) {});
 					$state.go("yoga-app.home");
 				}else{
-					var alertPopup = $ionicPopup.alert({
+					var alertPopup1 = $ionicPopup.alert({
 					 title: 'Book Appoinment',
-					 template:data.Appointments.Appointment.Messages.string
+					 template:"Sorry, unable to book appointment."
 				   });
-				   alertPopup.then(function(res) {});
+				   alertPopup1.then(function(res) {});
 				}
 				
 				apptdatabase = data;
@@ -3070,12 +3072,14 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 				}
 			}
 
-			$scope.schedules = appointmentService.getApptResponse();
+			
 			$scope.openModal();
+			$scope.schedules = appointmentService.getApptResponse();
 	};	
 	
 	//when a date is selected
 	$scope.selectedDate=function(date){
+	//alert(date);
 		$scope.schedules = appointmentService.getApptResponse1(date);
 		
 		//$scope.displayDate = false;
@@ -3146,11 +3150,6 @@ app.controller('yogapediaCtrl',function($scope,$ionicModal){
 	$scope.poseInfo = function(pose){
 		$scope.selectedPose = pose;
 		 $scope.openModal();
-	};
-	
-	$scope.completedPose = function(chosenPose){
-	 $scope.completedPoseName = chosenPose.pose;
-		$localstorage.set(JSON.stringify($scope.completedPoseName),JSON.stringify($scope.completedPoseName));
 	};
 	
 	//MODAL START

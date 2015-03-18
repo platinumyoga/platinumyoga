@@ -942,7 +942,6 @@ About page
     <script id="templates/appointments.html" type="text/ng-template">
       <ion-view title="Appointments">
         <ion-content has-header="true">
-			
 			<div class="list">
 				<a class="item" ng-repeat="sessionType in sessionTypes" href="#/yoga-app/appointmentType/{{sessionType.ID}}">
 					{{sessionType.Name}}
@@ -988,8 +987,7 @@ About page
 				
 		</ion-header-bar>
 		<ion-content>
-		<div class="row"><b>Instructor: </b>{{instructorName}}</div>
-		<div class="row"><b>Appointment: </b>{{sessionName}}</div>
+		
 		<!--
 		<div class="button-bar">
 			  <a class="button button-small" id="showUpcoming" ng-click="showDate()">Date</a>
@@ -998,16 +996,25 @@ About page
 		-->
 		
 		<div class="container">
-				  <div pickadate ng-model="date" min-date="minDate" max-date="maxDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" no-extra-rows ng-click="selectedDate(date)">
-				  </div>
-				  <!--
-				  <div class="selected-date">
+		
+			   <label class="item item-input item-icon-right"> 
+				  <span class="input-label">Date</span>
+				  <input type="date" ng-model="date" ng-click="selectedDate(date)" placeholder="yyyy-MM-dd">
+				  <i class="icon ion-calendar"></i>
+				</label>
+				
+				<div class="row"><b>Instructor: </b>{{instructorName}}</div>
+				<div class="row"><b>Appointment: </b>{{sessionName}}</div>
+				<!--<div pickadate ng-model="date" min-date="minDate" max-date="maxDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" no-extra-rows ng-click="selectedDate(date)">
+				  </div>-->
+				  <!--<div class="selected-date">
 					Selected date is {{date || dateDefault}}
 				</div>-->
 		</div>
 		
 			<!--list showing instructors free timeslots-->
-			<b>Available Timeslots for {{date}}:</b><br/>
+			<!--<b>Available Timeslots for {{date}}:</b><br/>-->
+			<b>*Select date to view available timeslots:</b><br/>
 			<div class="list" ng-show="displayTime">
 				<div class="item" ng-repeat="schedule in schedules">
 						<a style="color:green" ng-click="showPopup(schedule)">
@@ -1127,7 +1134,7 @@ About page
 						</div>
 						<div class="col col-75">
 							<b>Pose:&nbsp;</b>{{yogapediapose.pose}}<br/>
-							<b>Category:&nbsp;</b>{{yogapediapose.classType}}<br/>
+							<b>Category:&nbsp;</b>{{yogapediapose.classType}}<br/>	
 							<button class="button button-small" ng-click="poseInfo(yogapediapose)">&nbsp;&nbsp;Info&nbsp;&nbsp;</button>
 						</div>
 					</div>
@@ -1147,11 +1154,13 @@ About page
 			  </div>
 		</ion-header-bar>
 			<ion-content>	
-			    <img ng-src="data:{{selectedPose.posepicturebase64.filetype}};base64,{{selectedPose.posepicturebase64.base64}}" alt=""  height="100" width="100">
+			    <div align="center">
+				<img ng-src="data:{{selectedPose.posepicturebase64.filetype}};base64,{{selectedPose.posepicturebase64.base64}}" alt=""  height="100" width="100"></div>
 				<br/>
-				<b>Pose Name:&nbsp;</b>{{selectedPose.pose}}<br/>
-				<b>Category:&nbsp;</b>{{selectedPose.classType}}<br/>
-				<button class="button button-block button-energized" ng-click="completedPose(selectedPose)">Completed</button>
+				<b>Pose Name:&nbsp;</b>{{selectedPose.pose}}<br/><br/>
+				<b>Category:&nbsp;</b>{{selectedPose.classType}}<br/><br/>
+				<b>Health Benefits:</b><br/>{{selectedPose.information}}
+				<button class="button button-block button-energized" ng-click="closeModal()">Got it!</button>
 				
 				<!--<div class="list">
 				  <label class="item item-input">
@@ -1187,8 +1196,6 @@ About page
     <script id="templates/halloffame.html" type="text/ng-template">
       <ion-view title="HALL OF FAME" ng-controller="halloffameCtrl">
 		<ion-content has-header="true">
-		
-		
 			<!--<div class="button-bar">
 					<!--<a class="button button-small button-stable" ng-click="winnersData.filter='current'">Current</a>
 					<!--<a class="button button-small button-stable" ng-click="winnersData.filter='past'">Past</a>
