@@ -1472,7 +1472,7 @@ var check = "";
 app.factory('bookApptService',function($http,userScheduleService,$ionicPopup,$state){
 	return {
 		bookAppointment: function(isMale,instructorID,sessionID,userID,startDateTime,notesStr){
-		alert("start");
+		//alert("start");
 			var request = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/bookClientIntoAppointment.php",
