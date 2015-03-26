@@ -120,7 +120,7 @@ About page
 				</div>
             </div>-->
 			<div align="center">
-				<div ng-click="openModal()">Reset Password</div><br/>
+				<div style="color:blue;" ng-click="openModal()">Reset Password</div><br/>
               <!--<a href="#/forgot-password">Forgot password</a>-->
             </div>
           </div>
@@ -142,16 +142,21 @@ About page
 		</ion-header-bar>
 			<ion-content>
 				<div class="list">
-				  <label class="item item-input">
-					<input type="text" placeholder="Email" ng-model='reset.email'>
+				  <label class="item item-input item-stacked-label" style="padding-right:15px">
+				    <span class="input-label">Email</span>
+					<input style="background-color:#ecf0f1;padding-left:10px;" type="text" ng-model='reset.email'>
 				  </label>
-				  <label class="item item-input">
-					<input type="text" placeholder="First Name" ng-model='reset.firstName' >
+				  <label class="item item-input item-stacked-label"style="padding-right:15px">
+				    <span class="input-label">First Name</span>
+					<input style="background-color:#ecf0f1;padding-left:10px;" type="text" ng-model='reset.firstName' >
 				  </label>
-				  <label class="item item-input">
-					<input type="text" placeholder="Last Name" ng-model='reset.lastName' >
+				  <label class="item item-input item-stacked-label"style="padding-right:15px">
+				  <span class="input-label">Last Name</span>
+					<input style="background-color:#ecf0f1;padding-left:10px;" type="text" ng-model='reset.lastName' >
 				  </label>
+				  <div class="padding">
 					  <button class="button button-block button-energized" ng-click="passwordReset(reset)">Submit</button>
+					</div>
 				</div>
 			</ion-content>
 	  </ion-modal-view>
@@ -204,7 +209,7 @@ About page
 							  </a>
 							  <!--review-->
 							  <a class="tab-item" href="#yoga-app/review" ng-click="" ng-controller="reviewCtrl">
-								<i class="icon ion-star custom-icon" style="padding-top:2px;"></></i>
+								<i class="icon ion-clipboard custom-icon" style="padding-top:2px;"></></i>
 							  </a>
 							 
 					</ion-tabs>
@@ -214,9 +219,6 @@ About page
 
 		<!--left side menu bar-->
         <ion-side-menu side="left">
-          <!--<ion-header-bar>
-            <h1 class="title">Menu</h1>
-          </ion-header-bar>-->
 		  
           <ion-content>
             <ul class="list">
@@ -235,7 +237,7 @@ About page
 					  <ion-item class="item-accordion"
 								ng-repeat="item in group.items"
 								ng-show="isGroupShown(group)"  ng-repeat="" href="#/yoga-app/{{item}}" type="item-link" menu-close>
-						<i class="icon ion-chevron-right" style="padding:10px">&nbsp;&nbsp;&nbsp;&nbsp;{{item}}</i>
+						<i class="icon ion-chevron-right" style="padding:10px; font-size:92%;">&nbsp;&nbsp;&nbsp;&nbsp;{{item}}</i>
 					  </ion-item>
 					</div>
 				</ion-list>
@@ -252,7 +254,7 @@ About page
 			  <a class="item item-icon-left" href="#/yoga-app/halloffame" menu-close><i class="icon ion-trophy"></i>HALL OF FAME</a>
 			  
 			  <a href="#/yoga-app/faq" class="item item-icon-left" menu-close>
-			  <i class="icon ion-clipboard"></i>INFO/ETIQUETTE</a>
+			  <i class="icon ion-information-circled"></i>INFO/ETIQUETTE</a>
 			  
 			  <a href="" class="item item-icon-left" ng-click="loadContact()" menu-close><i class="icon ion-map"></i>
 			  CONTACT US</a>
@@ -268,11 +270,10 @@ About page
 	<!--HOME PAGE-->
     <script id="templates/home.html" type="text/ng-template">
       <ion-view title="Home">
-			<ion-content has-header="true">
-				<!--user picture & name + points-->
+			<ion-header-bar class="bar-subheader" style="height: auto">
 				<div class="row">
 					<div class="col">
-						<b>Username:</b>{{username}}<br/>
+						<b>Username: </b>{{username}}<br/>
 						<b>User ID: </b>{{userId}}<br/>
 						<!--<b>Points:</b> 50(dummy)-->
 					</div>
@@ -280,21 +281,25 @@ About page
 				
 				<b>
 				<div class="button-bar">
-				  <a class="button button-small" id="showClasses" ng-click="showClasses()">CLASSES</a>
+				  <a class="button button-small" id="showClasses" ng-click="showClasses()">CLASSES SCHEDULE</a>
 				</div>
 				<div class="button-bar">
-				  <a class="button button-small" id="showUpcoming" ng-click="showUpcoming()">MY SCHEDULE</a>
+				  <a class="button button-small" id="showUpcoming" ng-click="showUpcoming()">MY SCHEDULES</a>
 				  <a class="button button-small" id="showWaitingList" ng-click="showWaitingList()">WAITING LIST</a>
 				</div>
 				</b>
-				
+			</ion-header-bar>
+			
+			<ion-content padding="true">
+
+				<br><br><br><br><br>
 				<!--displays one week's worth of classes for booking-->
 				<div class="list" ng-show="displayClasses">
 					<div class="item wrap" ng-repeat="classListItem in totalClasses | orderBy:'StartDateTime'">
 					<div class="row">
 						<div class="col col-75">
 							<a href="#/yoga-app/selectedClass/{{classListItem.ID}}">
-							<b>{{classListItem.ClassDescription.Name}}</b><br/>			
+							<b>{{classListItem.ClassDescription.Name}}</b><br/>
 							{{(classListItem.StartDateTime).slice(8,10)}}-{{(classListItem.StartDateTime).slice(5,7)}}-{{(classListItem.StartDateTime).slice(0,4)}}<br/>
 							{{(classListItem.StartDateTime).slice(11,16)}} - {{(classListItem.EndDateTime).slice(11,16)}}<br/>
 							{{classListItem.Staff.Name}}<br/>
@@ -330,7 +335,6 @@ About page
 				
 				<!--waitlist-->
 				<div class="list" ng-show="showWaitlist">
-					
 					<div class="item wrap" ng-repeat="class in waitlist">
 						<div class="row">
 							<div class="col col-67">
@@ -357,16 +361,14 @@ About page
       <ion-view title="History">
 			<ion-content has-header="true">
 				<!--list showing the history-->
-				
 				<b>
 					<div class="button-bar">
 					  <a class="button button-small" id="showHistoryButton" ng-click="showHistory()">PAST BOOKINGS</a>
 					  <a class="button button-small" id="showPurchaseHistory" ng-click="showPurchaseHistory()">PURCHASES</a>
 					</div>
 				</b>
-				
-				
-				<!--histories showing past bookings-->
+		
+			<!--histories showing past bookings-->
 				<div class="list" ng-show="showHistoryView">
 					<div class="item wrap" ng-repeat="history in userHistory | orderBy:'-StartDateTime'">
 						<div class="row">
@@ -379,7 +381,7 @@ About page
 							<span ng-show=!{{history.SignedIn}}>Absent</span>
 							</div>
 							<div class="col col-33">
-								<div class="button button-small" ng-click="writeReview({{history}})" ng-show={{history.SignedIn}}>Review</div>
+								<div class="button button-outline button-energized" ng-click="writeReview({{history}})" ng-show={{history.SignedIn}}>Review</div>
 							</div>
 						</div>
 					</div>
@@ -400,12 +402,11 @@ About page
       </ion-view>
     </script>
 	
-	
-	
+
 	<!--SHOW REVIEW MODAL-->
 	<script id="review-modal.html" type="text/ng-template">
 	  <ion-modal-view>
-		<ion-header-bar class="bar-assertive">
+		<ion-header-bar class="bar-energized">
 			<h1 class="title">Review</h1>
 			  <div class="buttons">
 					<a class="button button-icon ion-close" ng-click="closeModal()"></a>
@@ -415,9 +416,10 @@ About page
 			<ion-content>
 				<div class="row">
 					<div class="col">
-						<b>Lesson Name: </b>{{lessonName}}<br/>
-						<b>Staff staffName: </b>{{staffName}}<br/>
-						<textarea rows="4" cols="40" ng-model='review.feedback' type="text" placeholder='enter feedback'></textarea>
+						<b>Lesson: </b>{{lessonName}}<br/>
+						<b>Staff: </b>{{staffName}}<br/>
+						<br>
+						<textarea rows="4" cols="40" ng-model='review.feedback' type="text" placeholder='Enter your review here'></textarea>
 						
 						<span class="rating">
 							<input type="radio" class="rating-input" id="rating-input-1-5" name="rating-input-1" value="5" ng-model='review.stars'/>
@@ -456,52 +458,30 @@ About page
     <script id="templates/classes.html" type="text/ng-template">
       <ion-view title="Classes" has-header="true">
 			<ion-content padding="true">
-			
 			<!--pull to refresh(start)-->
 			<ion-refresher on-refresh="refreshClasses()"></ion-refresher>
 			<!--pull to refresh(end)-->
-			
-			
-			<label class="item item-input item-icon-right">
+			<
+			<label class="bar bar-header item-input item-icon-right">
 			  <i class="icon ion-calendar"></i>
 			  <span class="input-label">Date</span>
-			  <input type="date" ng-model="datex" placeholder="yyyy-MM-dd">
+			  <input type="date" ng-model="date" placeholder="yyyy-MM-dd">
 			</label>
-			
-			<!--<div class="container" ng-controller="DateCtrl">	-->
-				<!--<div pickadate id="classDate" ng-model="date" min-date="minDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" date="selectedDate" no-extra-rows>-->
-				<!--</div>-->
-				
-		   <!-- <button align="center" class="button button-energized" ng-click="showDate()">
-			{{date || dateDefault}}
-			</button>-->
-			
-			<!--<input type="date" id="exampleInput" name="input" ng-model="date"
-			placeholder="{{date}}" />
-			{{date}}-->
+	
+			<div class="bar bar-header item-input-inset">
+				<input type="text" ng-model="search" placeholder="Search for Class/Instructor name">
+			</div>
 
-			<!--<div class="item" align="center">
-				<span class="input-label">Select Level:</span>
-				<select data-ng-options="o.name for o in options" data-ng-model="selectedOption"></select>
-			</div>-->
-			
-				<div class="bar bar-header item-input-inset">
-					<input type="text" ng-model="search" placeholder="Search for Class/Instructor name">
-				</div>
-				<div class="bar bar-header item-input-inset ng-hide">
-					<ion-search placeholder="Search for Instructor/Class name" filter="(date)"></ion-search>
-				</div>
-				<!--<div class="bar bar-header item-input-inset ng-hide">
-					<ion-search filter="(selectedOption.value)"></ion-search>
-				</div>-->
+			<div class="bar bar-header item-input-inset ng-hide">
+				<ion-search placeholder="Search for Instructor/Class name" filter="(date)"></ion-search>
+			</div>
 			
 				<div class="list">
 					<div class="item wrap" ng-repeat="class in totalClasses | orderBy:'StartDateTime'| filter:(datex) | filter:(selectedOption.value)|contains:search">
 					<div class="row">
 						<div class="col col-75">
 							<a href="#/yoga-app/selectedClass/{{class.ID}}">
-							<b>{{class.ClassDescription.Name}}</b><br/>			
-							{{(class.StartDateTime).slice(8,10)}}-{{(class.StartDateTime).slice(5,7)}}-{{(class.StartDateTime).slice(0,4)}}<br/>
+							<b>{{class.ClassDescription.Name}}</b><br/>		{{(class.StartDateTime).slice(8,10)}}-{{(class.StartDateTime).slice(5,7)}}-{{(class.StartDateTime).slice(0,4)}}<br/>
 							{{(class.StartDateTime).slice(11,16)}} - {{(class.EndDateTime).slice(11,16)}}<br/>
 							{{class.Staff.Name}}<br/>
 							{{class.ClassDescription.Level.Name}}
@@ -1367,62 +1347,36 @@ About page
 					<div class="list">
 						 <!--Address-->	
 						  <div class="item item-button-right">
-							Address:&nbsp;{{user.address}}
-							<button class="button button-energized" ng-click="editAddress()">
+							<b>Address:&nbsp;</b>{{user.address}}
+							<button class="button button-outline button-energized" ng-click="editAddress()">
 								Edit
 							</button>
 						  </div>
 						  <!--Email-->	
 						  <div class="item item-button-right">
-							Email:&nbsp;{{user.email}}
-							<button class="button button-energized" ng-click="editEmail()">
+							<b>Email:&nbsp;</b>{{user.email}}
+							<button class="button button-outline button-energized" ng-click="editEmail()">
 								Edit
 							</button>
 						  </div>
 						  <!--Postal Code-->	
 						  <div class="item item-button-right">
-							Postal Code:&nbsp;{{user.postalCode}}
-							<button class="button button-energized" ng-click="editPostal()">
+							<b>Postal Code:&nbsp;</b>{{user.postalCode}}
+							<button class="button button-outline button-energized" ng-click="editPostal()">
 								Edit
 							</button>
 						  </div>
 						  <!--Mobile Phone-->	
 						  <div class="item item-button-right">
-							Mobile Phone:&nbsp;{{user.mobile}}
-							<button class="button button-energized" ng-click="editMobile()">
+							<b>Mobile Phone:&nbsp;</b>{{user.mobile}}
+							<button class="button button-outline button-energized" ng-click="editMobile()">
 								Edit
 							</button>
 						  </div>
-						  <!--Emergency Contact Info name-->	
-						  <!--<div class="item item-button-right">
-							Emergency Contact Name:&nbsp;{{user.emerName}}
-							<button class="button button-energized" ng-click="editEmergencyName()">
-								Edit
-							</button>
-						  </div>-->
-						  <!--Emergency Contact Info relationship-->	
-						 <!-- <div class="item item-button-right">
-							Emergency Contact Relationship:&nbsp;{{user.emerRelation}}
-							<button class="button button-energized" ng-click="editEmergencyRelationship()">
-								Edit
-							</button>
-						  </div>-->
-						  <!--Emergency Contact Info phone-->	
-						  <!--<div class="item item-button-right">
-							Emergency Contact Phone:&nbsp;{{user.emerPhone}}
-							<button class="button button-energized" ng-click="editEmergencyPhone()">
-								Edit
-							</button>
-						  </div>-->
-						  <!--Emergency Contact Info email-->	
-						 <!-- <div class="item item-button-right">
-							Emergency Contact Email:&nbsp;{{user.emerEmail}}
-							<button class="button button-energized" ng-click="editEmergencyEmail()">
-								Edit
-							</button>
-						  </div>-->
 					</div>
-					<button class="button button-block button-stable" ng-click="goBack()">Done</button>
+					<div class="padding">
+						<button class="button button-block button-energized" ng-click="goBack()">Done</button>
+					</div>
         </ion-content>
       </ion-view>
     </script>

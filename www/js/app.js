@@ -1976,7 +1976,7 @@ app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet,$localstor
 	/*booking pop up start*/
 	$scope.showActionsheet = function() {
 		$ionicActionSheet.show({
-		  titleText: 'BOOKINGS',
+		  titleText: 'BOOK',
 		  buttons: [
 			{ text: 'Classes' },
 			{ text: 'Appointments' },
@@ -2130,8 +2130,8 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 	var waiting = document.getElementById('showWaitingList');
 	var allClasses = document.getElementById('showClasses');
 	
-	upcoming.style.cssText = "background-color:#f8f8f8";
-	waiting.style.cssText = "background-color:#f8f8f8";
+	upcoming.style.cssText = "background-color:#f8f8f8; color:#808080;";
+	waiting.style.cssText = "background-color:#f8f8f8; color:#808080;";
 	allClasses.style.cssText = "background-color:#e87722; color:#ffffff;";
 	
 	$scope.displayClasses = true;
@@ -2141,8 +2141,8 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 		$scope.showWaitlist = false;
 		$scope.displayClasses = false;
 		upcoming.style.cssText = "background-color:#e87722; color:#ffffff;";
-		waiting.style.cssText ="background-color:#f8f8f8";
-		allClasses.style.cssText = "background-color:#f8f8f8";
+		waiting.style.cssText ="background-color:#f8f8f8; color:#808080;";
+		allClasses.style.cssText = "background-color:#f8f8f8; color:#808080;";
 	};
 	
 	$scope.showWaitingList = function(){
@@ -2150,9 +2150,9 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 		$scope.showWaitlist = true;
 		$scope.displayClasses = false;
 		
-		upcoming.style.cssText="background-color:#f8f8f8;";
+		upcoming.style.cssText="background-color:#f8f8f8; color:#808080;";
 		waiting.style.cssText="background-color:#e87722; color:#ffffff;";
-		allClasses.style.cssText = "background-color:#f8f8f8";
+		allClasses.style.cssText = "background-color:#f8f8f8; color:#808080;";
 	};
 	
 	$scope.showClasses = function(){
@@ -2160,8 +2160,8 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 		$scope.showUpcomingView = false;
 		$scope.showWaitlist = false;
 		
-		upcoming.style.cssText="background-color:#f8f8f8;";
-		waiting.style.cssText="background-color:#f8f8f8;";
+		upcoming.style.cssText="background-color:#f8f8f8; color:#808080;";
+		waiting.style.cssText="background-color:#f8f8f8; color:#808080;";
 		allClasses.style.cssText = "background-color:#e87722; color:#ffffff;";
 	};
 
@@ -2348,16 +2348,12 @@ app.controller('reviewCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLo
 				retrievePurchaseHistory();
 			  }, 5500);
 	   }
-	  
-		  
-	//var historyBtn = document.getElementById('showHistoryButton');
-	//var purchaseBtn = document.getElementById('showPurchaseHistory');
-	
-	//historyBtn.style.cssText ="background-color:#e87722; color:#ffffff;";
-	//purchaseBtn.style.cssText ="background-color:#f8f8f8";
-	
+
 	$scope.showHistoryView = true;
-	
+	var purchaseR = document.getElementById('showHistoryButton');
+	var historyR = document.getElementById('showPurchaseHistory');
+	//historyR.style.cssText = "background-color:#f8f8f8; color:#808080;";
+	//purchaseR.style.cssText = "background-color:#e87722; color:#ffffff;";
 	
 	$scope.showHistory = function(){
 		$scope.showPurchase = false;
