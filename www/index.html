@@ -359,14 +359,16 @@ About page
 	<!--REVIEW PAGE-->
     <script id="templates/review.html" type="text/ng-template">
       <ion-view title="History">
-			<ion-content has-header="true">
-				<!--list showing the history-->
+	  		<ion-header-bar class="bar-subheader" style="height: auto">
 				<b>
 					<div class="button-bar">
-					  <a class="button button-small" id="showHistoryButton" ng-click="showHistory()">PAST BOOKINGS</a>
-					  <a class="button button-small" id="showPurchaseHistory" ng-click="showPurchaseHistory()">PURCHASES</a>
+					  <a class="button button-small" id="showHistoryButton" ng-click="showHistory()" style="background-color:#e87722; color:#ffffff;">PAST BOOKINGS</a>
+					  <a class="button button-small" id="showPurchaseHistory" ng-click="showPurchaseHistory()" style="background-color:#f8f8f8; color:#808080;">PURCHASES</a>
 					</div>
 				</b>
+			</ion-header-bar>
+			
+			<ion-content has-header="true" padding="true">
 		
 			<!--histories showing past bookings-->
 				<div class="list" ng-show="showHistoryView">
@@ -433,8 +435,8 @@ About page
 							<input type="radio" class="rating-input" id="rating-input-1-1" name="rating-input-1" value="1" ng-model='review.stars'/>
 							<label for="rating-input-1-1" class="rating-star"></label>
 						</span>
-						<br/>
-						<button class="button button-small" ng-click="addReview(review)">&nbsp;&nbsp;Add&nbsp;&nbsp;</button>
+						<br><br>
+						<button class="button button-energized button-small" ng-click="addReview(review)">&nbsp;&nbsp;Add Review&nbsp;&nbsp;</button>
 					</div>
 				</div>
 				

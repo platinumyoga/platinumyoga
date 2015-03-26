@@ -2350,14 +2350,16 @@ app.controller('reviewCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLo
 	   }
 
 	$scope.showHistoryView = true;
-	var purchaseR = document.getElementById('showHistoryButton');
-	var historyR = document.getElementById('showPurchaseHistory');
-	//historyR.style.cssText = "background-color:#f8f8f8; color:#808080;";
+	var historyButton= document.getElementById('showHistoryButton');
+	var purchase = document.getElementById('showPurchaseHistory');
+	//historyButton.style.cssText = "background-color:#f8f8f8; color:#808080;";
 	//purchaseR.style.cssText = "background-color:#e87722; color:#ffffff;";
 	
 	$scope.showHistory = function(){
 		$scope.showPurchase = false;
 		$scope.showHistoryView = true;
+		historyButton.style.cssText = "background-color:#e87722; color:#ffffff;";
+		purchase.style.cssText = "background-color:#f8f8f8; color:#808080;";
 		//historyBtn.style.cssText ="background-color:#e87722; color:#ffffff;";
 		//purchaseBtn.style.cssText ="background-color:#f8f8f8";
 	};
@@ -2365,6 +2367,8 @@ app.controller('reviewCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLo
 	$scope.showPurchaseHistory = function(){
 		$scope.showHistoryView = false;
 		$scope.showPurchase = true;
+		purchase.style.cssText = "background-color:#e87722; color:#ffffff;";
+		historyButton.style.cssText = "background-color:#f8f8f8; color:#808080;";
 		//purchaseBtn.style.cssText="background-color:#e87722; color:#ffffff;";
 		//historyBtn.style.cssText ="background-color:#f8f8f8";
 	};
