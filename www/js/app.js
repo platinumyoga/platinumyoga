@@ -2914,20 +2914,25 @@ app.controller('faqCtrl',function($scope,faqDb,$ionicLoading,$timeout,$state,$lo
 	if($localstorage.get('duringClassRules')!=null && $localstorage.get('duringClassRules')!==""){
 		$scope.duringClass = JSON.parse($localstorage.get('duringClassRules'));
 	 }
-	  
-
 	
-	  
 	//$state.go($state.current, {}, {reload: true});
 	$scope.displayBeforeClass = true;
+	
+	var before = document.getElementById('before');
+	var during = document.getElementById('during');
+	
 	$scope.showBeforeClass = function(){
 		$scope.displayBeforeClass = true;
-		$scope.displayDuringClass = false;	 
+		$scope.displayDuringClass = false;
+		during.style.cssText = "background-color:#f8f8f8; color:#808080;";
+		before.style.cssText = "background-color:#e87722; color:#ffffff;";		
 	};
 	
 	$scope.showDuringClass = function(){
 		$scope.displayBeforeClass = false;
 		$scope.displayDuringClass = true;
+		before.style.cssText = "background-color:#f8f8f8; color:#808080;";
+		during.style.cssText = "background-color:#e87722; color:#ffffff;";	
 	};
 	
 })
@@ -3144,7 +3149,7 @@ app.controller('halloffameCtrl',function($scope,hallOfFameDb,$timeout,$ionicLoad
 
 
 app.controller('yogapediaCtrl',function($scope,$ionicModal){
-	$scope.poseOptions = [{ name: "Standing", value: "Standing"}, { name: "Seated", value: "Seated"},{ name: "Inversions", value: "Inversions"},{name: "Backbends", value: "Backbends"},{name: "Arm Balances", value: "Arm Balances"}];
+$scope.poseOptions = [{name:"All", value:""},{ name: "Standing", value: "Standing"}, { name: "Seated", value: "Seated"},{ name: "Inversions", value: "Inversions"},{name: "Backbends", value: "Backbends"},{name: "Arm Balances", value: "Arm Balances"}];
 	$scope.poseOption = $scope.poseOptions[1].value;
 	
 	$scope.poseInfo = function(pose){

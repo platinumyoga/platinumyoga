@@ -36,8 +36,7 @@
   
   <!--application splash screen-->
   <gap:splash src="icons/splash-port-hdpi.png" />
-  
-  
+
 <icon src="icons/android/res/drawable-ldpi/appicon.png" gap:platform="android" gap:qualifier="ldpi" />
 <icon src="icons/android/res/drawable-mdpi/appicon.png" gap:platform="android" gap:qualifier="mdpi" />
 <icon src="icons/android/res/drawable-hdpi/appicon.png" gap:platform="android" gap:qualifier="hdpi" />
