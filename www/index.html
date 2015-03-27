@@ -121,7 +121,7 @@ About page
             </div>-->
 			<div align="center">
 				<div style="color:blue;" ng-click="openModal()">Reset Password</div><br/>
-              <!--<a href="#/forgot-password">Forgot password</a>-->
+              <!--<a nav-transition="none" href="#/forgot-password">Forgot password</a>-->
             </div>
           </div>
         </ion-content>
@@ -137,7 +137,7 @@ About page
 		<ion-header-bar class="bar-energized">
 			<h1 class="title">Password Reset</h1>
 			  <div class="buttons">
-					<a class="button button-icon ion-close" ng-click="closeModal()"></a>
+					<a nav-transition="none" class="button button-icon ion-close" ng-click="closeModal()"></a>
 			  </div>
 		</ion-header-bar>
 			<ion-content>
@@ -182,7 +182,7 @@ About page
 				
 				<!--right menu setting button-->
 				<ion-nav-buttons side="right">
-				  <a class="button button-icon button-clear ion-gear-a" href="#/yoga-app/setting">
+				  <a nav-transition="none" class="button button-icon button-clear ion-gear-a" href="#/yoga-app/setting">
 				  </a>
 				</ion-nav-buttons>
           </ion-nav-bar>
@@ -193,22 +193,22 @@ About page
 		<!--bottom footer (permanent)-->
 				<ion-footer-bar>	
 					<ion-tabs class="tabs-striped tabs-background-energized tabs-color-light">
-							  <a class="tab-item" href="#/yoga-app/home">
+							  <a nav-transition="none" class="tab-item" href="#/yoga-app/home">
 								<i class="icon ion-home custom-icon" style="padding-top:2px;"></i>
 							  </a>
 							  <div class="tab-item" ng-click="showActionsheet()">
 								<i class="icon ion-compose custom-icon" style="padding-top:2px;"></></i>
 							  </div>
 							  <!--barcode-->
-							  <a class="tab-item" href="#/yoga-app/barcode">
+							  <a nav-transition="none" class="tab-item" href="#/yoga-app/barcode">
 								<i class="icon ion-card custom-icon" style="padding-top:2px;"></></i>
 							  </a>
 							  <!--yogapedia-->
-							  <a class="tab-item" href="#/yoga-app/yogapedia">
+							  <a nav-transition="none" class="tab-item" href="#/yoga-app/yogapedia">
 								<i class="icon ion-man custom-icon" style="padding-top:2px;"></></i>
 							  </a>
 							  <!--review-->
-							  <a class="tab-item" href="#yoga-app/review" ng-click="" ng-controller="reviewCtrl">
+							  <a nav-transition="none" class="tab-item" href="#yoga-app/review" ng-click="" ng-controller="reviewCtrl">
 								<i class="icon ion-clipboard custom-icon" style="padding-top:2px;"></></i>
 							  </a>
 							 
@@ -223,7 +223,7 @@ About page
           <ion-content>
             <ul class="list">
               <!-- Note each link has the 'menu-close' attribute so the menu auto closes when clicking on one of these links -->
-              <a class="item item-icon-left" href="#/yoga-app/home" menu-close><i class="icon ion-home"></i>HOME</a>
+              <a nav-transition="none" class="item item-icon-left" href="#/yoga-app/home" menu-close><i class="icon ion-home"></i>HOME</a>
 			  
 			  <!--BOOK LINK in ACCORDION-->
 			  	<ion-list>
@@ -242,24 +242,24 @@ About page
 					</div>
 				</ion-list>
 			
-			<a href="" ng-click="loadPromotions()" class="item item-icon-left" menu-close><i class="icon ion-speakerphone"></i>PROMOTIONS</a>
+			<a nav-transition="none" href="" ng-click="loadPromotions()" class="item item-icon-left" menu-close><i class="icon ion-speakerphone"></i>PROMOTIONS</a>
 			
 			<!--HEALTH TIP LINK
-			  <a href="#/yoga-app/promotions" class="item item-icon-left" menu-close><i class="icon ion-speakerphone"></i>PROMOTIONS</a>-->
+			  <a nav-transition="none" href="#/yoga-app/promotions" class="item item-icon-left" menu-close><i class="icon ion-speakerphone"></i>PROMOTIONS</a>-->
 			  
-			  <a href="" ng-click="loadPrivileges()" class="item item-icon-left" menu-close><i class="icon ion-happy"></i>PY PRIVILEGES</a>
+			  <a nav-transition="none" href="" ng-click="loadPrivileges()" class="item item-icon-left" menu-close><i class="icon ion-happy"></i>PY PRIVILEGES</a>
 			  
-			  <a href="#/yoga-app/yogapedia" class="item item-icon-left" menu-close><i class="icon ion-man"></i>YOGAPEDIA</a>
+			  <a nav-transition="none" href="#/yoga-app/yogapedia" class="item item-icon-left" menu-close><i class="icon ion-man"></i>YOGAPEDIA</a>
 			  
-			  <a class="item item-icon-left" href="#/yoga-app/halloffame" menu-close><i class="icon ion-trophy"></i>HALL OF FAME</a>
+			  <a nav-transition="none" class="item item-icon-left" href="#/yoga-app/halloffame" menu-close><i class="icon ion-trophy"></i>HALL OF FAME</a>
 			  
-			  <a href="#/yoga-app/faq" class="item item-icon-left" menu-close>
+			  <a nav-transition="none" href="#/yoga-app/faq" class="item item-icon-left" menu-close>
 			  <i class="icon ion-information-circled"></i>INFO/ETIQUETTE</a>
 			  
-			  <a href="" class="item item-icon-left" ng-click="loadContact()" menu-close><i class="icon ion-map"></i>
+			  <a nav-transition="none" href="" class="item item-icon-left" ng-click="loadContact()" menu-close><i class="icon ion-map"></i>
 			  CONTACT US</a>
 			  
-			  <a href="#/login" class="item item-icon-left" ng-click="logout()" menu-close>
+			  <a nav-transition="none" href="#/login" class="item item-icon-left" ng-click="logout()" menu-close>
 			  <i class="icon ion-power"></i>LOG OUT</a>
             </ul>
           </ion-content>
@@ -270,7 +270,7 @@ About page
 	<!--HOME PAGE-->
     <script id="templates/home.html" type="text/ng-template">
       <ion-view title="Home">
-			<ion-header-bar class="bar-subheader" style="height: auto">
+			<ion-header-bar class="bar-subheader" style="height: auto;border-color:transparent;">
 				<div class="row">
 					<div class="col">
 						<b>Username: </b>{{username}}<br/>
@@ -281,11 +281,11 @@ About page
 				
 				<b>
 				<div class="button-bar">
-				  <a class="button button-small" id="showClasses" ng-click="showClasses()">CLASSES SCHEDULE</a>
+				  <a nav-transition="none" class="button button-small" id="showClasses" ng-click="showClasses()">CLASSES SCHEDULE</a>
 				</div>
 				<div class="button-bar">
-				  <a class="button button-small" id="showUpcoming" ng-click="showUpcoming()">MY SCHEDULES</a>
-				  <a class="button button-small" id="showWaitingList" ng-click="showWaitingList()">WAITING LIST</a>
+				  <a nav-transition="none" class="button button-small" id="showUpcoming" ng-click="showUpcoming()">MY SCHEDULES</a>
+				  <a nav-transition="none" class="button button-small" id="showWaitingList" ng-click="showWaitingList()">WAITING LIST</a>
 				</div>
 				</b>
 			</ion-header-bar>
@@ -298,7 +298,7 @@ About page
 					<div class="item wrap" ng-repeat="classListItem in totalClasses | orderBy:'StartDateTime'">
 					<div class="row">
 						<div class="col col-75">
-							<a href="#/yoga-app/selectedClass/{{classListItem.ID}}">
+							<a nav-transition="none" href="#/yoga-app/selectedClass/{{classListItem.ID}}">
 							<b>{{classListItem.ClassDescription.Name}}</b><br/>
 							{{(classListItem.StartDateTime).slice(8,10)}}-{{(classListItem.StartDateTime).slice(5,7)}}-{{(classListItem.StartDateTime).slice(0,4)}}<br/>
 							{{(classListItem.StartDateTime).slice(11,16)}} - {{(classListItem.EndDateTime).slice(11,16)}}<br/>
@@ -359,11 +359,11 @@ About page
 	<!--REVIEW PAGE-->
     <script id="templates/review.html" type="text/ng-template">
       <ion-view title="History">
-	  		<ion-header-bar class="bar-subheader" style="height: auto">
+	  		<ion-header-bar class="bar-subheader" style="height: auto;border-color:transparent;">
 				<b>
 					<div class="button-bar">
-					  <a class="button button-small" id="showHistoryButton" ng-click="showHistory()" style="background-color:#e87722; color:#ffffff;">PAST BOOKINGS</a>
-					  <a class="button button-small" id="showPurchaseHistory" ng-click="showPurchaseHistory()" style="background-color:#f8f8f8; color:#808080;">PURCHASES</a>
+					  <a nav-transition="none" class="button button-small" id="showHistoryButton" ng-click="showHistory()" style="background-color:#e87722; color:#ffffff;">PAST BOOKINGS</a>
+					  <a nav-transition="none" class="button button-small" id="showPurchaseHistory" ng-click="showPurchaseHistory()" style="background-color:#f8f8f8; color:#808080;">PURCHASES</a>
 					</div>
 				</b>
 			</ion-header-bar>
@@ -411,7 +411,7 @@ About page
 		<ion-header-bar class="bar-energized">
 			<h1 class="title">Review</h1>
 			  <div class="buttons">
-					<a class="button button-icon ion-close" ng-click="closeModal()"></a>
+					<a nav-transition="none" class="button button-icon ion-close" ng-click="closeModal()"></a>
 			  </div>
 		</ion-header-bar>
 			
@@ -459,30 +459,31 @@ About page
 	<!--CLASSES PAGE-->
     <script id="templates/classes.html" type="text/ng-template">
       <ion-view title="Classes" has-header="true">
+	  		<ion-header-bar class="bar-subheader" style="height: auto;border-color:transparent;">
+				<label class="bar bar-header item-input item-icon-right" style="padding-right:15px">
+				  <i class="icon ion-calendar" style="padding-right:15px"></i>
+				  <span class="input-label">Date</span>
+				  <input style="background-color:#ecf0f1;padding-left:10px;" type="date" ng-model="datex" placeholder="yyyy-MM-dd">
+				</label>
+		
+				<label class="bar bar-header item-input-inset" style="padding-right:15px">
+					<input style="background-color:#ecf0f1;padding-left:10px;" type="text" ng-model="search" placeholder="Search for Class/Instructor name">
+				</label>
+
+				<div class="bar bar-header item-input-inset ng-hide">
+					<ion-search placeholder="Search for Instructor/Class name" filter="(date)"></ion-search>
+				</div>
+			</ion-header-bar>
 			<ion-content padding="true">
 			<!--pull to refresh(start)-->
 			<ion-refresher on-refresh="refreshClasses()"></ion-refresher>
 			<!--pull to refresh(end)-->
-			<
-			<label class="bar bar-header item-input item-icon-right">
-			  <i class="icon ion-calendar"></i>
-			  <span class="input-label">Date</span>
-			  <input type="date" ng-model="date" placeholder="yyyy-MM-dd">
-			</label>
-	
-			<div class="bar bar-header item-input-inset">
-				<input type="text" ng-model="search" placeholder="Search for Class/Instructor name">
-			</div>
-
-			<div class="bar bar-header item-input-inset ng-hide">
-				<ion-search placeholder="Search for Instructor/Class name" filter="(date)"></ion-search>
-			</div>
-			
+				<br><br><br>
 				<div class="list">
 					<div class="item wrap" ng-repeat="class in totalClasses | orderBy:'StartDateTime'| filter:(datex) | filter:(selectedOption.value)|contains:search">
 					<div class="row">
 						<div class="col col-75">
-							<a href="#/yoga-app/selectedClass/{{class.ID}}">
+							<a nav-transition="none" href="#/yoga-app/selectedClass/{{class.ID}}">
 							<b>{{class.ClassDescription.Name}}</b><br/>		{{(class.StartDateTime).slice(8,10)}}-{{(class.StartDateTime).slice(5,7)}}-{{(class.StartDateTime).slice(0,4)}}<br/>
 							{{(class.StartDateTime).slice(11,16)}} - {{(class.EndDateTime).slice(11,16)}}<br/>
 							{{class.Staff.Name}}<br/>
@@ -518,16 +519,16 @@ About page
 				<div class="row">
 				  <div class="col">
 						<div class="button-bar">
-						  <a class="button button-small button-energized" href="tel:+6563480809">Call</a>
+						  <a nav-transition="none" class="button button-small button-energized" href="tel:+6563480809">Call</a>
 						  <div class="button button-small button-energized" ng-click="bookClass({{selectedclass.ID}},{{userID}})">Enroll</div>
-						  <a class="button button-small button-energized" href="#/yoga-app/CLASSES">All Classes</a>
+						  <a nav-transition="none" class="button button-small button-energized" href="#/yoga-app/CLASSES">See All Classes</a>
 						</div>
 					</div>
 				</div>
 
 				<div class="row">
 				  <div class="col">
-					<a href="#yoga-app/classStaff/{{selectedclass.Staff.ID}}" class="button button-small">Instructor:&nbsp;{{selectedclass.Staff.Name}}
+					<a nav-transition="none" href="#yoga-app/classStaff/{{selectedclass.Staff.ID}}" class="button button-small">Instructor:&nbsp;{{selectedclass.Staff.Name}}
 					</a>
 				  </div>
 				  <div class="col">
@@ -569,7 +570,7 @@ About page
 		<ion-header-bar class="bar-assertive">
 			<h1 class="title">Reviews</h1>
 			  <div class="buttons">
-					<a class="button button-icon ion-close" ng-click="closeModal()"></a>
+					<a nav-transition="none" class="button button-icon ion-close" ng-click="closeModal()"></a>
 			  </div>
 		</ion-header-bar>			
 			<ion-content>
@@ -632,7 +633,7 @@ About page
 					<div class="item wrap" ng-repeat="workshop in workShopsData | filter:search.value">
 						<div class="row">
 								<div class="col col-67">
-									<a href="#/yoga-app/selectedWorkshop/{{workshop.ID}}">
+									<a nav-transition="none" href="#/yoga-app/selectedWorkshop/{{workshop.ID}}">
 									<b>{{workshop.ClassDescription.Name}}</b><br/>
 									{{(workshop.StartDate).slice(8,10)}}-{{(workshop.StartDate).slice(5,7)}}-{{(workshop.StartDate).slice(0,4)}}<br/>
 									{{(workshop.StartTime).slice(11,16)}} - {{(workshop.EndTime).slice(11,16)}}<br/>
@@ -669,16 +670,16 @@ About page
 				<div class="row">
 				  <div class="col">
 						<div class="button-bar">
-						  <a class="button button-small button-energized" href="tel:+6563480809">Call</a>
+						  <a nav-transition="none" class="button button-small button-energized" href="tel:+6563480809">Call</a>
 						  <div class="button button-small button-energized" ng-click="bookSelectedWorkshop(selectedWorkshop,userID)">Enroll</div>
-						  <a class="button button-small button-energized" href="#/yoga-app/WORKSHOPS">All Workshops</a>
+						  <a nav-transition="none" class="button button-small button-energized" href="#/yoga-app/WORKSHOPS">See All Workshops</a>
 						</div>
 					</div>
 				</div>
 
 				<div class="row">
 				  <div class="col">
-					  <a href="#yoga-app/workshopStaff/{{selectedWorkshop.Staff.ID}}" class="button button-small">Instructor:&nbsp;{{selectedWorkshop.Staff.Name}}</a>
+					  <a nav-transition="none" href="#yoga-app/workshopStaff/{{selectedWorkshop.Staff.ID}}" class="button button-small">Instructor:&nbsp;{{selectedWorkshop.Staff.Name}}</a>
 				  </div>
 				</div>
 				
@@ -757,16 +758,16 @@ About page
 				<div class="row">
 				  <div class="col">
 						<div class="button-bar">
-						  <a class="button button-small button-energized" href="tel:+6563480809">Call</a>
+						  <a nav-transition="none" class="button button-small button-energized" href="tel:+6563480809">Call</a>
 						  <div class="button button-small button-energized" ng-click="bookEvent({{selectedEvent.ID}},{{userID}})">Enroll</div>
-						  <a class="button button-small button-energized" href="#/yoga-app/EVENTS">All Events</a>
+						  <a nav-transition="none" class="button button-small button-energized" href="#/yoga-app/EVENTS">See All Events</a>
 						</div>
 					</div>
 				</div>
 
 				<div class="row">
 				  <div class="col">
-					  <a href="#yoga-app/eventStaff/{{selectedEvent.Staff.ID}}" class="button button-small">{{selectedEvent.Staff.Name}}</a>
+					  <a nav-transition="none" href="#yoga-app/eventStaff/{{selectedEvent.Staff.ID}}" class="button button-small">{{selectedEvent.Staff.Name}}</a>
 				  </div>
 				</div>
 				
@@ -829,7 +830,7 @@ About page
 					<div class="item wrap" ng-repeat="retreat in retreatsData | filter:search.value">
 						<div class="row">
 							<div class="col col-67">
-								<a href="#/yoga-app/selectedRetreat/{{retreat.ID}}">
+								<a nav-transition="none" href="#/yoga-app/selectedRetreat/{{retreat.ID}}">
 								<b>{{retreat.ClassDescription.Name}}</b><br/>
 								{{(retreat.StartDate).slice(8,10)}}-{{(retreat.StartDate).slice(5,7)}}-{{(retreat.StartDate).slice(0,4)}}<br/>
 								{{(retreat.StartTime).slice(11,16)}} - {{(retreat.EndTime).slice(11,16)}}<br/>
@@ -867,16 +868,16 @@ About page
 				<div class="row">
 				  <div class="col">
 						<div class="button-bar">
-						  <a class="button button-small button-energized" href="tel:+6563480809">Call</a>
+						  <a nav-transition="none" class="button button-small button-energized" href="tel:+6563480809">Call</a>
 						  <div class="button button-small button-energized" ng-click="bookRetreatNow({{selectedRetreat.ID}},{{userID}})">Enroll</div>
-						  <a class="button button-small button-energized" href="#/yoga-app/RETREATS/TT">All Retreats/TT</a>
+						  <a nav-transition="none" class="button button-small button-energized" href="#/yoga-app/RETREATS/TT">All Retreats/TT</a>
 						</div>
 					</div>
 				</div>
 
 				<div class="row">
 				  <div class="col">
-					  <a href="#yoga-app/retreatStaff/{{selectedRetreat.Staff.ID}}" class="button button-small">Instructor:&nbsp;{{selectedRetreat.Staff.Name}}</a>
+					  <a nav-transition="none" href="#yoga-app/retreatStaff/{{selectedRetreat.Staff.ID}}" class="button button-small">Instructor:&nbsp;{{selectedRetreat.Staff.Name}}</a>
 				  </div>
 				</div>
 
@@ -925,7 +926,7 @@ About page
       <ion-view title="Appointments">
         <ion-content has-header="true">
 			<div class="list">
-				<a class="item" ng-repeat="sessionType in sessionTypes" href="#/yoga-app/appointmentType/{{sessionType.ID}}">
+				<a nav-transition="none" class="item" ng-repeat="sessionType in sessionTypes" href="#/yoga-app/appointmentType/{{sessionType.ID}}">
 					{{sessionType.Name}}
 				</a>
 			</div>
@@ -960,22 +961,15 @@ About page
 	<!--MODAL SHOWING CALENDAR FOR APPOINTMENT-->
 	<script id="my-modal.html" type="text/ng-template">
 	  <ion-modal-view>
-		<ion-header-bar class="bar-assertive">
+		<ion-header-bar class="bar-energized">
 		  <h1 class="title">Appointment</h1>
 		  
 		  <div class="buttons">
-			<a class="button button-icon ion-close" ng-click="closeModal()"></a>
+			<a nav-transition="none" class="button button-icon ion-close" ng-click="closeModal()"></a>
 		  </div>
 				
 		</ion-header-bar>
 		<ion-content>
-		
-		<!--
-		<div class="button-bar">
-			  <a class="button button-small" id="showUpcoming" ng-click="showDate()">Date</a>
-			  <a class="button button-small" id="showHistory" ng-click="showTime()">Time</a>
-		</div>
-		-->
 		
 		<div class="container">
 		
@@ -999,7 +993,7 @@ About page
 			<b>*Select date to view available timeslots:</b><br/>
 			<div class="list" ng-show="displayTime">
 				<div class="item" ng-repeat="schedule in schedules">
-						<a style="color:green" ng-click="showPopup(schedule)">
+						<a nav-transition="none" style="color:green" ng-click="showPopup(schedule)">
 							{{schedule.slice(11, 19)}}
 						</a>
 				</div>
@@ -1023,7 +1017,7 @@ About page
 				</div>
 				<div class="row" ng-repeat="challenge in challengesData | filter:search.value">
 						<div class="item col col-67" style="border-right-style: none;padding-left:15px;padding-top:10px;padding-bottom:10px;">
-							<a href="#/yoga-app/selectedChallenge/{{challenge.ID}}">
+							<a nav-transition="none" href="#/yoga-app/selectedChallenge/{{challenge.ID}}">
 							<b>{{challenge.ClassDescription.Name}}</b><br/>
 							{{(challenge.StartDate).slice(8,10)}}-{{(challenge.StartDate).slice(5,10)}}-{{(challenge.StartDate).slice(0,4)}}<br/>
 							{{(challenge.StartTime).slice(12,20)}} - {{(challenge.EndTime).slice(12,20)}}<br/>
@@ -1058,9 +1052,9 @@ About page
 				<div class="row">
 				  <div class="col">
 						<div class="button-bar">
-						  <a class="button button-small button-energized" href="tel:+6563480809">Call</a>
+						  <a nav-transition="none" class="button button-small button-energized" href="tel:+6563480809">Call</a>
 						  <div class="button button-small button-energized" ng-click="bookChallenge({{selectedChallenge.ID}},{{userID}})">Enroll</div>
-						  <a class="button button-small button-energized" href="#/yoga-app/Challenges">All Challenges</a>
+						  <a nav-transition="none" class="button button-small button-energized" href="#/yoga-app/Challenges">All Challenges</a>
 						</div>
 					</div>
 				</div>
@@ -1094,20 +1088,21 @@ About page
 	<!--YOGAPEDIA PAGE-->
     <script id="templates/yogapedia.html" type="text/ng-template">
       <ion-view title="Yogapedia">
-        <ion-content has-header="true">
-			<!--<p align="center">-->
-				<!--<img src="img/yoga_v0.jpg" width="90%"/>-->
-			<!--</p>-->
+	  	<ion-header-bar class="bar-subheader" style="height: auto;border-color:transparent;">
 			<div class="item" align="center">
-				<span class="input-label">Select Pose Category:</span>
+				<b><span class="input-label">Select Pose Category:</span></b>
 				<select data-ng-options="o.name for o in poseOptions" data-ng-model="poseOption"></select>
 			</div>
 			
 			<div class="bar bar-header item-input-inset ng-hide">
 					<ion-search filter="(poseOption.value)"></ion-search>
 			</div>
-			
-			
+		</ion-header-bar>
+        <ion-content has-header="true">
+			<!--<p align="center">-->
+				<!--<img src="img/yoga_v0.jpg" width="90%"/>-->
+			<!--</p>-->
+			<br><br><br>
 			<div class="list">
 				<div class="item wrap" ng-repeat="yogapediapose in yogapediaList | filter:(poseOption.value)">
 					<div class="row">
@@ -1117,7 +1112,9 @@ About page
 						<div class="col col-75">
 							<b>Pose:&nbsp;</b>{{yogapediapose.pose}}<br/>
 							<b>Category:&nbsp;</b>{{yogapediapose.classType}}<br/>	
-							<button class="button button-small" ng-click="poseInfo(yogapediapose)">&nbsp;&nbsp;Info&nbsp;&nbsp;</button>
+							<div class="padding">
+								<button class="button button-energized button-outline button-small" ng-click="poseInfo(yogapediapose)">&nbsp;&nbsp;Info&nbsp;&nbsp;</button>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -1132,7 +1129,7 @@ About page
 		<ion-header-bar class="bar-energized">
 			<h1 class="title">Yogapedia Pose</h1>
 			  <div class="buttons">
-					<a class="button button-icon ion-close" ng-click="closeModal()"></a>
+					<a nav-transition="none" class="button button-icon ion-close" ng-click="closeModal()"></a>
 			  </div>
 		</ion-header-bar>
 			<ion-content>	
@@ -1179,11 +1176,11 @@ About page
       <ion-view title="HALL OF FAME" ng-controller="halloffameCtrl">
 		<ion-content has-header="true">
 			<!--<div class="button-bar">
-					<!--<a class="button button-small button-stable" ng-click="winnersData.filter='current'">Current</a>
-					<!--<a class="button button-small button-stable" ng-click="winnersData.filter='past'">Past</a>
+					<!--<a nav-transition="none" class="button button-small button-stable" ng-click="winnersData.filter='current'">Current</a>
+					<!--<a nav-transition="none" class="button button-small button-stable" ng-click="winnersData.filter='past'">Past</a>
 			<!--</div>
 			<!--<div class="list">
-				<!--<a class="item" ng-repeat="winner in winnersData.winners | filter : winnersData.filter">
+				<!--<a nav-transition="none" class="item" ng-repeat="winner in winnersData.winners | filter : winnersData.filter">
 					<!--<b>{{winner.title}}</b><br>{{winner.name}}
 				<!--</a>
 			<!--</div>-->
@@ -1238,15 +1235,14 @@ About page
 			<!--top bar-->
 			<b>
 			<div class="button-bar">
-				<!--<a style="background-color:#f8f8f8;color:#e67e22; border-bottom: thick solid #e67e22;border-bottom-width:2px;" class="button button-small button-stable" href="#/yoga-app/faq" ng-click="showBeforeClass()" ><b>INFO/ETIQUETTE</b></a>-->
-				<a class="button button-small button-stable" href="#/yoga-app/about"><b>ABOUT</b></a>	
+				<a nav-transition="none" class="button button-small button-stable" href="#/yoga-app/about" style="background-color:#f8f8f8; color:#808080;"><b>ABOUT</b></a>	
 			</div>
 			</b>
 			
 			<b>
 			<div class="button-bar">
-				<a class="button button-small button-stable" href="#/yoga-app/faq" ng-click="showBeforeClass()"><b>BEFORE CLASS</b></a>
-				<a class="button button-small button-stable" href="#/yoga-app/faq" ng-click="showDuringClass()"><b>DURING CLASS</b></a>
+				<a id="before" nav-transition="none" class="button button-small button-stable" href="#/yoga-app/faq" ng-click="showBeforeClass()" style="background-color:#e87722; color:#ffffff;"><b>BEFORE CLASS</b></a>
+				<a id="during" nav-transition="none" class="button button-small button-stable" href="#/yoga-app/faq" ng-click="showDuringClass()" style="background-color:#f8f8f8; color:#808080;"><b>DURING CLASS</b></a>
 			</div>
 			</b>
 			
@@ -1269,24 +1265,6 @@ About page
 					</div>
 				</div>
 			</div>
-			
-			<!--
-			<ion-list>
-				<div ng-repeat="group in groups">
-				  <ion-item class="item-stable"
-							ng-click="toggleGroup(group)"
-							ng-class="{active: isGroupShown(group)}">
-					  <i class="icon" ng-class="isGroupShown(group) ? 'ion-minus' : 'ion-plus'"></i>
-					&nbsp;
-					{{group.name}}
-				  </ion-item>
-				  <ion-item class="item-accordion wrap"
-							ng-repeat="item in group.items"
-							ng-show="isGroupShown(group)">
-					{{item}}
-				  </ion-item>
-				</div>
-			</ion-list>-->
 		</ion-content>
 	</ion-view>
     </script>
@@ -1298,17 +1276,15 @@ About page
 			<!--top bar-->
 			<b>
 			<div class="button-bar">
-				<a class="button button-small button-stable" href="#/yoga-app/about" style="background-color:#e67e22;color:#f8f8f8; border-bottom: thick solid #e67e22;border-bottom-width:2px;">ABOUT</a>	
+				<a nav-transition="none" class="button button-small button-stable" href="#/yoga-app/about" style="background-color:#e67e22;color:#f8f8f8; border-bottom: thick solid #e67e22;border-bottom-width:2px;">ABOUT</a>	
 			</div></b>
 			
 		<b>
 			<div class="button-bar">
-				<a class="button button-small button-stable" href="#/yoga-app/faq" ng-click="showBeforeClass()"><b>BEFORE CLASS</b></a>
-				<a class="button button-small button-stable" href="#/yoga-app/faq" ng-click="showDuringClass()"><b>DURING CLASS</b></a>	
+				<a nav-transition="none" class="button button-small button-stable" id="beforeClass" href="#/yoga-app/faq" ng-click="showBeforeClass()" style="background-color:#f8f8f8; color:#808080;"><b>BEFORE CLASS</b></a>
+				<a nav-transition="none" class="button button-small button-stable" id="afterClass" href="#/yoga-app/faq" ng-click="showDuringClass()" style="background-color:#f8f8f8; color:#808080;"><b>DURING CLASS</b></a>	
 			</div>
 			</b>
-			
-			
 			
 			<ion-list>
 				<div ng-repeat="group in groups">
