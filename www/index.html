@@ -421,7 +421,7 @@ About page
 						<b>Lesson: </b>{{lessonName}}<br/>
 						<b>Staff: </b>{{staffName}}<br/>
 						<br>
-						<textarea rows="4" cols="40" ng-model='review.feedback' type="text" placeholder='Enter your review here'></textarea>
+						<textarea rows="4" cols="40" style="background-color:#f8f8f8;"ng-model='review.feedback' type="text" placeholder='Enter your review here'></textarea>
 						
 						<span class="rating">
 							<input type="radio" class="rating-input" id="rating-input-1-5" name="rating-input-1" value="5" ng-model='review.stars'/>
@@ -435,7 +435,7 @@ About page
 							<input type="radio" class="rating-input" id="rating-input-1-1" name="rating-input-1" value="1" ng-model='review.stars'/>
 							<label for="rating-input-1-1" class="rating-star"></label>
 						</span>
-						<br><br>
+						<br>
 						<button class="button button-energized button-small" ng-click="addReview(review)">&nbsp;&nbsp;Add Review&nbsp;&nbsp;</button>
 					</div>
 				</div>
@@ -461,9 +461,8 @@ About page
       <ion-view title="Classes" has-header="true">
 	  		<ion-header-bar class="bar-subheader" style="height: auto;border-color:transparent;">
 				<label class="bar bar-header item-input item-icon-right" style="padding-right:15px">
-				  <i class="icon ion-calendar" style="padding-right:15px"></i>
 				  <span class="input-label">Date</span>
-				  <input style="background-color:#ecf0f1;padding-left:10px;" type="date" ng-model="datex" placeholder="yyyy-MM-dd">
+				  	<i class="icon ion-calendar"></i><input style="background-color:#ecf0f1;padding-left:10px;" type="date" ng-model="datex" placeholder="yyyy-MM-dd">
 				</label>
 		
 				<label class="bar bar-header item-input-inset" style="padding-right:15px">
@@ -517,11 +516,14 @@ About page
 				</div>-->
 
 				<div class="row">
+					<div class="col"><a nav-transition="none" class="button button-small button-energized" href="#/yoga-app/CLASSES">See All Classes</a>
+					</div>
+				</div>
+				<div class="row">
 				  <div class="col">
 						<div class="button-bar">
 						  <a nav-transition="none" class="button button-small button-energized" href="tel:+6563480809">Call</a>
 						  <div class="button button-small button-energized" ng-click="bookClass({{selectedclass.ID}},{{userID}})">Enroll</div>
-						  <a nav-transition="none" class="button button-small button-energized" href="#/yoga-app/CLASSES">See All Classes</a>
 						</div>
 					</div>
 				</div>
@@ -979,8 +981,8 @@ About page
 				  <i class="icon ion-calendar"></i>
 				</label>
 				
-				<div class="row"><b>Instructor: </b>{{instructorName}}</div>
-				<div class="row"><b>Appointment: </b>{{sessionName}}</div>
+				<div class="row"><b>Instructor: &nbsp</b>{{instructorName}}</div>
+				<div class="row"><b>Appointment:&nbsp </b>{{sessionName}}</div>
 				<!--<div pickadate ng-model="date" min-date="minDate" max-date="maxDate" disabled-dates="disabledDates" week-starts-on="0" default-date="dateDefault" no-extra-rows ng-click="selectedDate(date)">
 				  </div>-->
 				  <!--<div class="selected-date">
@@ -990,7 +992,7 @@ About page
 		
 			<!--list showing instructors free timeslots-->
 			<!--<b>Available Timeslots for {{date}}:</b><br/>-->
-			<b>*Select date to view available timeslots:</b><br/>
+			<b>*Select date to view available timeslots:</b><br/><br>
 			<div class="list" ng-show="displayTime">
 				<div class="item" ng-repeat="schedule in schedules">
 						<a nav-transition="none" style="color:green" ng-click="showPopup(schedule)">

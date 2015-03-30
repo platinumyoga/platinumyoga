@@ -3096,14 +3096,14 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 		   // An elaborate, custom popup
 		   var myPopup = $ionicPopup.show({
 			 template: '<textarea type="text" ng-model="data.notes">',
-			 title: 'BOOKING',
-			 subTitle: 'Notes:',
+			 title: 'APPOINTMENT BOOKING',
+			 subTitle: 'Notes for instructor:',
 			 scope: $scope,
 			 buttons: [
-			   { text: 'Cancel' },
+			 { text: 'Cancel', type: 'button-outline button-assertive' },
 			   {
 				 text: '<b>Book</b>',
-				 type: 'button-assertive',
+				 type: 'button-positive',
 				 onTap: function(e) {
 					//method trigger here
 
