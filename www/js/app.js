@@ -2518,6 +2518,12 @@ app.controller('reviewCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLo
 		   $scope.closeModal();
 		}
     };	  
+	
+	$scope.shareHistory = function(historyInfo){
+		var msg = "Join me for "+JSON.stringify(historyInfo.Name)+" at Platinum Yoga!"
+		window.plugins.socialsharing.share(msg, null, null,'http://http://www.platinumyoga.com/');
+	};
+	
 })
 
 

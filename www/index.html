@@ -120,7 +120,7 @@ About page
 				</div>
             </div>-->
 			<div align="center">
-				<div style="color:blue;" ng-click="openModal()">Reset Password</div><br/>
+				<div style="color:black;" ng-click="openModal()">Reset Password</div><br/>
               <!--<a nav-transition="none" href="#/forgot-password">Forgot password</a>-->
             </div>
           </div>
@@ -383,7 +383,8 @@ About page
 							<span ng-show=!{{history.SignedIn}}>Absent</span>
 							</div>
 							<div class="col col-33">
-								<div class="button button-outline button-energized" ng-click="writeReview({{history}})" ng-show={{history.SignedIn}}>Review</div>
+								<div class="button button-outline button-small button-energized" ng-click="writeReview({{history}})" ng-show={{history.SignedIn}}>Review</div><br/>
+								<div class="button button-outline button-small button-energized" ng-click="shareHistory({{history}})" ng-show={{history.SignedIn}}>&nbsp;Share&nbsp;&nbsp;</div><br/>
 							</div>
 						</div>
 					</div>
