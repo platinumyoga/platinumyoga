@@ -2915,9 +2915,6 @@ app.controller('challengesCtrl',function($scope,$stateParams,$ionicPopup,userSer
 })
 
 app.controller('faqCtrl',function($scope,faqDb,$ionicLoading,$timeout,$state,$localstorage){
-
-
-	
 	if($localstorage.get('beforeClassRules')==null || $localstorage.get('duringClassRules')==null){
 		   $ionicLoading.show({
 			content: 'Loading',
@@ -2946,11 +2943,13 @@ app.controller('faqCtrl',function($scope,faqDb,$ionicLoading,$timeout,$state,$lo
 	
 	var before = document.getElementById('before');
 	var during = document.getElementById('during');
+	var about = document.getElementById('about');
 	
 	$scope.showBeforeClass = function(){
 		$scope.displayBeforeClass = true;
 		$scope.displayDuringClass = false;
 		during.style.cssText = "background-color:#f8f8f8; color:#808080;";
+		about.style.cssText = "background-color:#f8f8f8; color:#808080;";
 		before.style.cssText = "background-color:#e87722; color:#ffffff;";		
 	};
 	
@@ -2958,12 +2957,18 @@ app.controller('faqCtrl',function($scope,faqDb,$ionicLoading,$timeout,$state,$lo
 		$scope.displayBeforeClass = false;
 		$scope.displayDuringClass = true;
 		before.style.cssText = "background-color:#f8f8f8; color:#808080;";
+		about.style.cssText = "background-color:#f8f8f8; color:#808080;";
 		during.style.cssText = "background-color:#e87722; color:#ffffff;";	
 	};
 	
-})
-
-app.controller('aboutCtrl',function($scope){
+	$scope.showAbout = function(){
+		$scope.displayBeforeClass = false;
+		$scope.displayDuringClass = false;
+		$scope.displayAbout = true;
+		before.style.cssText = "background-color:#f8f8f8; color:#808080;";
+		about.style.cssText = "background-color:#e87722; color:#ffffff;";
+		during.style.cssText = "background-color:#f8f8f8; color:#808080;";
+	};
 	
 	/*ACCORDION START*/
 	  $scope.groups = [];
@@ -3033,6 +3038,138 @@ app.controller('aboutCtrl',function($scope){
 		return $scope.shownGroup === group;
 	  };
 	/*ACCORDION END*/
+	
+	
+	
+	
+	
+})
+
+app.controller('aboutCtrl',function($scope,faqDb,$ionicLoading,$timeout,$state,$localstorage){
+	
+	/*ACCORDION START*/
+	  $scope.groups = [];
+	  for (var i=0; i<3; i++) {
+		if(i==0){
+			$scope.groups[i] = {
+			name: 'About Us',
+			items: []
+			};
+			for (var j=0; j<1; j++) {
+				if(j==0){
+					$scope.groups[i].items.push('Platinum Yoga is an authentic yoga centre offering all levels and styles of Yoga in Singapore, with hundreds of classes available 7 days a week.Our yoga instructors and guest instructors are the best in the industry, and represent the full spectrum of yoga disciplines. Be it classical Iyengar yoga, Ashtanga yoga or Flow yoga, or specialized classes in Prenatal, Athletic, Yin Yoga Rehabilitative, Yoga for Kids or Power Yoga, you will find it all at Platinum yoga.');
+				}
+			}
+		}
+		
+		if(i==1){
+			$scope.groups[i] = {
+			name: 'Our Mission',
+			items: []
+			};
+			for (var j=0; j<7; j++) {
+				if(j==0){
+					$scope.groups[i].items.push('It is our mission to honor and embrace each student’s search for personal growth, wellbeing, and fulfillment by offering the highest quality yoga programs to people of all ages and from all walks of life. We do this with love, compassion, a sense of humor, and with respect for what each individual can accomplish through Yoga and throughout their lives. Acknowledging that there are many types of people, and therefore more than one way to practice yoga, we bring it all together just for you!');
+				}
+			}
+		}
+		
+		if(i==2){
+			$scope.groups[i] = {
+			name: 'Our Values',
+			items: []
+			};
+			for (var j=0; j<7; j++) {
+				if(j==0){
+					$scope.groups[i].items.push((j+1)+'. Yoga is a Way of Life');
+				}
+				if(j==1){
+					$scope.groups[i].items.push((j+1)+'. Yoga is for Everyone');
+				}
+				if(j==2){
+					$scope.groups[i].items.push((j+1)+'. In Listening');
+				}
+				if(j==3){
+					$scope.groups[i].items.push((j+1)+'. In Supporting and Respecting Each Other');
+				}
+				if(j==4){
+					$scope.groups[i].items.push((j+1)+'. Yoga Keeps the Body Healthy and the Mind Clear');
+				}
+				
+			}
+		}
+	}
+	  
+	  /*
+	   * if given group is the selected group, deselect it
+	   * else, select the given group
+	   */
+	  $scope.toggleGroup = function(group) {
+		if ($scope.isGroupShown(group)) {
+		  $scope.shownGroup = null;
+		} else {
+		  $scope.shownGroup = group;
+		}
+	  };
+	  $scope.isGroupShown = function(group) {
+		return $scope.shownGroup === group;
+	  };
+	/*ACCORDION END*/
+	
+	
+	
+	if($localstorage.get('beforeClassRules')==null || $localstorage.get('duringClassRules')==null){
+		   $ionicLoading.show({
+			content: 'Loading',
+			animation: 'fade-in',
+			showBackdrop: true,
+			maxWidth: 200,
+			showDelay: 0
+		  });
+		  
+		  // Set a timeout to clear loader, however you would actually call the $ionicLoading.hide() method whenever everything is ready or loaded.
+		  $timeout(function () {
+		  $ionicLoading.hide();
+		  }, 9000);
+	  }  
+	  
+	  if($localstorage.get('beforeClassRules')!=null && $localstorage.get('beforeClassRules')!==""){
+		$scope.beforeClass = JSON.parse($localstorage.get('beforeClassRules'));
+	}
+	
+	if($localstorage.get('duringClassRules')!=null && $localstorage.get('duringClassRules')!==""){
+		$scope.duringClass = JSON.parse($localstorage.get('duringClassRules'));
+	 }
+	
+	//$state.go($state.current, {}, {reload: true});
+	$scope.displayBeforeClass = true;
+	
+	var before = document.getElementById('before');
+	var during = document.getElementById('during');
+	
+	$scope.showBeforeClass = function(){
+		$scope.displayBeforeClass = true;
+		$scope.displayDuringClass = false;
+		$scope.displayAbout = false; 
+		//during.style.cssText = "background-color:#f8f8f8; color:#808080;";
+		//before.style.cssText = "background-color:#e87722; color:#ffffff;";		
+	};
+	
+	$scope.showDuringClass = function(){
+		$scope.displayBeforeClass = false;
+		$scope.displayDuringClass = true;
+		$scope.displayAbout = false;
+		//before.style.cssText = "background-color:#f8f8f8; color:#808080;";
+		//during.style.cssText = "background-color:#e87722; color:#ffffff;";	
+	};
+	
+	$scope.showAbout = function(){
+		$scope.displayBeforeClass = false;
+		$scope.displayDuringClass = false;
+		$scope.displayAbout = true;
+	
+	};
+	
 	
 })
 
