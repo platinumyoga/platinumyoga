@@ -272,10 +272,15 @@ About page
       <ion-view title="Home">
 			<ion-header-bar class="bar-subheader" style="height: auto;border-color:transparent;">
 				<div class="row">
-					<div class="col">
+					<div class="col col-35">
 						<b>Username: </b>{{username}}<br/>
 						<b>User ID: </b>{{userId}}<br/>
 						<!--<b>Points:</b> 50(dummy)-->
+					</div>
+					<div class="col col-65">				
+						<label class="bar bar-header item-input item-icon-right">
+							<div style="margin-left:-15px;"><i class="icon ion-calendar"></i></div><input style="border-color:white;background:#ecf0f1;left:25px;" type="date" ng-model="dateNow" placeholder="yyyy-MM-dd">
+						</label>
 					</div>
 				</div>
 				
@@ -295,7 +300,7 @@ About page
 				<br><br><br><br><br>
 				<!--displays one week's worth of classes for booking-->
 				<div class="list" ng-show="displayClasses">
-					<div class="item wrap" ng-repeat="classListItem in totalClasses | orderBy:'StartDateTime'">
+					<div class="item wrap" ng-repeat="classListItem in totalClasses | orderBy:'StartDateTime'| filter:(dateNow)">
 					<div class="row">
 						<div class="col col-75">
 							<a nav-transition="none" href="#/yoga-app/selectedClass/{{classListItem.ID}}">

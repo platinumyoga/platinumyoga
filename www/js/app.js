@@ -2027,6 +2027,26 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 	$scope.userId = userService.getUserID();;
 	$scope.username = userService.getUsername();
 	
+	
+	//date
+	//date
+	var today = new Date();
+	var dd = today.getDate();
+	var mm = today.getMonth()+1;//jan is 0
+	var yyyy = today.getFullYear();
+	
+	if(mm<10){
+		mm="0"+mm;
+	}
+	
+	if(dd<10){
+		dd="0"+dd;
+	}
+	$scope.dateNow = yyyy+"-"+mm+"-"+dd;
+	
+	
+	
+	
 	var retrieveScheduledClasses = function(){
 		//retrieve user's scheduled classes
 		userScheduleService.getUserSchedule($scope.userId);
