@@ -288,21 +288,25 @@ About page
 						</label>
 					</div>
 				</div>
-				<!--
-				<div class="row">
-					<div class="col">
-						<div class="input-label">
-							Location:
-						</div>
-					</div>
-					<div class="col">
-						<select>
-							<option selected>Marine Parade</option>
-							<option>Suntec</option>
-						</select>
-					  
-					</div>
-			    </div>-->
+				<script>
+				function calendar_events(){
+				 //var startDate = new Date(2015,4,1,2,30,0,0,0); // beware: month 0 = january, 11 = december
+				 // var endDate = new Date(2015,4,1,3,30,0,0,0);
+				 
+				 var startDate = new Date(2015,2,15,0,0,0,0,0);
+				 var endDate = new Date(2015,2,16,0,0,0,0,0);
+				  var title = "Skype meeting With Lead";
+				 //var location = "myleads.html";
+				  var notes = "Need to do a skype meeting with the lead.";
+				  var success = function(message) { alert("Success: " + JSON.stringify(message)); };
+				  var error = function(message) { alert("Error: " + message); };
+				  // window.plugins.calendar.listEventsInRange(startDate,endDate,success,error);
+
+				//  window.plugins.calendar.createCalendar(calendarName,success,error);
+				  window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
+				 }
+				 document.addEventListener("deviceready", calendar_events, false);
+			</script>
 				
 				<b>
 				<div class="button-bar">
@@ -316,25 +320,6 @@ About page
 			</ion-header-bar>
 			
 			<ion-content padding="true">
-			
-				
-			<script>
-			 function calendar_events(){
-				 var startDate = new Date(2015,4,1,2,30,0,0,0); // beware: month 0 = january, 11 = december
-				  var endDate = new Date(2015,4,1,3,30,0,0,0);
-				  var title = "Skype meeting With Lead";
-				 //var location = "myleads.html";
-				  var notes = "Need to do a skype meeting with the lead.";
-				  var success = function(message) { alert("Success: " + JSON.stringify(message)); };
-				  var error = function(message) { alert("Error: " + message); };
-				  // window.plugins.calendar.listEventsInRange(startDate,endDate,success,error);
-
-				//  window.plugins.calendar.createCalendar(calendarName,success,error);
-				  window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
-				 }
-				 document.addEventListener("deviceready", calendar_events, false);
-			</script>
-
 				<br><br><br><br><br>
 				<!--displays one week's worth of classes for booking-->
 				<div class="list" ng-show="displayClasses">
