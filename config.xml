@@ -35,8 +35,6 @@
 	<feature name="Calendar">
 	  <param name="android-package" value="nl.xservices.plugins.Calendar" />
 	</feature>
-	
-	<gap:plugin name="Calendar" value="Calendar"/>
 	  
   <!--application icon-->
   <icon src="icons/android/res/drawable-hdpi/appicon.png" />
