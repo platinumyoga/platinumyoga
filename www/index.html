@@ -294,7 +294,10 @@ About page
 					<div class="col col-35">
 						<b>Username: </b>{{username}}<br/>
 						<b>User ID: </b>{{userId}}<br/>
-						<!--<b>Points:</b> 50(dummy)-->
+						<b>Venue: </b>
+						<select ng-options="venue for venue in ['Marine Parade', 'Suntec']" ng-model="venue1" ng-change="selectVenue()">
+						<option value="" selected>Select Venue</option>
+					</select>
 					</div>
 					<div class="col col-65">				
 						<label class="bar bar-header item-input item-icon-right">
@@ -302,6 +305,21 @@ About page
 						</label>
 					</div>
 				</div>
+				<!--
+				<div class="row">
+					<div class="col">
+						<div class="input-label">
+							Location:
+						</div>
+					</div>
+					<div class="col">
+						<select>
+							<option selected>Marine Parade</option>
+							<option>Suntec</option>
+						</select>
+					  
+					</div>
+			    </div>-->
 				
 				<b>
 				<div class="button-bar">

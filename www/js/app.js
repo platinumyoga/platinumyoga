@@ -288,10 +288,12 @@ app.factory('classesService', function($http,$ionicPopup,userScheduleService,wai
 var availClasses = [];
 	return {
 		getClassesDatabase: function(){
-
 			var request = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/getClasses.php",
+			data: {
+				locationID:$localstorage.get('locationNo'),
+			},
 			headers: { 
 				'Content-Type': 'application/x-www-form-urlencoded' 
 			}
@@ -299,10 +301,16 @@ var availClasses = [];
 
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
-
-				$localstorage.set('classesDb', JSON.stringify(data.Classes.Class));
-				classesDatabase = JSON.parse($localstorage.get('classesDb'));
-
+				//alert(data.Classes.length);
+				if(JSON.stringify(data.Classes)==="{}"){
+					//alert("empty");
+					$localstorage.set('classesDb', "");
+					classesDatabase = [];
+				}else{
+					//alert("not empty");
+					$localstorage.set('classesDb', JSON.stringify(data.Classes.Class));
+					classesDatabase = JSON.parse($localstorage.get('classesDb'));
+				}
 			})
 		},
 		getClasses:function(){
@@ -386,12 +394,15 @@ var availClasses = [];
 	}
 })
 
-app.factory('workshopsService',function($http,$ionicPopup,userScheduleService){
+app.factory('workshopsService',function($http,$ionicPopup,userScheduleService,$localstorage){
 	return {
 		getWorkshopsDatabase: function(){
 			var request = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/getWorkshops.php",
+			data: {
+				locationID:$localstorage.get('locationNo'),
+			},
 			headers: { 
 				'Content-Type': 'application/x-www-form-urlencoded' 
 			}
@@ -468,13 +479,16 @@ app.factory('workshopsService',function($http,$ionicPopup,userScheduleService){
 })
 
 
-app.factory('retreatsService',function($http,$ionicPopup,userScheduleService){
+app.factory('retreatsService',function($http,$ionicPopup,userScheduleService,$localstorage){
 	return {
 		getRetreatsDatabase: function(){
 			var request = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/getRetreatsTT.php",
-			headers: { 
+			data: {
+				locationID:$localstorage.get('locationNo'),
+			},
+			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded' 
 			}
 			});
@@ -552,12 +566,15 @@ app.factory('retreatsService',function($http,$ionicPopup,userScheduleService){
 
 
 
-app.factory('eventsService',function($http,$ionicPopup,userScheduleService){
+app.factory('eventsService',function($http,$ionicPopup,userScheduleService,$localstorage){
 	return {
 		getEventsDatabase: function(){
 			var request = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/getEvents.php",
+			data: {
+				locationID:$localstorage.get('locationNo'),
+			},
 			headers: { 
 				'Content-Type': 'application/x-www-form-urlencoded' 
 			}
@@ -622,12 +639,15 @@ app.factory('eventsService',function($http,$ionicPopup,userScheduleService){
 })
 
 
-app.factory('challengesService',function($http,$ionicPopup,userScheduleService){
+app.factory('challengesService',function($http,$ionicPopup,userScheduleService,$localstorage){
 	return {
 		getChallengesDatabase: function(){
 			var request = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/getChallenges.php",
+			data: {
+				locationID:$localstorage.get('locationNo'),
+			},
 			headers: { 
 				'Content-Type': 'application/x-www-form-urlencoded' 
 			}
@@ -690,7 +710,7 @@ app.factory('challengesService',function($http,$ionicPopup,userScheduleService){
 })
 
 
-app.factory('sessionService',function($http){
+app.factory('sessionService',function($http,$localstorage){
 	return {
 		getSession: function(){
 			var request = $http({
@@ -740,9 +760,6 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
 		maxWidth: 200,
 		showDelay: 0
 	  });*/
-
-	  
-	
 	return {
 		authentication: function(user){
 			var request = $http({
@@ -760,11 +777,15 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
 			/* Check whether the HTTP Request is successful or not. */
 			request.success(function (data) {
 				userDatabase = data;
-				if(userDatabase.ValidateLoginResult.ErrorCode === 200){	
-					
-
+				if(userDatabase.ValidateLoginResult.ErrorCode === 200){
 					$localstorage.set('name', user.username);
 					$localstorage.set('password', user.password);
+					
+				    //set the location of branch to 1 first (marine parade)
+					if($localstorage.get('locationNo')===null || $localstorage.get('locationNo')==="3") {
+						$localstorage.set('locationNo', "1");
+					}
+					
 					//console.log(JSON.stringify(userDatabase.ValidateLoginResult));
 					userID = userDatabase.ValidateLoginResult.Client.ID;
 					userScheduleService.getUserSchedule(userID);
@@ -780,9 +801,8 @@ app.factory('userService', function($http,$localstorage,$state,$ionicPopup,userS
 					challengesService.getChallengesDatabase();
 					sessionService.getSession();
 					sessionStaffService.getSessionStaff();
-	  //$ionicLoading.hide();
+					//$ionicLoading.hide();
  
-					
 					$state.go("yoga-app.home");
 				}else{
 					var alertPopup = $ionicPopup.alert({
@@ -1520,12 +1540,15 @@ app.factory('bookApptService',function($http,userScheduleService,$ionicPopup,$st
 })
 
 
-app.factory('sessionStaffService',function($http){
+app.factory('sessionStaffService',function($http,$localstorage){
 	return {
 		getSessionStaff: function(){
 			var request = $http({
 			method: "post",
 			url: "http://platinumyoga-rerawan.rhcloud.com/getStaff.php",
+			data: {
+				locationID:$localstorage.get('locationNo'),
+			},
 			headers: { 
 				'Content-Type': 'application/x-www-form-urlencoded' 
 			}
@@ -1927,6 +1950,8 @@ app.controller('sidebarCtrl',function($scope,$state,$ionicActionSheet,$localstor
 		$localstorage.set('beforeClassRules','');
 		$localstorage.set('duringClassRules','');
 		$localstorage.set('hallofFameList','');
+		$localstorage.set('locationNo', "3");
+		$localstorage.set('venue1','');
 	};
 	
 	
@@ -2023,10 +2048,32 @@ app.controller('barcodeCtrl',function($scope,userService){
 })
 
 
-app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoading,userService,userScheduleService,removeBookingService,waitlistService,removeWaitlistService,historyService,purchaseHistoryService,$ionicModal,feedbackDb,$firebase,removeAppointmentService,$localstorage,classesService,$stateParams){
+app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoading,userService,userScheduleService,removeBookingService,waitlistService,removeWaitlistService,historyService,purchaseHistoryService,$ionicModal,feedbackDb,$firebase,removeAppointmentService,$localstorage,classesService,$stateParams,workshopsService,retreatsService){
 	$scope.userId = userService.getUserID();;
 	$scope.username = userService.getUsername();
 	
+	//checking for current venue
+	if($localstorage.get('venue1')!=null && $localstorage.get('venue1')!=""){
+		$scope.venue1 = $localstorage.get('venue1');
+	}
+	
+	$scope.selectVenue=function(){
+		if($scope.venue1=="Marine Parade"){
+			$localstorage.set('locationNo', "1");
+			$localstorage.set('venue1',$scope.venue1);
+			classesService.getClassesDatabase();
+			workshopsService.getWorkshopsDatabase(); 
+			retreatsService.getRetreatsDatabase();
+			$state.go($state.current, {}, {reload: true});
+		}else if($scope.venue1=="Suntec"){
+			$localstorage.set('locationNo', "2");
+			$localstorage.set('venue1',$scope.venue1);
+			classesService.getClassesDatabase();
+			workshopsService.getWorkshopsDatabase();
+			retreatsService.getRetreatsDatabase();		
+			$state.go($state.current, {}, {reload: true});
+		}
+	};
 	
 	//date
 	//date
@@ -2044,9 +2091,6 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 	}
 	$scope.dateNow = yyyy+"-"+mm+"-"+dd;
 	
-	
-	
-	
 	var retrieveScheduledClasses = function(){
 		//retrieve user's scheduled classes
 		userScheduleService.getUserSchedule($scope.userId);
@@ -2061,6 +2105,7 @@ app.controller('homeCtrl',function($scope,$state,$ionicPopup,$timeout,$ionicLoad
 	
 	//calling the classes 
 	var retrieveClasses = function(){
+		classesService.getClassesDatabase();
 		$scope.totalClasses = classesService.getClasses();
 		$scope.selectedclass = classesService.getSelectedClass($stateParams.classID);	
 	};
@@ -2591,7 +2636,6 @@ app.controller('classesCtrl', function($scope,$stateParams,$ionicPopup,classesSe
 		  $scope.totalClasses = classesService.getClasses();
 		  //Stop the ion-refresher from spinning
 		  $scope.$broadcast('scroll.refreshComplete');
-		
 		}, 2000);
 	};
 	//pull to refresh end classes(end)
