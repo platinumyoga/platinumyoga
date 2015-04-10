@@ -64,7 +64,7 @@
 	</style>
 	
 	<script>
-		function calendar_events(){
+		/*function calendar_events(){
 			 //var startDate = new Date(2015,4,1,2,30,0,0,0); // beware: month 0 = january, 11 = december
 			 // var endDate = new Date(2015,4,1,3,30,0,0,0);
 			 
@@ -73,13 +73,14 @@
 			  var title = "Skype meeting With Lead";
 			 //var location = "myleads.html";
 			  var notes = "Need to do a skype meeting with the lead.";
-			  var success = function(message) { alert("Success: " + JSON.stringify(message)); };
-			var error = function(message) { alert("Error: " + message); };
+			  //var success = function(message) { alert("Success: " + JSON.stringify(message)); };
+			//var error = function(message) { alert("Error: " + message); };
 			  // window.plugins.calendar.listEventsInRange(startDate,endDate,success,error);
 				//  window.plugins.calendar.createCalendar(calendarName,success,error);
 			window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
 			 }
 			 document.addEventListener("deviceready", calendar_events, false);
+			 */
 	</script>	
   </head>
   <!--APP STRUCTURE-->
@@ -548,8 +549,10 @@ About page
 						<div class="button-bar">
 						  <a nav-transition="none" class="button button-small button-energized" href="tel:+6563480809">Call</a>
 						  <div class="button button-small button-energized" ng-click="bookClass({{selectedclass.ID}},{{userID}})">Enroll</div>
-						</div>
-						<a nav-transition="none" class="button button-small button-energized" href="#/yoga-app/CLASSES">All Classes</a>
+					</div>
+					<div class="col">
+						<a nav-transition="none" class="button button-small button-energized" href="#/yoga-app/CLASSES">See All Classes</a>
+					</div>
 					</div>
 				</div>
 
