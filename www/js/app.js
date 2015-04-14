@@ -352,6 +352,34 @@ var availClasses = [];
 							returnMsg = "You have been added to waitlist.";
 						}else{
 							returnMsg = "Success!"
+							function calendar_events(){
+							 var tempStart = data.AddClientsToClassesResult.Classes.Class.StartDateTime;
+							 var tempEnd = data.AddClientsToClassesResult.Classes.Class.EndDateTime;
+							 //"2015-04-16T09:45:00",
+							 var classYear = tempStart.substring(0,4);
+							 var monthString = tempStart.substring(5,7);
+							 var classMonth = parseInt(monthString) - 1;
+							 var dateString = tempStart.substring(8,10);
+							 var classDate = parseInt(dateString);
+							 
+							 var startHour = parseInt(tempStart.substring(11,13));
+							 var startMin = parseInt(tempStart.substring(14,16));
+							 
+							 var endHour = parseInt(tempEnd.substring(11,13));
+							 var endMin = parseInt(tempEnd.substring(14,16));
+							 
+							 var startDate = new Date(classYear,classMonth,classDate,startHour,startMin,0,0,0);
+							 var endDate = new Date(classYear,classMonth,classDate,endHour,endMin,0,0,0);
+							  //py class name
+							  var title = "TEST FOR PY";
+							 var location = "Platinum Yoga";
+							  //var success = function(message) { alert("Success: " + JSON.stringify(message)); };
+							//var error = function(message) { alert("Error: " + message); };
+							  // window.plugins.calendar.listEventsInRange(startDate,endDate,success,error);
+								//  window.plugins.calendar.createCalendar(calendarName,success,error);
+							window.plugins.calendar.createEvent(title,location, startDate,endDate,success,error);
+							 }
+							 document.addEventListener("deviceready", calendar_events, false);
 						};
 						userScheduleService.getUserSchedule(userId);
 						waitlistService.getWaitlist(userId);

@@ -70,14 +70,14 @@
 			 
 			 var startDate = new Date(2015,2,15,0,0,0,0,0);
 			 var endDate = new Date(2015,2,16,0,0,0,0,0);
+			  //py class name
 			  var title = "Skype meeting With Lead";
 			 //var location = "myleads.html";
-			  var notes = "Need to do a skype meeting with the lead.";
 			  //var success = function(message) { alert("Success: " + JSON.stringify(message)); };
 			//var error = function(message) { alert("Error: " + message); };
 			  // window.plugins.calendar.listEventsInRange(startDate,endDate,success,error);
 				//  window.plugins.calendar.createCalendar(calendarName,success,error);
-			window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
+			window.plugins.calendar.createEvent(title,startDate,endDate,success,error);
 			 }
 			 document.addEventListener("deviceready", calendar_events, false);
 			 */
@@ -320,7 +320,7 @@ About page
 			</ion-header-bar>
 			
 			<ion-content padding="true">
-				<br><br><br><br><br>
+				<br><br><br><br><br><br>
 				<!--displays one week's worth of classes for booking-->
 				<div class="list" ng-show="displayClasses">
 					<div class="item wrap" ng-repeat="classListItem in totalClasses | orderBy:'StartDateTime'| filter:(dateNow)">
