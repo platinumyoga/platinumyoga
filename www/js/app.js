@@ -371,7 +371,7 @@ var availClasses = [];
 							 var endMin = parseInt(tempEnd.substring(14,16));
 							 
 							 var startDate = new Date(classYear,classMonth,classDate,startHour,startMin,0,0,0);
-							 var endDate = new Date(classYear,classMonth,classDate,endHour,,0,0,0);
+							 var endDate = new Date(classYear,classMonth,classDate,endHour,0,0,0);
 							 alert("2");
 							  //py class name
 							  var title = "TEST FOR PY";
