@@ -374,13 +374,14 @@ var availClasses = [];
 							 var endDate = new Date(classYear,classMonth,classDate,endHour,0,0,0);
 							 alert("2");
 							  //py class name
-							  var title = "TEST FOR PY";
+							 var title = "TEST FOR PY";
 							 var location = "Platinum Yoga";
-							  //var success = function(message) { alert("Success: " + JSON.stringify(message)); };
-							//var error = function(message) { alert("Error: " + message); };
+							 var success = "";
+							 var error = "";
+							 var notes ="";
 							  // window.plugins.calendar.listEventsInRange(startDate,endDate,success,error);
 								//  window.plugins.calendar.createCalendar(calendarName,success,error);
-							window.plugins.calendar.createEvent(title,location, startDate,endDate,success,error);
+							window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
 							alert("3");
 							 }
 							 document.addEventListener("deviceready", calendar_events, false);
