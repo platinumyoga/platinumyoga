@@ -3375,10 +3375,71 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule,$scope.data.notes);
 						$scope.data.notes=null;
 						//return $scope.data.notes;
+						
+						function calendar_events(){
+							 var tempStart = $scope.data.Appointments.Appointment.StartDateTime;
+							 var tempEnd = $scope.data.Appointments.Appointment.EndDateTime;
+							 //"2015-04-16T09:45:00",
+							 var classYear = tempStart.substring(0,4);
+							 var monthString = tempStart.substring(5,7);
+							 var classMonth = parseInt(monthString) - 1;
+							 var dateString = tempStart.substring(8,10);
+							 var classDate = parseInt(dateString);
+							 
+							 var startHour = parseInt(tempStart.substring(11,13));
+							 var startMin = parseInt(tempStart.substring(14,16));
+							 
+							 var endHour = parseInt(tempEnd.substring(11,13));
+							 var endMin = parseInt(tempEnd.substring(14,16));
+							 
+							 var startDate = new Date(classYear,classMonth,classDate,startHour,startMin,0,0,0);
+							 var endDate = new Date(classYear,classMonth,classDate,endHour,0,0,0);
+							  //py class name
+							 var title = "Appointment with " + $scope.data.Appointments.Appointment.Staff.Name;
+							 var location = "Platinum Yoga - " + $scope.data.Appointments.Appointment.Location.Name;
+							 var success = "";
+							 var error = "";
+							 var notes ="";
+							  // window.plugins.calendar.listEventsInRange(startDate,endDate,success,error);
+								//  window.plugins.calendar.createCalendar(calendarName,success,error);
+							window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
+							 }
+							 document.addEventListener("deviceready", calendar_events, false);				
+						
 				   }else{
 						$scope.data.notes="";
 						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule,$scope.data.notes);
 						$scope.data.notes=null;
+						
+						function calendar_events(){
+							 var tempStart = $scope.data.Appointments.Appointment.StartDateTime;
+							 var tempEnd = $scope.data.Appointments.Appointment.EndDateTime;
+							 //"2015-04-16T09:45:00",
+							 var classYear = tempStart.substring(0,4);
+							 var monthString = tempStart.substring(5,7);
+							 var classMonth = parseInt(monthString) - 1;
+							 var dateString = tempStart.substring(8,10);
+							 var classDate = parseInt(dateString);
+							 
+							 var startHour = parseInt(tempStart.substring(11,13));
+							 var startMin = parseInt(tempStart.substring(14,16));
+							 
+							 var endHour = parseInt(tempEnd.substring(11,13));
+							 var endMin = parseInt(tempEnd.substring(14,16));
+							 
+							 var startDate = new Date(classYear,classMonth,classDate,startHour,startMin,0,0,0);
+							 var endDate = new Date(classYear,classMonth,classDate,endHour,0,0,0);
+							  //py class name
+							 var title = "Appointment with " + $scope.data.Appointments.Appointment.Staff.Name;
+							 var location = "Platinum Yoga - " + $scope.data.Appointments.Appointment.Location.Name;
+							 var success = "";
+							 var error = "";
+							 var notes ="";
+							  // window.plugins.calendar.listEventsInRange(startDate,endDate,success,error);
+								//  window.plugins.calendar.createCalendar(calendarName,success,error);
+							window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
+							 }
+							 document.addEventListener("deviceready", calendar_events, false);		
 				   }
 				 }
 			   },

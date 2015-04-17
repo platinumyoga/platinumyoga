@@ -518,21 +518,18 @@ About page
 				<div class="row">
 				  <div class="col"><b>{{selectedclass.ClassDescription.Name}}</b></div>
 				</div>
-				
-				<!--
-				<div class="row">
-				  <div class="col">{{selectedclass.TotalBooked}}/{{selectedclass.MaxCapacity}} Enrolled</div>
-				</div>-->
 
 				<div class="row">
 				  <div class="col">
 						<div class="button-bar">
 						  <a nav-transition="none" class="button button-small button-energized" href="tel:+6563480809">Call</a>
 						  <div class="button button-small button-energized" ng-click="bookClass({{selectedclass.ID}},{{userID}})">Enroll</div>
+						</div>
 					</div>
-					<div class="col">
+				</div>
+				<div class="row">
+					<div class="col col-33 col-offset-33">
 						<a nav-transition="none" class="button button-small button-energized" href="#/yoga-app/CLASSES">See All Classes</a>
-					</div>
 					</div>
 				</div>
 
