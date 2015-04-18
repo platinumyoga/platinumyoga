@@ -3373,9 +3373,10 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 
 				   if ($scope.data.notes!=null) {
 						alert(1);
+						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule,$scope.data.notes);
 						//return $scope.data.notes;
-						
-						function calendar_events(){
+						alert(1.5);
+						function calendar_events2(){
 							 var tempStart = $scope.data.Appointments.Appointment.StartDateTime;
 							 var tempEnd = $scope.data.Appointments.Appointment.EndDateTime;
 							 //"2015-04-16T09:45:00",
@@ -3407,12 +3408,13 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 							 }
 							 document.addEventListener("deviceready", calendar_events, false);				
 							 alert(4);
+							$scope.data.notes=null;
+				   }else{
+						$scope.data.notes="";
 						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule,$scope.data.notes);
 						$scope.data.notes=null;
-						alert(5);
-				   }else{
 						alert(1);
-						function calendar_events(){
+						function calendar_events3(){
 							 var tempStart = $scope.data.Appointments.Appointment.StartDateTime;
 							 var tempEnd = $scope.data.Appointments.Appointment.EndDateTime;
 							 //"2015-04-16T09:45:00",
@@ -3443,11 +3445,7 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 							window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
 							 }
 							 document.addEventListener("deviceready", calendar_events, false);
-							 alert(4);
-						$scope.data.notes="";
-						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule,$scope.data.notes);
-						$scope.data.notes=null;
-						alert(5);
+							 
 				   }
 				 }
 			   },
