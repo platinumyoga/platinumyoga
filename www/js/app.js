@@ -3415,7 +3415,7 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 						var dataTemp = $scope.data;
 						function calendar_events(dataTemp){
 							alert(9);
-							alert(dateTemp);
+							alert(dataTemp);
 							 var tempStart = dataTemp.Appointments.Appointment.StartDateTime;
 							 var tempEnd = dataTemp.Appointments.Appointment.EndDateTime;
 							 //"2015-04-16T09:45:00",
