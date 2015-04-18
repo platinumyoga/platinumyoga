@@ -3374,7 +3374,7 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule,$scope.data.notes);
 						//return $scope.data.notes;
 						alert(1.5);
-						function calendar_events2(){
+						function calendar_events(){
 							 var tempStart = $scope.data.Appointments.Appointment.StartDateTime;
 							 var tempEnd = $scope.data.Appointments.Appointment.EndDateTime;
 							 //"2015-04-16T09:45:00",
@@ -3404,7 +3404,7 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 							window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
 							alert(3);
 							 }
-							 document.addEventListener("deviceready", calendar_events2, false);				
+							 document.addEventListener("deviceready", calendar_events, false);				
 							 alert(4);
 							$scope.data.notes=null;
 				   }else{
@@ -3412,10 +3412,13 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule,$scope.data.notes);
 						$scope.data.notes=null;
 						alert(1);
-						function calendar_events3(){
+						var dataTemp = $scope.data;
+						alert(dataTemp);
+						function calendar_events(){
 							alert(9);
-							 var tempStart = $scope.data.Appointments.Appointment.StartDateTime;
-							 var tempEnd = $scope.data.Appointments.Appointment.EndDateTime;
+							alert(dateTemp);
+							 var tempStart = dataTemp.Appointments.Appointment.StartDateTime;
+							 var tempEnd = dataTemp.Appointments.Appointment.EndDateTime;
 							 //"2015-04-16T09:45:00",
 							 var classYear = tempStart.substring(0,4);
 							 var monthString = tempStart.substring(5,7);
@@ -3433,17 +3436,18 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 							 var startDate = new Date(classYear,classMonth,classDate,startHour,startMin,0,0,0);
 							 var endDate = new Date(classYear,classMonth,classDate,endHour,0,0,0);
 							  //py class name
-							 var title = "Appointment with " + $scope.data.Appointments.Appointment.Staff.Name;
-							 var location = "Platinum Yoga - " + $scope.data.Appointments.Appointment.Location.Name;
+							 var title = "Appointment with " + dataTemp.Appointments.Appointment.Staff.Name;
+							 var location = "Platinum Yoga - " + dataTemp.Appointments.Appointment.Location.Name;
 							 var success = "";
 							 var error = "";
-							 var notes =$scope.data.notes;
+							 var notes = dataTemp.notes;
 							 alert(3);
 							  // window.plugins.calendar.listEventsInRange(startDate,endDate,success,error);
 								//  window.plugins.calendar.createCalendar(calendarName,success,error);
 							window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
 							 }
-							 document.addEventListener("deviceready", calendar_events3, false);
+							 alert(10);
+							 document.addEventListener("deviceready", calendar_events, false);
 							 
 				   }
 				 }
