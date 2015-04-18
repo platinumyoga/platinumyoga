@@ -3373,8 +3373,6 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 
 				   if ($scope.data.notes!=null) {
 						alert(1);
-						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule,$scope.data.notes);
-						$scope.data.notes=null;
 						//return $scope.data.notes;
 						
 						function calendar_events(){
@@ -3409,11 +3407,10 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 							 }
 							 document.addEventListener("deviceready", calendar_events, false);				
 							 alert(4);
-						
-				   }else{
-						$scope.data.notes="";
 						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule,$scope.data.notes);
 						$scope.data.notes=null;
+						alert(5);
+				   }else{
 						alert(1);
 						function calendar_events(){
 							 var tempStart = $scope.data.Appointments.Appointment.StartDateTime;
@@ -3447,6 +3444,10 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 							 }
 							 document.addEventListener("deviceready", calendar_events, false);
 							 alert(4);
+						$scope.data.notes="";
+						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule,$scope.data.notes);
+						$scope.data.notes=null;
+						alert(5);
 				   }
 				 }
 			   },
