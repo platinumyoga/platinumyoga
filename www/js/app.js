@@ -3413,8 +3413,7 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 						$scope.data.notes=null;
 						alert(1);
 						var dataTemp = $scope.data;
-						alert(dataTemp);
-						function calendar_events(){
+						function calendar_events(dataTemp){
 							alert(9);
 							alert(dateTemp);
 							 var tempStart = dataTemp.Appointments.Appointment.StartDateTime;
