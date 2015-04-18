@@ -3372,6 +3372,7 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 					//method trigger here
 
 				   if ($scope.data.notes!=null) {
+						alert(1);
 						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule,$scope.data.notes);
 						$scope.data.notes=null;
 						//return $scope.data.notes;
@@ -3385,6 +3386,7 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 							 var classMonth = parseInt(monthString) - 1;
 							 var dateString = tempStart.substring(8,10);
 							 var classDate = parseInt(dateString);
+							 alert(2);
 							 
 							 var startHour = parseInt(tempStart.substring(11,13));
 							 var startMin = parseInt(tempStart.substring(14,16));
@@ -3399,18 +3401,20 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 							 var location = "Platinum Yoga - " + $scope.data.Appointments.Appointment.Location.Name;
 							 var success = "";
 							 var error = "";
-							 var notes ="";
+							 var notes =$scope.data.notes;
 							  // window.plugins.calendar.listEventsInRange(startDate,endDate,success,error);
 								//  window.plugins.calendar.createCalendar(calendarName,success,error);
 							window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
+							alert(3);
 							 }
 							 document.addEventListener("deviceready", calendar_events, false);				
+							 alert(4);
 						
 				   }else{
 						$scope.data.notes="";
 						bookApptService.bookAppointment($scope.instructorVar.isMale,$scope.instructorVar.ID,$scope.sessionID,userService.getUserID(),schedule,$scope.data.notes);
 						$scope.data.notes=null;
-						
+						alert(1);
 						function calendar_events(){
 							 var tempStart = $scope.data.Appointments.Appointment.StartDateTime;
 							 var tempEnd = $scope.data.Appointments.Appointment.EndDateTime;
@@ -3420,6 +3424,7 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 							 var classMonth = parseInt(monthString) - 1;
 							 var dateString = tempStart.substring(8,10);
 							 var classDate = parseInt(dateString);
+							 alert(2);
 							 
 							 var startHour = parseInt(tempStart.substring(11,13));
 							 var startMin = parseInt(tempStart.substring(14,16));
@@ -3434,12 +3439,14 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 							 var location = "Platinum Yoga - " + $scope.data.Appointments.Appointment.Location.Name;
 							 var success = "";
 							 var error = "";
-							 var notes ="";
+							 var notes =$scope.data.notes;
+							 alert(3);
 							  // window.plugins.calendar.listEventsInRange(startDate,endDate,success,error);
 								//  window.plugins.calendar.createCalendar(calendarName,success,error);
 							window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
 							 }
-							 document.addEventListener("deviceready", calendar_events, false);		
+							 document.addEventListener("deviceready", calendar_events, false);
+							 alert(4);
 				   }
 				 }
 			   },
