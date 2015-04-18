@@ -1543,9 +1543,7 @@ app.factory('bookApptService',function($http,userScheduleService,$ionicPopup,$st
 			//alert(data);
 				//alert(JSON.stringify(data));
 				//alert(data.AddOrUpdateAppointmentsResult.ErrorCode);
-				console.log(JSON.stringify(data));
 				if(data.AddOrUpdateAppointmentsResult.ErrorCode==200){
-					console.log(JSON.stringify(data));
 					userScheduleService.getUserSchedule(userID);
 					var alertPopup = $ionicPopup.alert({
 					 title: 'Book Appoinment',
@@ -3406,7 +3404,7 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 							window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
 							alert(3);
 							 }
-							 document.addEventListener("deviceready", calendar_events, false);				
+							 document.addEventListener("deviceready", calendar_events2, false);				
 							 alert(4);
 							$scope.data.notes=null;
 				   }else{
@@ -3415,6 +3413,7 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 						$scope.data.notes=null;
 						alert(1);
 						function calendar_events3(){
+							alert(9);
 							 var tempStart = $scope.data.Appointments.Appointment.StartDateTime;
 							 var tempEnd = $scope.data.Appointments.Appointment.EndDateTime;
 							 //"2015-04-16T09:45:00",
@@ -3444,7 +3443,7 @@ app.controller('appointmentCtrl',function($scope,$rootScope,appointmentService,s
 								//  window.plugins.calendar.createCalendar(calendarName,success,error);
 							window.plugins.calendar.createEvent(title,location,notes,startDate,endDate,success,error);
 							 }
-							 document.addEventListener("deviceready", calendar_events, false);
+							 document.addEventListener("deviceready", calendar_events3, false);
 							 
 				   }
 				 }
