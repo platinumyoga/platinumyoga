@@ -16,6 +16,8 @@
   <preference name="DisallowOverscroll" value="true"/>
   <preference name="BackupWebStorage" value="none"/>
   <preference name="orientation" value="portrait" />
+  <preference name="android-build-tool" value="gradle" /> 
+<gap:plugin name="cordova-plugin-admobpro" source="npm" />
   
   
   <!--phonegap plugin for inapp browser-->
@@ -32,6 +34,7 @@
   </feature>
   
   <!-- for Android -->
+ 
 	<feature name="Calendar">
 	  <param name="android-package" value="nl.xservices.plugins.Calendar" />
 	</feature>
