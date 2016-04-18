@@ -22,7 +22,7 @@
   <plugin name="org.apache.cordova.inappbrowser" />
   <plugin name="org.apache.cordova.splashscreen" />
   <plugin name="nl.x-services.plugins.socialsharing" />
-  <plugin name="com.phonegap.plugins.pushplugin" />
+  <gap:plugin name="com.phonegap.plugins.pushplugin" version="2.5.0" />
   <plugin name="nl.x-services.plugins.calendar" />
   
   <access origin="*.pushwoosh.com" />
