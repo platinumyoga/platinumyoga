@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="com.ionicframework.pytracker944743" version="0.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
+<widget id="com.ionicframework.pytracker944743" version="0.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" version="1.0.0">
   <name>Platinum Yoga</name>
   <description>
         Get Fit For Life
@@ -16,16 +16,14 @@
   <preference name="DisallowOverscroll" value="true"/>
   <preference name="BackupWebStorage" value="none"/>
   <preference name="orientation" value="portrait" />
-  <preference name="android-build-tool" value="gradle" /> 
-<gap:plugin name="cordova-plugin-admobpro" source="npm" />
   
   
   <!--phonegap plugin for inapp browser-->
-  <plugin name="org.apache.cordova.inappbrowser" />
-  <plugin name="org.apache.cordova.splashscreen" />
-  <plugin name="nl.x-services.plugins.socialsharing" />
-  <gap:plugin name="com.phonegap.plugins.pushplugin" version="2.5.0" />
-  <plugin name="nl.x-services.plugins.calendar" />
+  <gap:plugin name="org.apache.cordova.inappbrowser" version="0.1.0" />
+  <gap:plugin name="org.apache.cordova.splashscreen" version="0.1.0" />
+  <gap:plugin name="nl.x-services.plugins.socialsharing" version="4.3.8" />
+  <gap:plugin name="com.phonegap.plugins.pushplugin" version="2.4.0" />
+  <gap:plugin name="nl.x-services.plugins.calendar" />
   
   <access origin="*.pushwoosh.com" />
   
@@ -34,7 +32,6 @@
   </feature>
   
   <!-- for Android -->
- 
 	<feature name="Calendar">
 	  <param name="android-package" value="nl.xservices.plugins.Calendar" />
 	</feature>
